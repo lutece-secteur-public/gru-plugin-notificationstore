@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
+import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -49,8 +50,8 @@ import java.util.List;
 public final class DemandHome
 {
     // Static variable pointed at the DAO instance
-    private static IDemandDAO _dao = SpringContextService.getBean( "grustoragedb.demandDao" );
-    private static Plugin _plugin = PluginService.getPlugin( "grustoragedb" );
+    private static IDemandDAO _dao = SpringContextService.getBean( "notificationstore.demandDao" );
+    private static Plugin _plugin = NotificationStorePlugin.getPlugin( );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -98,9 +99,9 @@ public final class DemandHome
      *            The project primary key
      * @return an instance of Project
      */
-    public static Demand findByPrimaryKey( String strKey, String strDemandTypeId )
+    public static Demand findByPrimaryKey( int nKey )
     {
-        return _dao.load( strKey, strDemandTypeId );
+        return _dao.load( nKey );
     }
 
     /**
@@ -113,6 +114,19 @@ public final class DemandHome
         return _dao.loadByCustomerId( strCustomerId );
     }
 
+    /**
+     * Finds the demands associated to the specified demand id and demand type id
+     * 
+     * @param strDemandId
+     * @param strDemandTypeId
+     * @return the list which contains the id of all the project objects
+     */
+    public static Demand getDemandByDemandIdAndTypeId( String strDemandId, String strDemandTypeId )
+    {
+        return _dao.loadByDemandIdAndTypeId( strDemandId, strDemandTypeId );
+    }
+
+    
     /**
      * Load demand ids ordered by date notification
      * 

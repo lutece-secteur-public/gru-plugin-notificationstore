@@ -1,0 +1,22 @@
+<#include "manage_tabs.html" />
+<@tabs2 tab="status" />
+
+
+<@box>
+	<@boxHeader title='#i18n{notificationstore.modify_status.title}' />
+	<@boxBody>
+    <@tform class="form-horizontal" method="post" name="modify_status" action="jsp/admin/plugins/notificationstore/ManageStatus.jsp" >
+			<@messages errors=errors />
+			<@input type="hidden" id="id" name="id" value="${status.id}"/>
+			<@input type="hidden" value="${token}" name="token" />
+			
+			<@formGroup labelFor='status' labelKey='#i18n{notificationstore.modify_status.labelStatus}' mandatory=true>
+				<@input type='text' id='status' name='status'  value='${status.status!\'\'}' tabIndex='0' />
+			</@formGroup>
+			<@formGroup labelFor='genstatus' labelKey='#i18n{notificationstore.modify_status.labelStatusCode}' mandatory=true>
+				<@select name="genstatus" id="genstatus" items=generic_status_list  default_value=(status.genericStatus)!  />
+			</@formGroup>
+        <@actionButtons button1Name="action_modifyStatus" button2Name="view_manageStatus"/>
+    </@tform>
+	</@boxBody>
+</@box>

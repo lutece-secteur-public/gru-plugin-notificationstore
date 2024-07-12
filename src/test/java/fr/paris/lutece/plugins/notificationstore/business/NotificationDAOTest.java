@@ -134,7 +134,7 @@ public class NotificationDAOTest extends LuteceTestCase
     {
         // Initialize an object
         Demand demand = new Demand( );
-        demand.setId( DEMAND_ID_1 );
+        demand.setDemandId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
@@ -153,7 +153,7 @@ public class NotificationDAOTest extends LuteceTestCase
         // Create test
         _notificationDAO.insert( notification );
 
-        String strDemandId = notification.getDemand( ).getId( );
+        String strDemandId = notification.getDemand( ).getDemandId( );
         String strDemandTypeId = notification.getDemand( ).getTypeId( );
         NotificationFilter filterDemand = new NotificationFilter( );
         filterDemand.setDemandId( strDemandId );
@@ -428,7 +428,7 @@ public class NotificationDAOTest extends LuteceTestCase
     {
         // Initialize an object
         Demand demand = new Demand( );
-        demand.setId( DEMAND_ID_1 );
+        demand.setDemandId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
@@ -441,7 +441,7 @@ public class NotificationDAOTest extends LuteceTestCase
         _demandDAO.insert( demand );
 
         Demand demand2 = new Demand( );
-        demand2.setId( DEMAND_ID_2 );
+        demand2.setDemandId( DEMAND_ID_2 );
         demand2.setTypeId( DEMAND_TYPE_ID_2 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_2 );
         demand2.setReference( DEMAND_REFERENCE_2 );

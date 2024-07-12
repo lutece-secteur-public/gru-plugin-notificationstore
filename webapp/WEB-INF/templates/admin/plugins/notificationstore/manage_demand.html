@@ -1,0 +1,102 @@
+<#include "managedemand_tabs.html" />
+
+<@tabs>
+	<@grustoragedb_tabList current_tab="demand" />
+	
+	<@tabContent>
+		<@tabPanel id='demand' active=true>
+					
+
+	
+	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/notificationstore/ManageDemand.jsp" name="manage_demand">
+	 	
+	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{notificationstore.manage_demand.demand_id.label}' >
+		 	<@input type='text' id="demand_id" name="demand_id" value=demand_id!'' />
+        </@formGroup>
+                
+		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{notificationstore.manage_demand.demand_type_id.label}' >
+             <@select name="demand_type_id" id="demand_type_id" items=demand_type_id_list![] default_value=demand_type_id!'' />
+        </@formGroup>
+                
+		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.start_date.label}' >
+		    <#if !start_date??><#assign start_date = .now /></#if>
+		    <#assign start_date_value = start_date?string["dd/MM/yyyy"] />
+           <@input type='date' id="start_date" name="start_date" language=.lang value=start_date_value />
+        </@formGroup>
+                
+		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.end_date.label}' >
+		    <#if end_date??><#assign end_date_value = end_date?string["dd/MM/yyyy"] /></#if>
+		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date_value!'' />
+        </@formGroup>
+                
+		<@formGroup>
+              <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
+		</@formGroup>
+		
+	</@tform>
+	
+        <@messages infos=infos />
+        <@paginationAdmin paginator=paginator combo=1 />
+        <div class="clearfix"></div>
+        
+    	<@table>
+	        <tr>
+	            <th>#i18n{notificationstore.manage_demand.columnDemandDate}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnDemandId}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnTypeId}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnStatusId}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnReference}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnsubTypeId}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnCustomerId}</th>
+	            <th>#i18n{notificationstore.manage_demand.action}</th>
+	        </tr>
+	        <@tableHeadBodySeparator />
+        	<#list demand_list as demand >
+        		<tr>
+		                <td>
+                                        ${demand.creationDate?number_to_datetime!''}
+                                </td>
+                                <td>
+                                        ${demand.demandId!''}
+                                </td>
+                                <td>
+                                        ${demand.typeId!''}
+                                </td>
+                                <td>
+                                        ${demand.statusId!''}
+                                </td>
+                                <td>
+                                        ${demand.reference!''}
+                                </td>
+                                <td>
+                                        ${demand.subtypeId!''}
+                                </td>
+                                <td>
+                                        ${demand.customer.id!''}
+                                </td>
+                                <td>
+                                        <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" >
+                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.demandId}"/>
+                                                <input type="hidden" id="demand_type_id" name="demand_type_id" value="${demand.typeId}"/>
+
+                                                <@formGroup>
+                                                        <@button type='submit' title='#i18n{notificationstore.manage_notification.pageTitle}' buttonIcon='envelope' />
+                                                </@formGroup>
+                                        </@tform>
+                                        <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotificationEvent.jsp" >
+                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.demandId}"/>
+                                                <input type="hidden" id="demand_type_id" name="demand_type_id" value="${demand.typeId}"/>
+
+                                                <@formGroup>
+                                                        <@button type='submit' title='#i18n{notificationstore.manage_event.pageTitle}' buttonIcon='flag' />
+                                                </@formGroup>
+                                        </@tform>
+			        </td>
+        		</tr>
+        	</#list>
+   		</@table>
+   	  	<@paginationAdmin paginator=paginator />
+
+   	  	</@tabPanel>
+	</@tabContent>
+</@tabs>

@@ -1,0 +1,50 @@
+<#include "managedemandtype_tabs.html" />
+<@tabs2 tab="demandtype" />
+
+<@box>
+	<@boxHeader title='#i18n{notificationstore.manage_demandtype.title}' boxTools=true>
+		<@tform class='form-inline pull-right' name='manage_demandtype' action='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp'>
+			<@button type='submit' name='view_createDemandType' buttonIcon='plus' title='#i18n{notificationstore.manage_demandtypes.buttonAdd}' />
+		</@tform>
+	</@boxHeader>
+	<@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    <div class="clearfix"></div>
+    <@table>
+        <tr>
+            <th>#i18n{notificationstore.manage_demandtypes.columnIdDemandType}</th>
+            <th>#i18n{notificationstore.manage_demandtypes.columnCode}</th>
+            <th>#i18n{notificationstore.manage_demandtypes.columnLabel}</th>
+            <th>#i18n{notificationstore.manage_demandtypes.columnCodeCategory}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+        <#list demandtype_list as demandtype >
+        <tr>
+            <td>
+				${demandtype.idDemandType}
+			</td>
+            <td>
+				${demandtype.appCode}
+			</td>
+            <td>
+				${demandtype.label}
+			</td>
+            <td>
+				${demandtype.category}
+			</td>
+        	<td>
+				<@aButton href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?view=modifyDemandType&id=${demandtype.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+						
+				<@aButton href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?action=confirmRemoveDemandType&id=${demandtype.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+
+	        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@box>

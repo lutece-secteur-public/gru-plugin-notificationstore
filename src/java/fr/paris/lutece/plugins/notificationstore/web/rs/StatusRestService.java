@@ -38,7 +38,6 @@ import java.util.Optional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -103,7 +102,7 @@ public class StatusRestService
     @Path( NotificationStoreConstants.PATH_ID )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getStatus( @PathParam( NotificationStoreConstants.PATH_ID ) int nId )
+    public Response getStatus( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
         Optional<DemandStatus> status = StatusHome.findByPrimaryKey( nId );
 
@@ -194,7 +193,7 @@ public class StatusRestService
     @Path( NotificationStoreConstants.PATH_ID )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response doDeleteStatus( @PathParam( NotificationStoreConstants.PATH_ID ) int nId )
+    public Response doDeleteStatus( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
         if ( StatusHome.findByPrimaryKey( nId ).isPresent( ) )
         {

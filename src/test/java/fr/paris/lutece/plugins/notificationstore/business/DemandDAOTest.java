@@ -38,10 +38,7 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.test.LuteceTestCase;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -87,7 +84,7 @@ public class DemandDAOTest extends LuteceTestCase
     {
         // Create test
         Demand demand = new Demand( );
-        demand.setId( DEMAND_ID_1 );
+        demand.setDemandId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
@@ -103,7 +100,7 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.insert( demand );
 
-        Demand demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
+        Demand demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getDemandId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getId( ), demand.getId( ) );
         assertEquals( demandStored.getTypeId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );
@@ -116,7 +113,7 @@ public class DemandDAOTest extends LuteceTestCase
         assertEquals( demandStored.getCurrentStep( ), demand.getCurrentStep( ) );
 
         // Update test
-        demand.setId( DEMAND_ID_2 );
+        demand.setDemandId( DEMAND_ID_2 );
         demand.setTypeId( DEMAND_TYPE_ID_2 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_2 );
         demand.setReference( DEMAND_REFERENCE_2 );
@@ -131,15 +128,15 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.store( demand );
 
-        demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
+        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getDemandId( ), demand.getTypeId( ) );
         assertNull( demandStored );
 
-        demand.setId( DEMAND_ID_1 );
+        demand.setDemandId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         _demandDao.store( demand );
 
-        demandStored = _demandDao.load( demand.getId( ), demand.getTypeId( ) );
+        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getDemandId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getId( ), demand.getId( ) );
         assertEquals( demandStored.getTypeId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );
@@ -173,7 +170,7 @@ public class DemandDAOTest extends LuteceTestCase
 
         // Delete test
         _demandDao.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
-        demandStored = _demandDao.load( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
+        demandStored = _demandDao.loadByDemandIdAndTypeId( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
         assertEquals( demandStored, nullValue( ) );
     }
 }

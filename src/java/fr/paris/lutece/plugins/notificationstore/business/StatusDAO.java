@@ -50,7 +50,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 public final class StatusDAO implements IDemandStatusDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_status, status, status_id FROM notificationstore_status WHERE id = ?";
+    private static final String SQL_QUERY_SELECT = "SELECT id, status, status_id FROM notificationstore_status WHERE id = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_status ( status, status_id ) VALUES ( ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_status WHERE id = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_status SET status = ?, status_id = ? WHERE id = ?";

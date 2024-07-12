@@ -36,6 +36,7 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
+import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.portal.service.file.IFileStoreServiceProvider;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
@@ -51,8 +52,8 @@ import java.util.Optional;
 public final class NotificationHome
 {
     // Static variable pointed at the DAO instance
-    private static INotificationDAO _dao = SpringContextService.getBean( "grustoragedb.notificationDao" );
-    private static Plugin _plugin = PluginService.getPlugin( "grustoragedb" );
+    private static INotificationDAO _dao = SpringContextService.getBean( "notificationstore.notificationDao" );
+    private static Plugin _plugin = NotificationStorePlugin.getPlugin( );
 
     /**
      * Private constructor - this class need not be instantiated

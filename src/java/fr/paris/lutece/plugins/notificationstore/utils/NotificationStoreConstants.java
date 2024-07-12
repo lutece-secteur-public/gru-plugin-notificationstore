@@ -47,15 +47,29 @@ public class NotificationStoreConstants
 
     public static final String PATH_DEMAND_LIST = "list";
     public static final String PATH_TYPE_NOTIFICATION = "notification_types";
-    public static final String PATH_ID = "/{id}";
+    public static final String PATH_ID = "/{" + NotificationStoreConstants.ID + "}";
+    
+    public static final String ID = "id";
 
     public static final String QUERY_PARAM_INDEX = "index";
+    public static final String QUERY_PARAM_LIMIT = "limitResult";
     public static final String QUERY_PARAM_ID_DEMAND_TYPE = "idDemandType";
     public static final String QUERY_PARAM_CUSTOMER_ID = "customerId";
     public static final String QUERY_PARAM_NOTIFICATION_TYPE = "notificationType";
     public static final String QUERY_PARAM_ID_DEMAND = "idDemand";
     public static final String QUERY_PARAM_LIST_STATUS = "listStatus";
-
+    
+    //Demand type attributes
+    public static final String DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE = "id_demand_type";
+    public static final String DEMANDTYPE_ATTRIBUTE_LABEL = "label";
+    public static final String DEMANDTYPE_ATTRIBUTE_URL = "url";
+    public static final String DEMANDTYPE_ATTRIBUTE_APP_CODE = "app_code";
+    public static final String DEMANDTYPE_ATTRIBUTE_CATEGORY = "category";
+    
+    //Demand category attributes
+    public static final String DEMANDCATEGORY_ATTRIBUTE_CODE = "code";
+    public static final String DEMANDCATEGORY_ATTRIBUTE_LABEL = "label";
+    
     // EXIT STATUS
     public static final String STATUS_201 = "{" + "\"status\":" + "\"201\"" + "}";
     public static final String STATUS_404 = "{" + "\"status\":" + "\"404\"" + "}";
@@ -66,11 +80,17 @@ public class NotificationStoreConstants
     // PROPERTIES
     /** The Constant LIMIT_DEMAND_API_REST. */
     public static final String LIMIT_DEMAND_API_REST = "notificationstore.api.rest.limit.demand";
+    public static final String PROPERTY_COMPRESS_NOTIFICATION = "notificationstore.notification.compress";
 
     // MESSAGE
     public static final String MESSAGE_ERROR_DEMAND = "Parameter customerId is mandatory";
     public static final String MESSAGE_ERROR_STATUS = "Parameters customerId and listStatus are mandatory ( can separated status by ,)";
     public static final String MESSAGE_ERROR_NOTIF = "Parameters idDemand, customerId and idDemandType are mandatory ";
     public static final String MESSAGE_ALL_REQUIRED = "All attributes are required";
+    public static final String MESSAGE_ERROR_NOT_FOUND_RESOURCE = "Resource not found";
+    public static final String MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER = "Empty parameter";
+    
+    // Constants
+    public static final String CHARECTER_REGEXP_FILTER = "[^\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\p{Sm}\\p{Sc}\\s]";
 
 }

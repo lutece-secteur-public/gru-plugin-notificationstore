@@ -49,21 +49,20 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
-import fr.paris.lutece.plugins.notificationstore.service.DemandService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.date.DateUtil;
 import fr.paris.lutece.util.html.AbstractPaginator;
 
-@Controller( controllerJsp = "ManageNotification.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "DEMAND_MANAGEMENT" )
+@Controller( controllerJsp = "ManageNotification.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "DEMAND_MANAGEMENT" )
 public class NotificationJspBean extends AbstractManageDemandJspBean<Integer, Notification>
 {
 
     private static final long serialVersionUID = 1L;
 
     // Templates
-    private static final String TEMPLATE_MANAGE_NOTIFICATION = "/admin/plugins/grustoragedb/manage_notification.html";
+    private static final String TEMPLATE_MANAGE_NOTIFICATION = "/admin/plugins/notificationstore/manage_notification.html";
 
     private static final String MARK_NOTIFICATION_LIST = "notification_list";
     private static final String MARK_DEMAND_TYPE_ID_LIST = "demand_type_id_list";
@@ -72,10 +71,10 @@ public class NotificationJspBean extends AbstractManageDemandJspBean<Integer, No
     private static final String MARK_START_DATE = "start_date";
     private static final String MARK_END_DATE = "end_date";
 
-    private static final String JSP_MANAGE_NOTIFICATIONS = "jsp/admin/plugins/grustoragedb/ManageNotification.jsp";
+    private static final String JSP_MANAGE_NOTIFICATIONS = "jsp/admin/plugins/notificationstore/ManageNotification.jsp";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_NOTIFICATION = "grustoragedb.manage_notification.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_NOTIFICATION = "notificationstore.manage_notification.pageTitle";
 
     // Views
     private static final String VIEW_MANAGE_NOTIFICATION = "manageNotification";

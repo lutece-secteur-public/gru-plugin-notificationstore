@@ -54,10 +54,10 @@ public abstract class AbstractManageDemandTypeJspBean<S, T> extends MVCAdminJspB
     private static final long serialVersionUID = -1830870191680941232L;
 
     // Rights
-    public static final String RIGHT_MANAGEDEMANDTYPE = "GRUSTORAGEDB_MANAGEMENT";
+    public static final String RIGHT_MANAGEDEMANDTYPE = "NOTIFICATIONSTORE_MANAGEMENT";
 
     // Properties
-    private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "grustoragedb.listItems.itemsPerPage";
+    private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "notificationstore.listItems.itemsPerPage";
 
     // Parameters
     private static final String PARAMETER_PAGE_INDEX = "page_index";

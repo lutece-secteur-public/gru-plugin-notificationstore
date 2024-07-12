@@ -1,0 +1,22 @@
+<#include "managedemandtype_tabs.html" />
+<@tabs2 tab="demandcategory" />
+<@box>
+	<@boxHeader title='#i18n{notificationstore.create_demandcategory.title}' />
+	<@boxBody>
+    <@tform name='create_demandcategory' action='jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp' >
+
+        <@messages errors=errors />
+        <@input type="hidden" id="id" name="id"/>
+        <@input type="hidden" value="${token}" name="token" />
+
+		<@formGroup labelFor='code' labelKey='#i18n{notificationstore.modify_demandcategory.labelCode}' mandatory=true>
+			<@input type='text' id='code' name='code'  maxlength=255 value='${demandcategory.code!\'\'}' tabIndex='0' />
+		</@formGroup>
+		<@formGroup labelFor='label' labelKey='#i18n{notificationstore.modify_demandcategory.labelLabel}' mandatory=true>
+			<@input type='text' id='label' name='label'  value='${demandcategory.label!\'\'}' tabIndex='1' />
+		</@formGroup>
+				
+		<@actionButtons button1Name="action_createDemandCategory" button2Name="view_manageDemandCategory"/>
+    </@tform>
+	</@boxBody>
+</@box>

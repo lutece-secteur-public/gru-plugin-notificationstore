@@ -50,7 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandDisplay;
@@ -59,7 +58,6 @@ import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.NotificationResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.SearchResult;
 import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
-import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import fr.paris.lutece.plugins.notificationstore.business.StatusHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
@@ -90,11 +88,16 @@ public class DemandNotificationRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getListDemand( @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
+            @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );
+        if( StringUtils.isNotEmpty( strLimitResult ) )
+        {
+            nDefaultItemsPerPage = Integer.parseInt( strLimitResult );
+        }
 
         DemandResult result = new DemandResult( );
         if ( StringUtils.isEmpty( strCustomerId ) )
@@ -121,12 +124,17 @@ public class DemandNotificationRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getListOfDemandByStatus( @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
+            @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIST_STATUS ) String strListStatus,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );
+        if( StringUtils.isNotEmpty( strLimitResult ) )
+        {
+            nDefaultItemsPerPage = Integer.parseInt( strLimitResult );
+        }
 
         DemandResult result = new DemandResult( );
         if ( StringUtils.isEmpty( strCustomerId ) || StringUtils.isEmpty( strListStatus ) )
@@ -213,11 +221,7 @@ public class DemandNotificationRestService
                 Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
                 if ( status.isPresent( ) )
                 {
-                    enumGenericStatus = EnumGenericStatus.valueOf( status.get( ).getStatus( ) );
-                    if ( enumGenericStatus != null )
-                    {
-                        return I18nService.getLocalizedString( enumGenericStatus.getLabel( ), LocaleService.getDefault( ) );
-                    }
+                    return I18nService.getLocalizedString( status.get( ).getGenericStatus( ).getLabel( ), LocaleService.getDefault( ) );
                 }
             }
             return notification.getMyDashboardNotification( ).getStatusText( );
@@ -257,22 +261,6 @@ public class DemandNotificationRestService
             result.setErrorMessage( NotificationStoreConstants.MESSAGE_ERROR_NOTIF );
             return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
         }
-    }
-
-    /**
-     * Gets list of demand types
-     * 
-     * @return list of demand types
-     */
-    @GET
-    @Path( NotificationStoreConstants.PATH_DEMAND_TYPE )
-    @Produces( MediaType.APPLICATION_JSON )
-    public Response getDemandTypes( )
-    {
-        List<DemandType> listDemandTypes = DemandTypeHome.getDemandTypesList( );
-
-        String strResult = NotificationStoreUtils.convertToJsonString( listDemandTypes );
-        return Response.ok( strResult ).build( );
     }
 
     /**

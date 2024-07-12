@@ -51,12 +51,12 @@ import java.sql.Statement;
 public final class NotificationContentDAO implements INotificationContentDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM grustoragedb_notification_content WHERE id_notification_content = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification_content ( notification_id, notification_type, status_id, content ) VALUES ( ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification_content WHERE id_notification_content = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_notification_content SET notification_type = ?, status_id = ?, content = ? WHERE id_notification_content = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM grustoragedb_notification_content";
-    private static final String SQL_QUERY_SELECT_BY_ID_NOTIF = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM grustoragedb_notification_content WHERE notification_id = ?";
+    private static final String SQL_QUERY_SELECT = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM notificationstore_notification_content WHERE id_notification_content = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification_content ( notification_id, notification_type, status_id, content ) VALUES ( ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification_content WHERE id_notification_content = ? ";
+    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_notification_content SET notification_type = ?, status_id = ?, content = ? WHERE id_notification_content = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM notificationstore_notification_content";
+    private static final String SQL_QUERY_SELECT_BY_ID_NOTIF = "SELECT id_notification_content, notification_id, notification_type, status_id, content FROM notificationstore_notification_content WHERE notification_id = ?";
     private static final String SQL_PARAM_QUERY_TYPE_NOTIF = " AND notification_type IN (";
 
     /**

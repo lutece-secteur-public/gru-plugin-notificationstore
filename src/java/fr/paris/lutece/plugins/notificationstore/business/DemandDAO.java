@@ -41,6 +41,7 @@ import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin
 import fr.paris.lutece.util.sql.DAOUtil;
 
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -54,9 +55,9 @@ import org.apache.commons.lang3.StringUtils;
 public final class DemandDAO implements IDemandDAO
 {
     // Columns
-    private static final String COLUMN_DEMAND_ID = "demand_id";
     private static final String COLUMN_ID = "id";
-    private static final String COLUMN_TYPE_ID = "type_id";
+    private static final String COLUMN_DEMAND_ID = "demand_id";
+    private static final String COLUMN_TYPE_ID = "demand_type_id";
     private static final String COLUMN_SUBTYPE_ID = "subtype_id";
     private static final String COLUMN_REFERENCE = "reference";
     private static final String COLUMN_STATUS_ID = "status_id";
@@ -67,35 +68,37 @@ public final class DemandDAO implements IDemandDAO
     private static final String COLUMN_CURRENT_STEP = "current_step";
     private static final String COLUMN_MODIFY_DATE = "modify_date";
     // SQL queries
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " demand_id, id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " id, demand_id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " demand_id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM grustoragedb_demand WHERE id = ? AND type_id = ?";
+            + " FROM notificationstore_demand WHERE id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM grustoragedb_demand WHERE demand_id = ? ";
-    private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM grustoragedb_demand";
-    private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT demand_id FROM grustoragedb_demand ";
-    private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where demand_id in ( %s )";
-    private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO grustoragedb_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
+            + " FROM notificationstore_demand WHERE demand_id = ? ";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID_AND_TYPE_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
+            + " FROM notificationstore_demand WHERE demand_id = ? AND  demand_type_id = ? ";
+    private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM notificationstore_demand";
+    private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT id FROM notificationstore_demand ";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where id in ( %s )";
+    private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO notificationstore_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE grustoragedb_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE demand_id = ? AND type_id = ?";
-    private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM grustoragedb_demand WHERE demand_id = ? AND type_id = ? ";
+    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE id = ? AND demand_type_id = ?";
+    private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE demand_id = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM grustoragedb_demand WHERE customer_id = ?";
+            + " FROM notificationstore_demand WHERE customer_id = ?";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_REFERENCE = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM grustoragedb_demand WHERE reference = ?";
+            + " FROM notificationstore_demand WHERE reference = ?";
 
-    private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.demand_id) "
-            + " FROM grustoragedb_demand gd, grustoragedb_notification gn, grustoragedb_notification_content gc "
+    private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.id) "
+            + " FROM notificationstore_demand gd, notificationstore_notification gn, notificationstore_notification_content gc "
             + " WHERE gd.demand_id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? ";
 
-    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct(gd.demand_id) "
-            + " FROM grustoragedb_demand gd, grustoragedb_notification gn, grustoragedb_notification_content gc "
+    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct(gd.id) "
+            + " FROM notificationstore_demand gd, notificationstore_notification gn, notificationstore_notification_content gc "
             + " WHERE gd.demand_id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? " + " AND gc.status_id IN ( ";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
-    private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
-    private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND type_id = ? ";
+    private static final String SQL_FILTER_BY_DEMAND_ID = " AND demand_id = ? ";
+    private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
     private static final String SQL_FILTER_BY_START_DATE = " AND creation_date >= ? ";
     private static final String SQL_FILTER_BY_END_DATE = " AND creation_date <= ? ";
     private static final String SQL_FILTER_NOTIFICATION_TYPE = " AND gc.notification_type = ? ";
@@ -106,24 +109,22 @@ public final class DemandDAO implements IDemandDAO
      * {@inheritDoc}
      */
     @Override
-    public Demand load( String strDemandId, String strDemandTypeId )
+    public Demand load( int nId )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_ID, NotificationStorePlugin.getPlugin( ) );
-
-        daoUtil.setString( 1, strDemandId );
-        daoUtil.setString( 2, strDemandTypeId );
-        daoUtil.executeQuery( );
-
-        Demand demand = null;
-
-        if ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
-            demand = dao2Demand( daoUtil );
+            daoUtil.setInt( 1, nId );
+            daoUtil.executeQuery( );
+    
+            Demand demand = null;
+    
+            if ( daoUtil.next( ) )
+            {
+                demand = dao2Demand( daoUtil );
+            }
+        
+            return demand;
         }
-
-        daoUtil.free( );
-
-        return demand;
     }
 
     /**
@@ -272,22 +273,22 @@ public final class DemandDAO implements IDemandDAO
 
             int nIndex = 1;
 
-            daoUtil.setString( nIndex++, demand.getId( ) );
+            daoUtil.setString( nIndex++, demand.getDemandId( ) );
             daoUtil.setString( nIndex++, demand.getTypeId( ) );
             daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
             daoUtil.setString( nIndex++, demand.getReference( ) );
             daoUtil.setInt( nIndex++, demand.getStatusId( ) );
             daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
-            daoUtil.setLong( nIndex++, demand.getCreationDate( ) );
-            daoUtil.setLong( nIndex++, demand.getClosureDate( ) );
+            daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) > 0 ? new Timestamp( demand.getCreationDate( ) )  : null );
+            daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp(demand.getClosureDate( ) ) : null );
             daoUtil.setInt( nIndex++, demand.getMaxSteps( ) );
-            daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
-            daoUtil.setLong( nIndex++, demand.getModifyDate( ) );
+            daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );           
+            daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
             {
-                demand.setDemandId( daoUtil.getGeneratedKeyInt( 1 ) );
+                demand.setId( daoUtil.getGeneratedKeyInt( 1 ) );
             }
         }
 
@@ -300,26 +301,26 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Demand store( Demand demand )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE, NotificationStorePlugin.getPlugin( ) );
-
-        int nIndex = 1;
-
-        // update
-        daoUtil.setInt( nIndex++, demand.getStatusId( ) );
-        daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
-        daoUtil.setLong( nIndex++, demand.getClosureDate( ) );
-        daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
-        daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
-        daoUtil.setLong( nIndex++, demand.getModifyDate( ) );
-
-        // where primary_key
-        daoUtil.setInt( nIndex++, demand.getDemandId( ) );
-        daoUtil.setString( nIndex++, demand.getTypeId( ) );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
-
-        return demand;
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            int nIndex = 1;
+    
+            // update
+            daoUtil.setInt( nIndex++, demand.getStatusId( ) );
+            daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
+            daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp(demand.getClosureDate( ) ) : null );
+            daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
+            daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
+            daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
+    
+            // where primary_key
+            daoUtil.setInt( nIndex++, demand.getId( ) );
+            daoUtil.setString( nIndex++, demand.getTypeId( ) );
+    
+            daoUtil.executeUpdate( );
+    
+            return demand;
+        }
     }
 
     /**
@@ -328,13 +329,13 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public void delete( String strDemandId, String strDemandTypeId )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE, NotificationStorePlugin.getPlugin( ) );
-
-        daoUtil.setString( 1, strDemandId );
-        daoUtil.setString( 2, strDemandTypeId );
-
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            daoUtil.setString( 1, strDemandId );
+            daoUtil.setString( 2, strDemandTypeId );
+    
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -345,41 +346,59 @@ public final class DemandDAO implements IDemandDAO
     {
         List<String> collectionIds = new ArrayList<>( );
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_ALL, NotificationStorePlugin.getPlugin( ) );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_ALL, NotificationStorePlugin.getPlugin( ) ) )
         {
-            collectionIds.add( String.valueOf( dao2Demand( daoUtil ).getDemandId( ) ) );
+            daoUtil.executeQuery( );
+    
+            while ( daoUtil.next( ) )
+            {
+                collectionIds.add( String.valueOf( dao2Demand( daoUtil ).getDemandId( ) ) );
+            }
+        
+            return collectionIds;
         }
-
-        daoUtil.free( );
-
-        return collectionIds;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Demand loadById( String strId )
+    public Demand loadByDemandId( String strDemandId )
     {
         Demand demand = null;
 
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID, NotificationStorePlugin.getPlugin( ) );
-
-        daoUtil.setString( 1, strId );
-        daoUtil.executeQuery( );
-
-        while ( daoUtil.next( ) )
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
-            demand = dao2Demand( daoUtil );
-            break;
+            daoUtil.setString( 1, strDemandId );
+            daoUtil.executeQuery( );
+    
+            while ( daoUtil.next( ) )
+            {
+                demand = dao2Demand( daoUtil );
+                break;
+            }
+            return demand;
         }
+    }
+    
+    @Override
+    public Demand loadByDemandIdAndTypeId( String strDemandId, String strDemandTypeId )
+    {
+        Demand demand = null;
 
-        daoUtil.free( );
-
-        return demand;
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID_AND_TYPE_ID, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            daoUtil.setString( 1, strDemandId );
+            daoUtil.setString( 2, strDemandTypeId );
+            daoUtil.executeQuery( );
+    
+            while ( daoUtil.next( ) )
+            {
+                demand = dao2Demand( daoUtil );
+                break;
+            }
+            return demand;
+        }
     }
 
     /**
@@ -393,8 +412,8 @@ public final class DemandDAO implements IDemandDAO
     {
         Demand demand = new Demand( );
 
-        demand.setDemandId( daoUtil.getInt( COLUMN_DEMAND_ID ) );
-        demand.setId( daoUtil.getString( COLUMN_ID ) );
+        demand.setId( daoUtil.getInt( COLUMN_ID ) );
+        demand.setDemandId( daoUtil.getString( COLUMN_DEMAND_ID ) );
         demand.setTypeId( daoUtil.getString( COLUMN_TYPE_ID ) );
         demand.setSubtypeId( daoUtil.getString( COLUMN_SUBTYPE_ID ) );
         demand.setStatusId( daoUtil.getInt( COLUMN_STATUS_ID ) );
@@ -404,11 +423,11 @@ public final class DemandDAO implements IDemandDAO
         demand.setCustomer( customer );
 
         demand.setReference( daoUtil.getString( COLUMN_REFERENCE ) );
-        demand.setCreationDate( daoUtil.getLong( COLUMN_CREATION_DATE ) );
-        demand.setClosureDate( daoUtil.getLong( COLUMN_CLOSURE_DATE ) );
+        demand.setCreationDate( daoUtil.getTimestamp( COLUMN_CREATION_DATE ) != null ? daoUtil.getTimestamp( COLUMN_CREATION_DATE ).getTime( ) : 0 );
+        demand.setClosureDate( daoUtil.getTimestamp( COLUMN_CLOSURE_DATE ) != null ? daoUtil.getTimestamp( COLUMN_CLOSURE_DATE ).getTime( ) : 0 );
         demand.setMaxSteps( daoUtil.getInt( COLUMN_MAX_STEPS ) );
         demand.setCurrentStep( daoUtil.getInt( COLUMN_CURRENT_STEP ) );
-        demand.setModifyDate( daoUtil.getLong( COLUMN_MODIFY_DATE ) );
+        demand.setModifyDate( daoUtil.getTimestamp( COLUMN_MODIFY_DATE ) != null ? daoUtil.getTimestamp( COLUMN_MODIFY_DATE ).getTime( ) : 0 );
 
         return demand;
     }
@@ -570,4 +589,5 @@ public final class DemandDAO implements IDemandDAO
             return listIds;
         }
     }
+
 }

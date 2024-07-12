@@ -59,7 +59,7 @@ import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 /**
  * This class provides the user interface to manage DemandType features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageDemandTypes.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "GRUSTORAGEDB_DEMANDTYPE_MANAGEMENT" )
+@Controller( controllerJsp = "ManageDemandTypes.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "NOTIFICATIONSTORE_DEMANDTYPE_MANAGEMENT" )
 public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, DemandType>
 {
     /**
@@ -67,30 +67,30 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
      */
     private static final long serialVersionUID = 949798411107898964L;
     // Templates
-    private static final String TEMPLATE_MANAGE_DEMANDTYPES = "/admin/plugins/grustoragedb/demandType/manage_demandtypes.html";
-    private static final String TEMPLATE_CREATE_DEMANDTYPE = "/admin/plugins/grustoragedb/demandType/create_demandtype.html";
-    private static final String TEMPLATE_MODIFY_DEMANDTYPE = "/admin/plugins/grustoragedb/demandType/modify_demandtype.html";
+    private static final String TEMPLATE_MANAGE_DEMANDTYPES = "/admin/plugins/notificationstore/demandType/manage_demandtypes.html";
+    private static final String TEMPLATE_CREATE_DEMANDTYPE = "/admin/plugins/notificationstore/demandType/create_demandtype.html";
+    private static final String TEMPLATE_MODIFY_DEMANDTYPE = "/admin/plugins/notificationstore/demandType/modify_demandtype.html";
 
     // Parameters
     private static final String PARAMETER_ID_DEMANDTYPE = "id";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_DEMANDTYPES = "grustoragedb.manage_demandtypes.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_MODIFY_DEMANDTYPE = "grustoragedb.modify_demandtype.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_CREATE_DEMANDTYPE = "grustoragedb.create_demandtype.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_DEMANDTYPES = "notificationstore.manage_demandtypes.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MODIFY_DEMANDTYPE = "notificationstore.modify_demandtype.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_CREATE_DEMANDTYPE = "notificationstore.create_demandtype.pageTitle";
 
     // Markers
     private static final String MARK_DEMANDTYPE_LIST = "demandtype_list";
     private static final String MARK_DEMANDTYPE = "demandtype";
     private static final String MARK_DEMANDCATEGORIES = "demandCategories";
 
-    private static final String JSP_MANAGE_DEMANDTYPES = "jsp/admin/plugins/grustoragedb/ManageDemandTypes.jsp";
+    private static final String JSP_MANAGE_DEMANDTYPES = "jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp";
 
     // Properties
-    private static final String MESSAGE_CONFIRM_REMOVE_DEMANDTYPE = "grustoragedb.message.confirmRemoveDemandType";
+    private static final String MESSAGE_CONFIRM_REMOVE_DEMANDTYPE = "notificationstore.message.confirmRemoveDemandType";
 
     // Validations
-    private static final String VALIDATION_ATTRIBUTES_PREFIX = "grustoragedb.model.entity.demandtype.attribute.";
+    private static final String VALIDATION_ATTRIBUTES_PREFIX = "notificationstore.model.entity.demandtype.attribute.";
 
     // Views
     private static final String VIEW_MANAGE_DEMANDTYPES = "manageDemandTypes";
@@ -104,9 +104,9 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
     private static final String ACTION_CONFIRM_REMOVE_DEMANDTYPE = "confirmRemoveDemandType";
 
     // Infos
-    private static final String INFO_DEMANDTYPE_CREATED = "grustoragedb.info.demandtype.created";
-    private static final String INFO_DEMANDTYPE_UPDATED = "grustoragedb.info.demandtype.updated";
-    private static final String INFO_DEMANDTYPE_REMOVED = "grustoragedb.info.demandtype.removed";
+    private static final String INFO_DEMANDTYPE_CREATED = "notificationstore.info.demandtype.created";
+    private static final String INFO_DEMANDTYPE_UPDATED = "notificationstore.info.demandtype.updated";
+    private static final String INFO_DEMANDTYPE_REMOVED = "notificationstore.info.demandtype.removed";
 
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
@@ -270,7 +270,7 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
 
         Map<String, Object> model = getModel( );
         model.put( MARK_DEMANDTYPE, _demandtype );
-        model.put( MARK_DEMANDCATEGORIES, DemandCategoryHome.getDemandCategoriesList( ) );
+        model.put( MARK_DEMANDCATEGORIES, DemandCategoryHome.getDemandCategoriesReferenceList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_DEMANDTYPE ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_DEMANDTYPE, TEMPLATE_MODIFY_DEMANDTYPE, model );

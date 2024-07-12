@@ -1,4 +1,4 @@
-<jsp:useBean id="manageStatus" scope="session" class="fr.paris.lutece.plugins.grustoragedb.web.StatusJspBean" />
+<jsp:useBean id="manageStatus" scope="session" class="fr.paris.lutece.plugins.notificationstore.web.StatusJspBean" />
 <% String strContent = manageStatus.processController ( request , response ); %>
 
 <%@ page errorPage="../../ErrorPage.jsp" %>

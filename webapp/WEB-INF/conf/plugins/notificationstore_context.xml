@@ -5,32 +5,37 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" >
 
 
-    <bean id="grustoragedb.demandDao" class="fr.paris.lutece.plugins.grustoragedb.business.DemandDAO" />
-    <bean id="grustoragedb.notificationDao" class="fr.paris.lutece.plugins.grustoragedb.business.NotificationDAO" />
-    <bean id="grustoragedb.notificationEventDao" class="fr.paris.lutece.plugins.grustoragedb.business.NotificationEventDAO" />
-    <bean id="grustoragedb.statusDao"  class="fr.paris.lutece.plugins.grustoragedb.business.StatusDAO" />
-    <bean id="grustoragedb.demandTypeDao" class="fr.paris.lutece.plugins.grustoragedb.business.DemandTypeDAO"/>
-	<bean id="grustoragedb.demandCategoryDao" class="fr.paris.lutece.plugins.grustoragedb.business.DemandCategoryDAO"/>
-    <bean id="grustoragedb.notificationContentDao" class="fr.paris.lutece.plugins.grustoragedb.business.NotificationContentDAO"/>
+    <bean id="notificationstore.demandDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandDAO" />
+    <bean id="notificationstore.notificationDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationDAO" />
+    <bean id="notificationstore.notificationEventDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationEventDAO" />
+    <bean id="notificationstore.statusDao"  class="fr.paris.lutece.plugins.notificationstore.business.StatusDAO" />
+    <bean id="notificationstore.demandTypeDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandTypeDAO"/>
+	<bean id="notificationstore.demandCategoryDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandCategoryDAO"/>
+    <bean id="notificationstore.notificationContentDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationContentDAO"/>
 
-	<bean id="gru.demandService" class="fr.paris.lutece.plugins.grustoragedb.service.DemandService" >
+	<bean id="notificationstore.demandService" class="fr.paris.lutece.plugins.notificationstore.service.DemandService" >
 		<property name="demandDao">
-			<ref bean="grustoragedb.demandDao" />
+			<ref bean="notificationstore.demandDao" />
 		</property>
 		<property name="notificationDao">
-			<ref bean="grustoragedb.notificationDao" />
+			<ref bean="notificationstore.notificationDao" />
 		</property>
 		<property name="notificationEventDao">
-			<ref bean="grustoragedb.notificationEventDao" />
+			<ref bean="notificationstore.notificationEventDao" />
 		</property>
 		<property name="statusDao">
-			<ref bean="grustoragedb.statusDao" />
+			<ref bean="notificationstore.statusDao" />
 		</property>
 		<property name="demandTypeDao">
-			<ref bean="grustoragedb.demandTypeDao" />
+			<ref bean="notificationstore.demandTypeDao" />
 		</property>
 	</bean>
 	
-  <bean id="gru.demandRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandNotificationRestService"/>
-
+		<!--  Status REST  -->
+ 	<bean id="notificationstore.statusRest" class="fr.paris.lutece.plugins.notificationstore.web.rs.StatusRestService" />
+    <bean id="notificationstore.demandRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandNotificationRestService"/>
+    <bean id="notificationstore.grurestdatabase" class="fr.paris.lutece.plugins.notificationstore.web.rs.NotificationRestService"/>
+    <bean id="notificationstore.demandTypeRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandTypeRestService"/>
+    <bean id="notificationstore.demandCategoryRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandCategoryRestService"/>
+    
 </beans>

@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.notificationstore.business;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BroadcastNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotification;
@@ -73,9 +75,11 @@ public final class NotificationDAO implements INotificationDAO
     private static final String COLUMN_DEMAND_ID = "demand_id";
     private static final String COLUMN_DEMAND_TYPE_ID = "demand_type_id";
     private static final String COLUMN_DATE = "date";
-    private static final String SQL_QUERY_NEW_PK = "SELECT max( id ) FROM grustoragedb_notification";
-    private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT id, demand_id, demand_type_id, date FROM grustoragedb_notification ";
-    private static final String SQL_QUERY_FILTER_SELECT_ID_BASE = "SELECT distinct id FROM grustoragedb_notification ";
+    private static final String COLUMN_CUSTOMER = "customer_id";
+    
+    private static final String SQL_QUERY_NEW_PK = "SELECT max( id ) FROM notificationstore_notification";
+    private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT id, demand_id, demand_type_id, customer_id, date FROM notificationstore_notification ";
+    private static final String SQL_QUERY_FILTER_SELECT_ID_BASE = "SELECT distinct id FROM notificationstore_notification ";
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE ";
     private static final String SQL_QUERY_FILTER_WHERE_DEMANDID = " demand_id = ? ";
     private static final String SQL_QUERY_FILTER_WHERE_ID_IN = " id in ( %s )";
@@ -84,16 +88,16 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_FILTER_WHERE_START_DATE = " date >= ? ";
     private static final String SQL_QUERY_FILTER_WHERE_END_DATE = " date <= ? ";
     private static final String SQL_QUERY_AND = " AND ";
-    private static final String SQL_QUERY_FILTER_NOTIFICATION_TYPE = " id IN (SELECT notification_id FROM grustoragedb_notification_content WHERE notification_type in (  ";
+    private static final String SQL_QUERY_FILTER_NOTIFICATION_TYPE = " id IN (SELECT notification_id FROM notificationstore_notification_content WHERE notification_type in (  ";
 
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification ( id, demand_id, demand_type_id, date ) VALUES ( ?, ?, ?, ? );";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification WHERE id = ?";
-    private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM grustoragedb_notification WHERE demand_id = ? AND demand_type_id = ?";
-    private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM grustoragedb_notification ORDER BY demand_type_id ";
-    private static final String SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE = " SELECT gn.* " + " FROM grustoragedb_notification gn, grustoragedb_demand gd "
-            + " WHERE gn.demand_id = gd.demand_id " + " AND gd.demand_id = ? " + " AND gd.type_id = ? " + " AND gd.customer_id = ? ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification ( id, demand_id, demand_type_id, customer_id, date ) VALUES ( ?, ?, ?, ?, ? );";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification WHERE id = ?";
+    private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM notificationstore_notification WHERE demand_id = ? AND demand_type_id = ?";
+    private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM notificationstore_notification ORDER BY demand_type_id ";
+    private static final String SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE = " SELECT gn.* " + " FROM notificationstore_notification gn, notificationstore_demand gd "
+            + " WHERE gn.demand_id = gd.demand_id " + " AND gd.demand_id = ? " + " AND gd.demand_type_id = ? " + " AND gd.customer_id = ? ";
 
-    private static final String SQL_QUERY_SELECT_LAST_NOTIFICATION = "SELECT * FROM grustoragedb_notification " + " WHERE demand_id = ?"
+    private static final String SQL_QUERY_SELECT_LAST_NOTIFICATION = "SELECT * FROM notificationstore_notification " + " WHERE demand_id = ?"
             + " AND demand_type_id = ?" + " ORDER BY date desc, id desc " + " LIMIT 1";
 
     private static final String PROPERTY_DECOMPRESS_NOTIFICATION = "grustoragedb.notification.decompress";
@@ -289,11 +293,11 @@ public final class NotificationDAO implements INotificationDAO
         }
         if ( notificationFilter.containsStartDate( ) )
         {
-            daoUtil.setLong( nIndex++, notificationFilter.getStartDate( ) );
+            daoUtil.setTimestamp( nIndex++, new Timestamp( notificationFilter.getStartDate( ) ) );
         }
         if ( notificationFilter.containsEndDate( ) )
         {
-            daoUtil.setLong( nIndex++, notificationFilter.getEndDate( ) );
+            daoUtil.setTimestamp( nIndex++, new Timestamp( notificationFilter.getEndDate( ) ) );
         }
     }
 
@@ -312,9 +316,18 @@ public final class NotificationDAO implements INotificationDAO
             int nIndex = 1;
 
             daoUtil.setInt( nIndex++, notification.getId( ) );
-            daoUtil.setString( nIndex++, String.valueOf( notification.getDemand( ).getDemandId( ) ) );
+            daoUtil.setString( nIndex++, notification.getDemand( ).getDemandId( ) );
             daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
-            daoUtil.setLong( nIndex++, notification.getDate( ) );
+            
+            String strCustomerId = StringUtils.EMPTY;           
+            if( notification.getDemand( ).getCustomer( ) != null 
+                    && StringUtils.isNotEmpty( notification.getDemand( ).getCustomer( ).getId( ) ) )
+            {
+                strCustomerId = notification.getDemand( ).getCustomer( ).getId( );
+            }           
+            daoUtil.setString( nIndex++, strCustomerId );
+            
+            daoUtil.setTimestamp( nIndex++, notification.getDate( ) > 0 ? new Timestamp( notification.getDate( ) ) : null );
 
             daoUtil.executeUpdate( );
         }
@@ -465,12 +478,16 @@ public final class NotificationDAO implements INotificationDAO
         {
             Notification notification = new Notification( );
             notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
-            notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
+            notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime ( ) : 0 );
 
             String strIdDemand = daoUtil.getString( COLUMN_DEMAND_ID );
             String strDemandTypeId = daoUtil.getString( COLUMN_DEMAND_TYPE_ID );
-            notification.setDemand( DemandHome.findByPrimaryKey( strIdDemand, strDemandTypeId ) );
+            notification.setDemand( DemandHome.getDemandByDemandIdAndTypeId( strIdDemand, strDemandTypeId ) );
             setNotificationContent( notification, notificationFilter );
+            
+            Customer customer = new Customer ();
+            customer.setId( daoUtil.getString( COLUMN_CUSTOMER ) );
+            notification.getDemand( ).setCustomer( customer );
 
             listNotifications.add( notification );
         }
@@ -572,11 +589,15 @@ public final class NotificationDAO implements INotificationDAO
             {
                 Notification notification = new Notification( );
                 notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
-                notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
+                notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime ( ) : 0 );
 
-                notification.setDemand( DemandHome.findByPrimaryKey( strDemandId, strDemandTypeId ) );
+                notification.setDemand( DemandHome.getDemandByDemandIdAndTypeId( strDemandId, strDemandTypeId ) );
                 setNotificationContent( notification, new NotificationFilter( ) );
-
+                
+                Customer customer = new Customer ();
+                customer.setId( daoUtil.getString( COLUMN_CUSTOMER ) );
+                notification.getDemand( ).setCustomer( customer );
+                
                 listNotifications.add( notification );
             }
 
@@ -600,7 +621,7 @@ public final class NotificationDAO implements INotificationDAO
             {
                 notification = new Notification( );
                 notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
-                notification.setDate( daoUtil.getLong( COLUMN_DATE ) );
+                notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime ( ) : 0 );
                 setNotificationContent( notification, new NotificationFilter( ) );
 
             }

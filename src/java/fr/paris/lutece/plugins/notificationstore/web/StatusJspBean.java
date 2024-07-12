@@ -52,14 +52,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
+import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.business.StatusHome;
-import fr.paris.lutece.plugins.notificationstore.utils.GrustoragedbUtils_old;
+import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 
 /**
  * This class provides the user interface to manage Status features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageStatus.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "GRUSTORAGEDB_MANAGEMENT" )
+@Controller( controllerJsp = "ManageStatus.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "NOTIFICATIONSTORE_MANAGEMENT" )
 public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
 {
     /**
@@ -67,30 +70,31 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
      */
     private static final long serialVersionUID = 2030181750801572844L;
     // Templates
-    private static final String TEMPLATE_MANAGE_STATUS = "/admin/plugins/grustoragedb/status/manage_status.html";
-    private static final String TEMPLATE_CREATE_STATUS = "/admin/plugins/grustoragedb/status/create_status.html";
-    private static final String TEMPLATE_MODIFY_STATUS = "/admin/plugins/grustoragedb/status/modify_status.html";
+    private static final String TEMPLATE_MANAGE_STATUS = "/admin/plugins/notificationstore/status/manage_status.html";
+    private static final String TEMPLATE_CREATE_STATUS = "/admin/plugins/notificationstore/status/create_status.html";
+    private static final String TEMPLATE_MODIFY_STATUS = "/admin/plugins/notificationstore/status/modify_status.html";
 
     // Parameters
     private static final String PARAMETER_ID_STATUS = "id";
+    private static final String PARAMETER_GENERIC_STATUS = "genstatus";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_STATUS = "grustoragedb.manage_status.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_MODIFY_STATUS = "grustoragedb.modify_status.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_CREATE_STATUS = "grustoragedb.create_status.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_STATUS = "notificationstore.manage_status.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MODIFY_STATUS = "notificationstore.modify_status.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_CREATE_STATUS = "notificationstore.create_status.pageTitle";
 
     // Markers
     private static final String MARK_STATUS_LIST = "status_list";
     private static final String MARK_STATUS = "status";
     private static final String MARK_GENERIC_STATUS_LIST = "generic_status_list";
 
-    private static final String JSP_MANAGE_STATUS = "jsp/admin/plugins/grustoragedb/ManageStatus.jsp";
+    private static final String JSP_MANAGE_STATUS = "jsp/admin/plugins/notificationstore/ManageStatus.jsp";
 
     // Properties
-    private static final String MESSAGE_CONFIRM_REMOVE_STATUS = "grustoragedb.message.confirmRemoveStatus";
+    private static final String MESSAGE_CONFIRM_REMOVE_STATUS = "notificationstore.message.confirmRemoveStatus";
 
     // Validations
-    private static final String VALIDATION_ATTRIBUTES_PREFIX = "grustoragedb.model.entity.status.attribute.";
+    private static final String VALIDATION_ATTRIBUTES_PREFIX = "notificationstore.model.entity.status.attribute.";
 
     // Views
     private static final String VIEW_MANAGE_STATUS = "manageStatus";
@@ -104,9 +108,9 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
     private static final String ACTION_CONFIRM_REMOVE_STATUS = "confirmRemoveStatus";
 
     // Infos
-    private static final String INFO_STATUS_CREATED = "grustoragedb.info.status.created";
-    private static final String INFO_STATUS_UPDATED = "grustoragedb.info.status.updated";
-    private static final String INFO_STATUS_REMOVED = "grustoragedb.info.status.removed";
+    private static final String INFO_STATUS_CREATED = "notificationstore.info.status.created";
+    private static final String INFO_STATUS_UPDATED = "notificationstore.info.status.updated";
+    private static final String INFO_STATUS_REMOVED = "notificationstore.info.status.removed";
 
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
@@ -174,7 +178,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
 
         Map<String, Object> model = getModel( );
         model.put( MARK_STATUS, _status );
-        model.put( MARK_GENERIC_STATUS_LIST, GrustoragedbUtils_old.getEnumGenericStatusRefList( ) );
+        model.put( MARK_GENERIC_STATUS_LIST, NotificationStoreUtils.getEnumGenericStatusRefList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_STATUS ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_STATUS, TEMPLATE_CREATE_STATUS, model );
@@ -192,6 +196,8 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
     public String doCreateStatus( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _status, request, getLocale( ) );
+        
+        populateGenericStatus( request );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_STATUS ) )
         {
@@ -269,7 +275,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
 
         Map<String, Object> model = getModel( );
         model.put( MARK_STATUS, _status );
-        model.put( MARK_GENERIC_STATUS_LIST, GrustoragedbUtils_old.getEnumGenericStatusRefList( ) );
+        model.put( MARK_GENERIC_STATUS_LIST, NotificationStoreUtils.getEnumGenericStatusRefList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_STATUS ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_STATUS, TEMPLATE_MODIFY_STATUS, model );
@@ -287,6 +293,8 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
     public String doModifyStatus( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _status, request, getLocale( ) );
+        
+        populateGenericStatus( request );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_STATUS ) )
         {
@@ -305,4 +313,20 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
 
         return redirectView( request, VIEW_MANAGE_STATUS );
     }
+    
+    /**
+     * Populate generic status
+     * @param request
+     */
+    private void populateGenericStatus( HttpServletRequest request )
+    {
+        String strGenericStatus = request.getParameter( PARAMETER_GENERIC_STATUS );
+        
+        if( StringUtils.isNotEmpty( strGenericStatus ) )
+        {
+            _status.setGenericStatus( EnumGenericStatus.valueOf( strGenericStatus ) );
+        }
+    }
+
 }
+

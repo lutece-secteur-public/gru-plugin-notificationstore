@@ -1,0 +1,23 @@
+<#macro grustoragedb_tabList current_tab >
+
+	<@tabList>
+						
+			<@tabLink active=( current_tab == "demand" ) 
+				title="#i18n{notificationstore.manage_demand.pageTitle}"
+				href="jsp/admin/plugins/notificationstore/ManageDemand.jsp" 
+				tabIcon="question"   />
+			
+			<@tabLink active=( current_tab == "notification" ) 
+				title="#i18n{notificationstore.manage_notification.pageTitle}"
+				href="jsp/admin/plugins/notificationstore/ManageNotification.jsp" 
+				tabIcon="envelope" />
+			
+			<@tabLink active=( current_tab == "event" )
+				title="#i18n{notificationstore.manage_event.pageTitle}" 
+				href="jsp/admin/plugins/notificationstore/ManageNotificationEvent.jsp" 
+				tabIcon="flag" />
+
+	</@tabList>
+
+
+</#macro>

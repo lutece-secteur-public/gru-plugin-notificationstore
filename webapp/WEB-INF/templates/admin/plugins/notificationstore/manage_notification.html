@@ -1,0 +1,151 @@
+<#include "managedemand_tabs.html" />
+
+<@tabs>
+	<@grustoragedb_tabList current_tab="notification" />
+	
+	<@tabContent>
+		<@tabPanel id='notification' active=true>
+	
+        
+        	
+	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" name="manage_notification">
+	 	
+	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{notificationstore.manage_demand.demand_id.label}' >
+		 	<@input type='text' id="demand_id" name="demand_id" value=demand_id!'' />
+                </@formGroup>
+                
+		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{notificationstore.manage_demand.demand_type_id.label}' >		 	
+                        <@select name="demand_type_id" id="demand_type_id" items=demand_type_id_list![] default_value=demand_type_id!'' />
+                </@formGroup>
+                
+		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.start_date.label}' >
+		    <#if !start_date??><#assign start_date = .now /></#if>
+		    <#assign start_date_value = start_date?string["dd/MM/yyyy"] />		    
+		 	<@input type='date' id="start_date" name="start_date" language=.lang value=start_date_value />
+                </@formGroup>
+                
+		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.end_date.label}' >
+			<#if end_date??><#assign end_date_value = end_date?string["dd/MM/yyyy"] /></#if>
+		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date_value!'' />
+                </@formGroup>
+           	
+		<@formGroup>
+                        <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
+		</@formGroup>
+	</@tform>
+        
+	<@messages infos=infos />
+        <@paginationAdmin paginator=paginator combo=1 />
+        <div class="clearfix"></div>
+        
+    	<@table>
+	        <tr>
+                    <th>#i18n{notificationstore.manage_demand.columnDemandId}</th>
+                    <th>#i18n{notificationstore.manage_notifification.date}</th>
+                    <th>#i18n{notificationstore.manage_notifification.has_backoffice}</th>
+                    <th>#i18n{notificationstore.manage_notifification.has_sms}</th>
+                    <th>#i18n{notificationstore.manage_notifification.has_customer_email}</th>
+                    <th>#i18n{notificationstore.manage_notifification.has_mydashboard}</th>
+                    <th>#i18n{notificationstore.manage_notifification.has_broadcast_email}</th>
+	            <th>#i18n{notificationstore.manage_demand.action}</th>
+	        </tr>
+	        <@tableHeadBodySeparator />
+        		<#list notification_list as notification >
+	        		<tr>
+			               <td>
+                                   ${notification.demand.demandId!''}<br>
+                                   <br>
+                                   type: ${notification.demand.typeId!''}<br>
+                                   <br>
+                                   connection_id: <br>
+                                   <#if notification.demand.customer ?? >
+                                   ${notification.demand.customer.connectionId!''}
+                                   </#if>
+                           </td>
+                           <td>
+                                   ${notification.date?number_to_datetime!''}
+                           </td>
+                           <td>
+                                   <#if notification.demand.customer ?? >
+                                   ${notification.demand.customer.connectionId!''}
+                                   </#if>
+                           </td>
+                           <td><#if notification.backofficeNotification ?? >
+                               Status : ${notification.backofficeNotification.statusText!''}<br>
+                               message : ${notification.backofficeNotification.message!''}
+                               <#else>
+                               -
+                               </#if>
+                           </td>
+                           <td><#if notification.SMSNotification ?? >
+                               Sender : ${notification.SMSNotification.sender!''}<br>
+                               Phone number : ${notification.SMSNotification.phoneNumber!''}<br>
+                               message : ${notification.SMSNotification.message!''}
+                               <#else>
+                               -
+                               </#if>
+                           </td>
+                           <td><#if notification.emailNotification ?? >
+                               Sender name : ${notification.emailNotification.senderName!''}<br>
+                               Sernder mail : ${notification.emailNotification.senderEmail!''}<br>
+                               Recipient : ${notification.emailNotification.recipient!''}<br>
+                               Cc : ${notification.emailNotification.cc!''}<br>
+                               Bcc : ${notification.emailNotification.bcc!''}<br>
+                               Subject : ${notification.emailNotification.subject!''}<br>
+                               message : ${notification.emailNotification.message!''}
+                               <#else>
+                               -
+                               </#if>
+                           </td>
+                           <td><#if notification.myDashboardNotification ?? >
+                               Status : ${notification.myDashboardNotification.statusText!''}<br>
+                               Subject : ${notification.myDashboardNotification.subject!''}<br>
+                               Sender name : ${notification.myDashboardNotification.senderName!''}<br>
+                               data : ${notification.myDashboardNotification.data!''}<br>
+                               message : ${notification.myDashboardNotification.message!''}
+                               <#else>
+                               -
+                               </#if>
+                           </td>
+<td><#if notification.broadcastEmail ?? >
+                               <#list notification.broadcastEmail as broadcastEmailItem >
+                                   Sender name : ${broadcastEmailItem.senderName!''}<br>
+                                   Sernder mail : ${broadcastEmailItem.senderEmail!''}<br>
+                                   Recipient : <#list broadcastEmailItem.recipient as item>${item.address}, </#list><br>
+                                   Cc : <#list broadcastEmailItem.cc as item>${item.address}, </#list><br>
+                                   Bcc : <#list broadcastEmailItem.bcc as item>${item.address}, </#list><br>
+                                   Subject : ${broadcastEmailItem.subject!''}<br>
+                                   message : ${broadcastEmailItem.message!''}<br><br>
+                               </#list>
+                               <#else>
+                               -
+                               </#if>
+                           </td>
+                           <td>
+                                   <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageDemand.jsp" >
+                                           <input type="hidden" id="demand_id" name="demand_id" value="${notification.demand.demandId}"/>
+                                           <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notification.demand.typeId}"/>
+
+                                           <@formGroup>
+                                                   <@button type='submit' title='#i18n{notificationstore.manage_demand.pageTitle}' buttonIcon='question' />
+                                           </@formGroup>
+                                   </@tform>
+                                   <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotificationEvent.jsp" >
+                                           <input type="hidden" id="demand_id" name="demand_id" value="${notification.demand.demandId}"/>
+                                           <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notification.demand.typeId}"/>
+                                           <input type="hidden" id="notification_date" name="notification_date" value="${notification.date}"/>
+
+                                           <@formGroup>
+                                                   <@button type='submit' title='#i18n{notificationstore.manage_event.pageTitle}' buttonIcon='flag' />
+                                           </@formGroup>
+                                   </@tform>
+                           </td>
+
+		        	</tr>
+       			 </#list>
+  			</@table>
+            <@paginationAdmin paginator=paginator />
+                        
+   	  	</@tabPanel>
+	</@tabContent>
+</@tabs>

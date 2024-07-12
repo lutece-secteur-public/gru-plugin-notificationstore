@@ -19,7 +19,7 @@ PRIMARY KEY ( id )
 );
 
 CREATE UNIQUE INDEX notificationstore_demand_unique_index on notificationstore_demand ( demand_type_id, demand_id, customer_id );
-CREATE UNIQUE INDEX notificationstore_demand_id_index on notificationstore_demand ( demand_id );
+CREATE INDEX notificationstore_demand_id_index on notificationstore_demand ( demand_id );
 CREATE INDEX notificationstore_demand_customer_index ON notificationstore_demand (customer_id);
 
 --

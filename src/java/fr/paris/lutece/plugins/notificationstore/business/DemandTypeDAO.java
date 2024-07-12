@@ -49,13 +49,13 @@ import java.util.Optional;
 public final class DemandTypeDAO implements IDemandTypeDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_demand_type, code, label, code_category, url FROM grustoragedb_demand_type ";
-    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECTALL + "  WHERE id_demand_type = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_demand_type ( code, label, code_category, url ) VALUES ( ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_demand_type WHERE id_demand_type = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_demand_type SET code = ?, label = ?, code_category = ? , url = ? WHERE id_demand_type = ?";
-    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_demand_type FROM grustoragedb_demand_type";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECTALL + " WHERE id_demand_type IN (  ";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id, demande_type_id, label, code_category, url, application_code FROM notificationstore_demand_type ";
+    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECTALL + "  WHERE id = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_type ( demande_type_id, label, code_category, url, application_code ) VALUES ( ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_demand_type WHERE id = ? ";
+    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_type SET demande_type_id = ?, label = ?, code_category = ? , url = ?, application_code = ? WHERE id = ?";
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id FROM notificationstore_demand_type";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECTALL + " WHERE id IN (  ";
 
     /**
      * {@inheritDoc }
@@ -66,16 +66,17 @@ public final class DemandTypeDAO implements IDemandTypeDAO
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
-            daoUtil.setString( nIndex++, demandType.getAppCode( ) );
+            daoUtil.setString( nIndex++, String.valueOf( demandType.getIdDemandType( ) ) );
             daoUtil.setString( nIndex++, demandType.getLabel( ) );
             daoUtil.setString( nIndex++, demandType.getCategory( ) );
             daoUtil.setString( nIndex++, demandType.getUrl( ) );
+            daoUtil.setString( nIndex++, demandType.getAppCode( ) );
 
             daoUtil.executeUpdate( );
 
             if ( daoUtil.nextGeneratedKey( ) )
             {
-                demandType.setIdDemandType( daoUtil.getGeneratedKeyInt( 1 ) );
+                demandType.setId( daoUtil.getGeneratedKeyInt( 1 ) );
             }
         }
 
@@ -98,10 +99,12 @@ public final class DemandTypeDAO implements IDemandTypeDAO
                 demandType = new DemandType( );
                 int nIndex = 1;
 
+                demandType.setId( daoUtil.getInt( nIndex++ ) );
                 demandType.setIdDemandType( daoUtil.getInt( nIndex++ ) );
-                demandType.setAppCode( daoUtil.getString( nIndex++ ) );
                 demandType.setLabel( daoUtil.getString( nIndex++ ) );
-                demandType.setCategory( daoUtil.getString( nIndex ) );
+                demandType.setCategory( daoUtil.getString( nIndex++ ) );
+                demandType.setUrl( daoUtil.getString( nIndex++ ) );
+                demandType.setAppCode( daoUtil.getString( nIndex++ ) );
             }
 
             return Optional.ofNullable( demandType );
@@ -131,12 +134,13 @@ public final class DemandTypeDAO implements IDemandTypeDAO
         {
             int nIndex = 1;
 
-            daoUtil.setString( nIndex++, demandType.getAppCode( ) );
+            daoUtil.setString( nIndex++, String.valueOf( demandType.getIdDemandType( ) ) );
             daoUtil.setString( nIndex++, demandType.getLabel( ) );
             daoUtil.setString( nIndex++, demandType.getCategory( ) );
             daoUtil.setString( nIndex++, demandType.getUrl( ) );
+            daoUtil.setString( nIndex++, demandType.getAppCode( ) );
 
-            daoUtil.setInt( nIndex, demandType.getIdDemandType( ) );
+            daoUtil.setInt( nIndex, demandType.getId( ) );
 
             daoUtil.executeUpdate( );
         }
@@ -239,11 +243,12 @@ public final class DemandTypeDAO implements IDemandTypeDAO
         DemandType demandType = new DemandType( );
         int nIndex = 1;
 
+        demandType.setId( daoUtil.getInt( nIndex++ ) );
         demandType.setIdDemandType( daoUtil.getInt( nIndex++ ) );
-        demandType.setAppCode( daoUtil.getString( nIndex++ ) );
         demandType.setLabel( daoUtil.getString( nIndex++ ) );
         demandType.setCategory( daoUtil.getString( nIndex++ ) );
         demandType.setUrl( daoUtil.getString( nIndex++ ) );
+        demandType.setAppCode( daoUtil.getString( nIndex ) );
 
         return demandType;
     }

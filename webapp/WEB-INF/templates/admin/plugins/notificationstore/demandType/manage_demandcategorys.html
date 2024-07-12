@@ -1,0 +1,42 @@
+<#include "managedemandtype_tabs.html" />
+<@tabs2 tab="demandcategory" />
+
+<@box>
+	<@boxHeader title='#i18n{notificationstore.manage_demandcategory.title}' boxTools=true>
+		<@tform class='form-inline pull-right' name='manage_demandcategory' action='jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp'>
+			<@button type='submit' name='view_createDemandCategory' buttonIcon='plus' title='#i18n{notificationstore.manage_demandcategorys.buttonAdd}' />
+		</@tform>
+	</@boxHeader>
+	<@boxBody>    
+    <@messages infos=infos />
+    <@paginationAdmin paginator=paginator combo=1 />
+    <div class="clearfix"></div>
+    <@table>
+        <tr>
+            <th>#i18n{notificationstore.manage_demandcategorys.columnCode}</th>
+            <th>#i18n{notificationstore.manage_demandcategorys.columnLabel}</th>
+            <th>#i18n{portal.util.labelActions}</th>
+        </tr>
+        <@tableHeadBodySeparator />
+        <#list demandcategory_list as demandcategory >
+        <tr>
+            <td>
+				${demandcategory.code}
+			</td>
+            <td>
+				${demandcategory.label}
+			</td>
+        	<td>
+				<@aButton href='jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp?view=modifyDemandCategory&id=${demandcategory.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />
+						
+				<@aButton href='jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp?action=confirmRemoveDemandCategory&id=${demandcategory.id}' title='#i18n{portal.util.labelDelete}' buttonIcon='trash' hideTitle=['all'] color='btn-danger'  />
+
+	        </td>
+        </tr>
+        </#list>
+    </@table>
+
+    <@paginationAdmin paginator=paginator />
+
+  </@boxBody>
+</@box>

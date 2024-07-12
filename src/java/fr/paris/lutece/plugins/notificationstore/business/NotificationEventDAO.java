@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.notificationstore.business;
 
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Event;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationEventDAO;
@@ -55,10 +57,10 @@ import fr.paris.lutece.util.sql.DAOUtil;
 public final class NotificationEventDAO implements INotificationEventDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, msg_id, demand_id, demand_type_id, notification_date FROM grustoragedb_notification_event ";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, notification_date, msg_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_notification_event WHERE id = ? ";
-    private static final String SQL_QUERY_DELETE_BY_DATE = "DELETE FROM grustoragedb_notification_event WHERE event_date < ? ";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, msg_id, demand_id, demand_type_id, customer_id, notification_date FROM notificationstore_notification_event ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, customer_id, notification_date, msg_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification_event WHERE id = ? ";
+    private static final String SQL_QUERY_DELETE_BY_DATE = "DELETE FROM notificationstore_notification_event WHERE event_date < ? ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_SELECT_BY_NOTIFICATION = SQL_QUERY_SELECTALL
             + " WHERE demand_id = ? AND demand_type_id = ? and notification_date = ? ";
@@ -80,14 +82,22 @@ public final class NotificationEventDAO implements INotificationEventDAO
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
-            daoUtil.setLong( nIndex++, notificationEvent.getEvent( ).getEventDate( ) );
+            daoUtil.setTimestamp( nIndex++, notificationEvent.getEvent( ).getEventDate( ) > 0 ? new Timestamp ( notificationEvent.getEvent( ).getEventDate( ) ) : null );
             daoUtil.setString( nIndex++, notificationEvent.getEvent( ).getType( ) );
             daoUtil.setString( nIndex++, notificationEvent.getEvent( ).getStatus( ) );
             daoUtil.setInt( nIndex++, notificationEvent.getEvent( ).getRedelivry( ) );
             daoUtil.setString( nIndex++, notificationEvent.getEvent( ).getMessage( ) );
-            daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getId( ) ) );
+            daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getDemandId( ) ) );
             daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getTypeId( ) ) );
-            daoUtil.setLong( nIndex++, notificationEvent.getNotificationDate( ) );
+            String strCustomerId = StringUtils.EMPTY;
+            
+            if( notificationEvent.getDemand( ).getCustomer( ) != null 
+                    && StringUtils.isNotEmpty( notificationEvent.getDemand( ).getCustomer( ).getId( ) ) )
+            {
+                strCustomerId = notificationEvent.getDemand( ).getCustomer( ).getId( );
+            }
+            daoUtil.setString( nIndex++, strCustomerId );
+            daoUtil.setTimestamp( nIndex++, notificationEvent.getNotificationDate( ) > 0 ? new Timestamp ( notificationEvent.getNotificationDate( ) ) : null );
             daoUtil.setString( nIndex++, notificationEvent.getMsgId( ) );
 
             daoUtil.executeUpdate( );
@@ -192,7 +202,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
         {
             daoUtil.setString( 1, strDemandId );
             daoUtil.setString( 2, strDemandTypeId );
-            daoUtil.setLong( 3, lNotificationDate );
+            daoUtil.setTimestamp( 3, new Timestamp( lNotificationDate ) );
 
             daoUtil.executeQuery( );
 
@@ -279,7 +289,8 @@ public final class NotificationEventDAO implements INotificationEventDAO
         notificationEvent.setId( daoUtil.getInt( nIndex++ ) );
 
         Event event = new Event( );
-        event.setEventDate( daoUtil.getLong( nIndex++ ) );
+        Timestamp eventDate =  daoUtil.getTimestamp( nIndex++ ) ;
+        event.setEventDate( eventDate != null ? eventDate.getTime( ) : 0  );
         event.setType( daoUtil.getString( nIndex++ ) );
         event.setStatus( daoUtil.getString( nIndex++ ) );
         event.setRedelivry( daoUtil.getInt( nIndex++ ) );
@@ -289,11 +300,16 @@ public final class NotificationEventDAO implements INotificationEventDAO
         notificationEvent.setMsgId( daoUtil.getString( nIndex++ ) );
 
         Demand demand = new Demand( );
-        demand.setId( daoUtil.getString( nIndex++ ) );
+        demand.setDemandId( daoUtil.getString( nIndex++ ) );
         demand.setTypeId( daoUtil.getString( nIndex++ ) );
+        
+        Customer cutomer = new Customer( );
+        cutomer.setId(  daoUtil.getString( nIndex++ ) );
+        demand.setCustomer( cutomer );
+        
         notificationEvent.setDemand( demand );
 
-        notificationEvent.setNotificationDate( daoUtil.getLong( nIndex ) );
+        notificationEvent.setNotificationDate(  daoUtil.getTimestamp( nIndex ) != null ? daoUtil.getTimestamp( nIndex ).getTime( ) : 0  );
 
         return notificationEvent;
     }

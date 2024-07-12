@@ -42,7 +42,7 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
  */
 public class NotificationEventDaemon extends Daemon
 {
-    private static final String PROPERTY_EVENT_NB_DAYS_BEFORE_PURGE = "grustoragedb.daemon.NotificationEventDaemon.purge.nbDaysBefore";
+    private static final String PROPERTY_EVENT_NB_DAYS_BEFORE_PURGE = "notificationstore.daemon.NotificationEventDaemon.purge.nbDaysBefore";
 
     /**
      * {@inheritDoc}

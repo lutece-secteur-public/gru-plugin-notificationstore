@@ -49,13 +49,13 @@ import java.util.Optional;
 public final class DemandCategoryDAO implements IDemandCategoryDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_demand_category, code, label FROM grustoragedb_demand_category WHERE id_demand_category = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO grustoragedb_demand_category ( code, label ) VALUES ( ?, ? ) ";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM grustoragedb_demand_category WHERE id_demand_category = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE grustoragedb_demand_category SET code = ?, label = ? WHERE id_demand_category = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_demand_category, code, label FROM grustoragedb_demand_category";
-    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_demand_category FROM grustoragedb_demand_category";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_demand_category, code, label FROM grustoragedb_demand_category WHERE id_demand_category IN (  ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_demand_category, code, label FROM notificationstore_demand_category WHERE id_demand_category = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_category ( code, label ) VALUES ( ?, ? ) ";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_demand_category WHERE id_demand_category = ? ";
+    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_category SET code = ?, label = ? WHERE id_demand_category = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_demand_category, code, label FROM notificationstore_demand_category";
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_demand_category FROM notificationstore_demand_category";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_demand_category, code, label FROM notificationstore_demand_category WHERE id_demand_category IN (  ";
 
     /**
      * {@inheritDoc }

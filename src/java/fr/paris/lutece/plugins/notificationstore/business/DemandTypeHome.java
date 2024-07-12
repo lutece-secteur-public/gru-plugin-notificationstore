@@ -49,7 +49,7 @@ import java.util.Optional;
 public final class DemandTypeHome
 {
     // Static variable pointed at the DAO instance
-    private static IDemandTypeDAO _dao = SpringContextService.getBean( "grustoragedb.demandTypeDao" );
+    private static IDemandTypeDAO _dao = SpringContextService.getBean( "notificationstore.demandTypeDao" );
     private static Plugin _plugin = NotificationStorePlugin.getPlugin( );
 
     /**

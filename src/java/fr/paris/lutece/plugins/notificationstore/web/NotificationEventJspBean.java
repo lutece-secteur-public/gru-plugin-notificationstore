@@ -55,12 +55,12 @@ import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.date.DateUtil;
 import fr.paris.lutece.util.html.AbstractPaginator;
 
-@Controller( controllerJsp = "ManageNotificationEvent.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "DEMAND_MANAGEMENT" )
+@Controller( controllerJsp = "ManageNotificationEvent.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "DEMAND_MANAGEMENT" )
 public class NotificationEventJspBean extends AbstractManageDemandJspBean<Integer, NotificationEvent>
 {
 
     // Templates
-    private static final String TEMPLATE_MANAGE_EVENT = "/admin/plugins/grustoragedb/manage_notification_event.html";
+    private static final String TEMPLATE_MANAGE_EVENT = "/admin/plugins/notificationstore/manage_notification_event.html";
 
     private static final String MARK_EVENT_LIST = "notification_event_list";
     private static final String MARK_DEMAND_TYPE_ID_LIST = "demand_type_id_list";
@@ -69,10 +69,10 @@ public class NotificationEventJspBean extends AbstractManageDemandJspBean<Intege
     private static final String MARK_START_DATE = "start_date";
     private static final String MARK_END_DATE = "end_date";
 
-    private static final String JSP_MANAGE_EVENTS = "jsp/admin/plugins/grustoragedb/ManageNotificationEvent.jsp";
+    private static final String JSP_MANAGE_EVENTS = "jsp/admin/plugins/notificationstore/ManageNotificationEvent.jsp";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_EVENT = "grustoragedb.manage_event.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_EVENT = "notificationstore.manage_event.pageTitle";
 
     // Views
     private static final String VIEW_MANAGE_EVENT = "manageNotification";

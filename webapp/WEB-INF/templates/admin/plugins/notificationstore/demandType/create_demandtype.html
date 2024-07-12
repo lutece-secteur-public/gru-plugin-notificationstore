@@ -1,0 +1,31 @@
+<#include "managedemandtype_tabs.html" />
+<@tabs2 tab="demandtype" />
+<@box>
+	<@boxHeader title='#i18n{notificationstore.create_demandtype.title}' />
+	<@boxBody>
+    <@tform name='create_demandtype' action='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp' >
+
+        <@messages errors=errors />
+        <@input type="hidden" id="id" name="id"/>
+        <@input type="hidden" value="${token}" name="token" />
+        
+		<@formGroup labelFor='id_demand_type' labelKey='#i18n{notificationstore.modify_demandtype.labelIdDemandType}' mandatory=true>
+			<@input type='text' id='id_demand_type' name='id_demand_type'  maxlength=255 value='${demandtype.idDemandType!\'\'}' tabIndex='0' />
+		</@formGroup>
+		<@formGroup labelFor='app_code' labelKey='#i18n{notificationstore.modify_demandtype.labelCode}' mandatory=true>
+			<@input type='text' id='app_code' name='app_code'  maxlength=255 value='${demandtype.appCode!\'\'}' tabIndex='0' />
+		</@formGroup>
+		<@formGroup labelFor='label' labelKey='#i18n{notificationstore.modify_demandtype.labelLabel}' mandatory=true>
+			<@input type='text' id='label' name='label'  maxlength=255 value='${demandtype.label!\'\'}' tabIndex='1' />
+		</@formGroup>
+		<@formGroup labelFor='category' labelKey='#i18n{notificationstore.modify_demandtype.labelCodeCategory}' mandatory=true>
+			<@select name='category' id='category' default_value=demandtype.category items=demandCategories />
+		</@formGroup>
+		<@formGroup labelFor='url' labelKey='#i18n{notificationstore.modify_demandtype.labelUrl}' mandatory=true>
+			<@input type='url' id='url' name='url'  maxlength=255 value='${demandtype.url!\'\'}' tabIndex='1' />
+		</@formGroup>
+				
+		<@actionButtons button1Name="action_createDemandType" button2Name="view_manageDemandType"/>
+    </@tform>
+	</@boxBody>
+</@box>

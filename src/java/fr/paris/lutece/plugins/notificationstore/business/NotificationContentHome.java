@@ -39,7 +39,8 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificatio
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
-import fr.paris.lutece.plugins.notificationstore.utils.GrustoragedbUtils_old;
+import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
+import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -66,7 +67,7 @@ public final class NotificationContentHome
 
     // Static variable pointed at the DAO instance
 
-    private static INotificationContentDAO _dao = (INotificationContentDAO) SpringContextService.getBean( "grustoragedb.notificationContentDao" );
+    private static INotificationContentDAO _dao = (INotificationContentDAO) SpringContextService.getBean( "notificationstore.notificationContentDao" );
 
     /**
      * Private constructor - this class need not be instantiated
@@ -207,7 +208,7 @@ public final class NotificationContentHome
 
         try
         {
-            ObjectMapper mapperr = GrustoragedbUtils_old.initMapper( );
+            ObjectMapper mapperr = NotificationStoreUtils.getMapper( );
             Demand demand = notification.getDemand( );
 
             if ( notification.getSmsNotification( ) != null )
@@ -267,11 +268,11 @@ public final class NotificationContentHome
     private static NotificationContent initNotificationContent( Notification notification, EnumNotificationType notificationType,
             String strNotificationContent ) throws IOException
     {
-        strNotificationContent = strNotificationContent.replaceAll( GrustoragedbUtils_old.CHARECTER_REGEXP_FILTER, "" );
+        strNotificationContent = strNotificationContent.replaceAll( NotificationStoreConstants.CHARECTER_REGEXP_FILTER, "" );
 
         byte [ ] bytes;
 
-        if ( AppPropertiesService.getPropertyBoolean( GrustoragedbUtils_old.PROPERTY_COMPRESS_NOTIFICATION, false ) )
+        if ( AppPropertiesService.getPropertyBoolean( NotificationStoreConstants.PROPERTY_COMPRESS_NOTIFICATION, false ) )
         {
             bytes = StringUtil.compress( strNotificationContent );
         }
@@ -307,11 +308,7 @@ public final class NotificationContentHome
                 Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
                 if ( status.isPresent( ) )
                 {
-                    EnumGenericStatus genericStatus = EnumGenericStatus.valueOf( status.get( ).getStatus( ) );
-                    if ( genericStatus != null )
-                    {
-                        return genericStatus.getStatusId( );
-                    }
+                    return status.get( ).getGenericStatus( ).getStatusId( );
                 }
                 return -1;
             }

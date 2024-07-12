@@ -22,26 +22,26 @@
      <daemons>
 	    <daemon>
 	        <daemon-id>NotificationEventDaemon</daemon-id>
-	        <daemon-name>grustoragedb.daemon.NotificationEventDaemon.name</daemon-name>
-	        <daemon-description>grustoragedb.daemon.NotificationEventDaemon.description</daemon-description>
-	        <daemon-class>fr.paris.lutece.plugins.grustoragedb.service.NotificationEventDaemon</daemon-class>
+	        <daemon-name>notificationstore.daemon.NotificationEventDaemon.name</daemon-name>
+	        <daemon-description>notificationstore.daemon.NotificationEventDaemon.description</daemon-description>
+	        <daemon-class>fr.paris.lutece.plugins.notificationstore.service.NotificationEventDaemon</daemon-class>
 	    </daemon>
 	</daemons>
     <admin-features>
         <admin-feature>
-            <feature-id>GRUSTORAGEDB_MANAGEMENT</feature-id>
-            <feature-title>grustoragedb.adminFeature.Manage.name</feature-title>
-            <feature-description>grustoragedb.adminFeature.Manage.description</feature-description>
+            <feature-id>NOTIFICATIONSTORE_MANAGEMENT</feature-id>
+            <feature-title>notificationstore.adminFeature.Manage.name</feature-title>
+            <feature-description>notificationstore.adminFeature.Manage.description</feature-description>
             <feature-level>0</feature-level>
-            <feature-url>jsp/admin/plugins/grustoragedb/ManageStatus.jsp</feature-url>
+            <feature-url>jsp/admin/plugins/notificationstore/ManageStatus.jsp</feature-url>
             <feature-icon-url></feature-icon-url>
         </admin-feature>
 		<admin-feature>
-			<feature-id>GRUSTORAGEDB_MANAGEMENT</feature-id>
-			<feature-title>grustoragedb.adminFeature.ManageDemandType.name</feature-title>
-			<feature-description>grustoragedb.adminFeature.ManageDemandType.description</feature-description>
+			<feature-id>NOTIFICATIONSTORE_DEMANDTYPE_MANAGEMENT</feature-id>
+			<feature-title>notificationstore.adminFeature.ManageDemandType.name</feature-title>
+			<feature-description>notificationstore.adminFeature.ManageDemandType.description</feature-description>
 			<feature-level>0</feature-level>
-			<feature-url>jsp/admin/plugins/grustoragedb/ManageDemandTypes.jsp</feature-url>
+			<feature-url>jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp</feature-url>
 			<feature-icon-url/>
 		</admin-feature>
     </admin-features>

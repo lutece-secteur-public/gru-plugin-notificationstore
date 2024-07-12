@@ -58,33 +58,33 @@ import fr.paris.lutece.plugins.notificationstore.business.DemandCategoryHome;
 /**
  * This class provides the user interface to manage DemandCategory features ( manage, create, modify, remove )
  */
-@Controller( controllerJsp = "ManageDemandCategorys.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "GRUSTORAGEDB_DEMANDTYPE_MANAGEMENT" )
+@Controller( controllerJsp = "ManageDemandCategorys.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "NOTIFICATIONSTORE_MANAGEMENT" )
 public class DemandCategoryJspBean extends AbstractManageDemandTypeJspBean<Integer, DemandCategory>
 {
     // Templates
-    private static final String TEMPLATE_MANAGE_DEMANDCATEGORYS = "/admin/plugins/grustoragedb/demandType/manage_demandcategorys.html";
-    private static final String TEMPLATE_CREATE_DEMANDCATEGORY = "/admin/plugins/grustoragedb/demandType/create_demandcategory.html";
-    private static final String TEMPLATE_MODIFY_DEMANDCATEGORY = "/admin/plugins/grustoragedb/demandType/modify_demandcategory.html";
+    private static final String TEMPLATE_MANAGE_DEMANDCATEGORYS = "/admin/plugins/notificationstore/demandType/manage_demandcategorys.html";
+    private static final String TEMPLATE_CREATE_DEMANDCATEGORY = "/admin/plugins/notificationstore/demandType/create_demandcategory.html";
+    private static final String TEMPLATE_MODIFY_DEMANDCATEGORY = "/admin/plugins/notificationstore/demandType/modify_demandcategory.html";
 
     // Parameters
     private static final String PARAMETER_ID_DEMANDCATEGORY = "id";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_DEMANDCATEGORYS = "grustoragedb.manage_demandcategorys.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_MODIFY_DEMANDCATEGORY = "grustoragedb.modify_demandcategory.pageTitle";
-    private static final String PROPERTY_PAGE_TITLE_CREATE_DEMANDCATEGORY = "grustoragedb.create_demandcategory.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_DEMANDCATEGORYS = "notificationstore.manage_demandcategorys.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MODIFY_DEMANDCATEGORY = "notificationstore.modify_demandcategory.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_CREATE_DEMANDCATEGORY = "notificationstore.create_demandcategory.pageTitle";
 
     // Markers
     private static final String MARK_DEMANDCATEGORY_LIST = "demandcategory_list";
     private static final String MARK_DEMANDCATEGORY = "demandcategory";
 
-    private static final String JSP_MANAGE_DEMANDCATEGORYS = "jsp/admin/plugins/grustoragedb/ManageDemandCategorys.jsp";
+    private static final String JSP_MANAGE_DEMANDCATEGORYS = "jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp";
 
     // Properties
-    private static final String MESSAGE_CONFIRM_REMOVE_DEMANDCATEGORY = "grustoragedb.message.confirmRemoveDemandCategory";
+    private static final String MESSAGE_CONFIRM_REMOVE_DEMANDCATEGORY = "notificationstore.message.confirmRemoveDemandCategory";
 
     // Validations
-    private static final String VALIDATION_ATTRIBUTES_PREFIX = "grustoragedb.model.entity.demandcategory.attribute.";
+    private static final String VALIDATION_ATTRIBUTES_PREFIX = "notificationstore.model.entity.demandcategory.attribute.";
 
     // Views
     private static final String VIEW_MANAGE_DEMANDCATEGORYS = "manageDemandCategorys";
@@ -98,9 +98,9 @@ public class DemandCategoryJspBean extends AbstractManageDemandTypeJspBean<Integ
     private static final String ACTION_CONFIRM_REMOVE_DEMANDCATEGORY = "confirmRemoveDemandCategory";
 
     // Infos
-    private static final String INFO_DEMANDCATEGORY_CREATED = "grustoragedb.info.demandcategory.created";
-    private static final String INFO_DEMANDCATEGORY_UPDATED = "grustoragedb.info.demandcategory.updated";
-    private static final String INFO_DEMANDCATEGORY_REMOVED = "grustoragedb.info.demandcategory.removed";
+    private static final String INFO_DEMANDCATEGORY_CREATED = "notificationstore.info.demandcategory.created";
+    private static final String INFO_DEMANDCATEGORY_UPDATED = "notificationstore.info.demandcategory.updated";
+    private static final String INFO_DEMANDCATEGORY_REMOVED = "notificationstore.info.demandcategory.removed";
 
     // Errors
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";

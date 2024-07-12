@@ -38,8 +38,6 @@ import java.util.Optional;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandCategory;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandCategoryDAO;
-import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
-import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.util.ReferenceList;
 
@@ -49,8 +47,7 @@ import fr.paris.lutece.util.ReferenceList;
 public final class DemandCategoryHome
 {
     // Static variable pointed at the DAO instance
-    private static IDemandCategoryDAO _dao = SpringContextService.getBean( "grustoragedb.demandCategoryDao" );
-    private static Plugin _plugin = NotificationStorePlugin.getPlugin( );
+    private static IDemandCategoryDAO _dao = SpringContextService.getBean( "notificationstore.demandCategoryDao" );
 
     /**
      * Private constructor - this class need not be instantiated

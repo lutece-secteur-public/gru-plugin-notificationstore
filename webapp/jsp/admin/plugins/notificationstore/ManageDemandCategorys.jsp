@@ -1,4 +1,4 @@
-<jsp:useBean id="managedemandtypeDemandCategory" scope="session" class="fr.paris.lutece.plugins.grustoragedb.web.DemandCategoryJspBean" />
+<jsp:useBean id="managedemandtypeDemandCategory" scope="session" class="fr.paris.lutece.plugins.notificationstore.web.DemandCategoryJspBean" />
 <% String strContent = managedemandtypeDemandCategory.processController ( request , response ); %>
 
 <%@ page errorPage="../../ErrorPage.jsp" %>

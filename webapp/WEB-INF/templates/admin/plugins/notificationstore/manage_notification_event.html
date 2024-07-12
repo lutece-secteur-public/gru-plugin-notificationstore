@@ -1,0 +1,117 @@
+<#include "managedemand_tabs.html" />
+
+<@tabs>
+	<@grustoragedb_tabList current_tab="event" />
+	
+	<@tabContent>
+		<@tabPanel id='event' active=true>
+
+        
+        	
+	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/notificationstore/ManageNotificationEvent.jsp" name="manage_notification_event">
+	 	
+	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{notificationstore.manage_demand.demand_id.label}' >
+		 	<@input type='text' id="demand_id" name="demand_id" value=demand_id!'' />
+                </@formGroup>
+                
+		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{notificationstore.manage_demand.demand_type_id.label}' >
+                        <@select name="demand_type_id" id="demand_type_id" items=demand_type_id_list![] default_value=demand_type_id!'' />
+                </@formGroup>
+                
+		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.start_date.label}' >
+		 	<#if !start_date??><#assign start_date = .now /></#if>
+		    <#assign start_date_value = start_date?string["dd/MM/yyyy"] />
+           <@input type='date' id="start_date" name="start_date" language=.lang value=start_date_value />
+        </@formGroup>
+                
+		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.end_date.label}' >
+		 	<#if end_date??><#assign end_date_value = end_date?string["dd/MM/yyyy"] /></#if>
+		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date_value!'' />
+        </@formGroup>
+        
+        <@formGroup labelFor='event_status'  tabIndex='5' labelKey='#i18n{notificationstore.manage_demand.event_status.label}' >		
+			<@checkBox labelKey='FAILED' name='event_status' id='event_status' value='FAILED'  />
+		 	
+        </@formGroup>
+           	
+           	
+		<@formGroup>
+                        <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
+		</@formGroup>
+	</@tform>
+        
+	<@messages infos=infos />
+        <@paginationAdmin paginator=paginator combo=1 />
+        <div class="clearfix"></div>
+        
+    	<@table>
+	        <tr>
+                    
+	            <th>#i18n{notificationstore.manage_event.date}</th>
+                    <th>#i18n{notificationstore.manage_event.notification_date}</th>
+                    <th>#i18n{notificationstore.manage_demand.columnDemandId}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnTypeId}</th>
+	            <th>#i18n{notificationstore.manage_event.type}</th>
+	            <th>#i18n{notificationstore.manage_event.status}</th>
+	            <th>#i18n{notificationstore.manage_event.redelivry}</th>
+	            <th>#i18n{notificationstore.manage_event.message}</th>
+	            <th>#i18n{notificationstore.manage_demand.action}</th>
+                    
+	        </tr>
+	        <@tableHeadBodySeparator />
+        		<#list notification_event_list as notificationEvent >
+                <tr>                                   
+                    <td>
+                            ${notificationEvent.event.eventDate?number_to_datetime!''}
+                    </td>
+                    <td>
+                            ${notificationEvent.notificationDate?number_to_datetime!''}
+                    </td>
+                    <td>
+                            ${notificationEvent.demand.demandId}
+                    </td>
+                    <td>
+                            ${notificationEvent.demand.typeId}
+                    </td>                                    
+                    <td>
+                            ${notificationEvent.event.type!''}
+                    </td>                                   
+                    <td>
+                            ${notificationEvent.event.status!''}
+                    </td>                                   
+                    <td>
+                            ${notificationEvent.event.redelivry!''}
+                    </td>                                   
+                    <td>
+                            <#if notificationEvent.msgId?? >[${notificationEvent.msgId}]<br></#if>
+                            ${notificationEvent.event.message!''}
+                    </td>
+                    <td>
+                            <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageDemand.jsp" >
+                                    <input type="hidden" id="demand_id" name="demand_id" value="${notificationEvent.demand.demandId}"/>
+                                    <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notificationEvent.demand.typeId}"/>
+
+                                    <@formGroup>
+                                            <@button type='submit' title='#i18n{notificationstore.manage_demand.pageTitle}' buttonIcon='question' />
+                                    </@formGroup>
+                            </@tform>
+                            <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" >
+                                    <input type="hidden" id="demand_id" name="demand_id" value="${notificationEvent.demand.demandId}"/>
+                                    <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notificationEvent.demand.typeId}"/>
+                                    <input type="hidden" id="demand_type_id" name="notification_date" value="${notificationEvent.notificationDate}"/>
+
+                                    <@formGroup>
+                                            <@button type='submit' title='#i18n{notificationstore.manage_notification.pageTitle}' buttonIcon='envelope' />
+                                    </@formGroup>
+                            </@tform>
+
+                    </td>
+                </tr>
+       			 </#list>
+  			</@table>
+  			<@paginationAdmin paginator=paginator />
+  			
+  			</@tabPanel>
+	</@tabContent>
+</@tabs>
+  			

@@ -36,8 +36,6 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationEventDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.plugin.PluginService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import java.util.List;
 import java.util.Optional;
@@ -48,8 +46,7 @@ import java.util.Optional;
 public final class NotificationEventHome
 {
 
-    private static INotificationEventDAO _dao = SpringContextService.getBean( "grustoragedb.notificationEventDAO" );
-    private static Plugin _plugin = PluginService.getPlugin( "grustoragedb" );
+    private static INotificationEventDAO _dao = SpringContextService.getBean( "notificationstore.notificationEventDao" );
 
     /**
      * Private constructor

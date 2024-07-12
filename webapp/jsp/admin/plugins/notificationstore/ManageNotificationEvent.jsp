@@ -1,4 +1,4 @@
-<jsp:useBean id="manageNotificationEvent" scope="session" class="fr.paris.lutece.plugins.grustoragedb.web.NotificationEventJspBean" />
+<jsp:useBean id="manageNotificationEvent" scope="session" class="fr.paris.lutece.plugins.notificationstore.web.NotificationEventJspBean" />
 <% String strContent = manageNotificationEvent.processController ( request , response ); %>
 
 <%@ page errorPage="../../ErrorPage.jsp" %>

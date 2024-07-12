@@ -54,14 +54,14 @@ import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.date.DateUtil;
 import fr.paris.lutece.util.html.AbstractPaginator;
 
-@Controller( controllerJsp = "ManageDemand.jsp", controllerPath = "jsp/admin/plugins/grustoragedb/", right = "DEMAND_MANAGEMENT" )
+@Controller( controllerJsp = "ManageDemand.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "DEMAND_MANAGEMENT" )
 public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
 {
 
     private static final long serialVersionUID = 1L;
 
     // Templates
-    private static final String TEMPLATE_MANAGE_DEMAND = "/admin/plugins/grustoragedb/manage_demand.html";
+    private static final String TEMPLATE_MANAGE_DEMAND = "/admin/plugins/notificationstore/manage_demand.html";
 
     // Markers
     private static final String MARK_DEMAND_LIST = "demand_list";
@@ -72,10 +72,10 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
     private static final String MARK_END_DATE = "end_date";
 
     // JSP
-    private static final String JSP_MANAGE_DEMANDS = "jsp/admin/plugins/grustoragedb/ManageDemand.jsp";
+    private static final String JSP_MANAGE_DEMANDS = "jsp/admin/plugins/notificationstore/ManageDemand.jsp";
 
     // Properties for page titles
-    private static final String PROPERTY_PAGE_TITLE_MANAGE_DEMAND = "grustoragedb.manage_demand.pageTitle";
+    private static final String PROPERTY_PAGE_TITLE_MANAGE_DEMAND = "notificationstore.manage_demand.pageTitle";
 
     // Views
     private static final String VIEW_MANAGE_DEMAND = "manageDemand";

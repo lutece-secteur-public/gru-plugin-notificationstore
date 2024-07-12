@@ -33,6 +33,8 @@
  */
 package fr.paris.lutece.plugins.notificationstore.utils;
 
+import java.util.Locale;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,6 +44,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceList;
 
@@ -97,7 +100,7 @@ public class NotificationStoreUtils
 
         for ( EnumGenericStatus status : EnumGenericStatus.values( ) )
         {
-            refList.addItem( status.name( ), status.getLabel( ) );
+            refList.addItem( status.name( ), I18nService.getLocalizedString( status.getLabel( ), Locale.FRENCH ) );
         }
         return refList;
     }

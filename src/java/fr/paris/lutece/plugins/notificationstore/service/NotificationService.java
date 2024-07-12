@@ -69,7 +69,7 @@ public class NotificationService
 {
 
 	// Bean names
-	private static final String BEAN_STORAGE_SERVICE = "gru.demandService";
+	private static final String BEAN_STORAGE_SERVICE = "notificationstore.demandService";
 
 	// Other constants
 	private static final String RESPONSE_OK = "{ \"acknowledge\" : { \"status\": \"received\" } }";
@@ -191,7 +191,7 @@ public class NotificationService
 	 */
 	private void checkNotification(Notification notification, List<StatusMessage> warnings) {
 		// notification should be associated to a demand id
-		if ( StringUtils.isBlank( notification.getDemand( ).getId( ) ) )
+		if ( StringUtils.isBlank( notification.getDemand( ).getDemandId( ) ) )
 		{
 			StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_WARNING, MESSAGE_MISSING_MANDATORY_FIELD, WARNING_DEMAND_ID_MANDATORY );
 			warnings.add( msg );
@@ -320,7 +320,7 @@ public class NotificationService
      */
     private void store( Notification notification )
     {
-        Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getId( ), notification.getDemand( ).getTypeId( ) );
+        Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getDemandId( ), notification.getDemand( ).getTypeId( ) );
                 
         if ( demand == null || 
         		( demand.getCustomer( ) != null && demand.getCustomer( ).getId( ) != null 
@@ -328,7 +328,7 @@ public class NotificationService
         {
             demand = new Demand( );
 
-            demand.setId( notification.getDemand( ).getId( ) );
+            demand.setDemandId( notification.getDemand( ).getDemandId( ) );
             demand.setTypeId( notification.getDemand( ).getTypeId( ) );
             demand.setSubtypeId( notification.getDemand( ).getSubtypeId( ) );
             demand.setReference( notification.getDemand( ).getReference( ) );
@@ -392,7 +392,7 @@ public class NotificationService
 		}
 
 		// check if Demand remote id and demand type id are present
-		if ( StringUtils.isBlank( notif.getDemand( ).getId( ) ) || StringUtils.isBlank( notif.getDemand( ).getTypeId( ) ) )
+		if ( StringUtils.isBlank( notif.getDemand( ).getDemandId( ) ) || StringUtils.isBlank( notif.getDemand( ).getTypeId( ) ) )
 		{
 			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_MISSING_DEMAND_ID );
 		}

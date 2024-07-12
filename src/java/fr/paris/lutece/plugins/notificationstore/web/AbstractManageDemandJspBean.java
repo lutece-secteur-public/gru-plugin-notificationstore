@@ -56,7 +56,7 @@ public abstract class AbstractManageDemandJspBean<S, T> extends MVCAdminJspBean
     public static final String RIGHT_MANAGEDEMAND = "DEMAND_MANAGEMENT";
 
     // Properties
-    private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "grustoragedb.listItems.itemsPerPage";
+    private static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "notificationstore.listItems.itemsPerPage";
 
     // Parameters
     private static final String PARAMETER_PAGE_INDEX = "page_index";
