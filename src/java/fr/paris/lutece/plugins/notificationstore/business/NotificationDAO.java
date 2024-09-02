@@ -94,8 +94,8 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification WHERE id = ?";
     private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM notificationstore_notification WHERE demand_id = ? AND demand_type_id = ?";
     private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM notificationstore_notification ORDER BY demand_type_id ";
-    private static final String SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE = " SELECT gn.* " + " FROM notificationstore_notification gn, notificationstore_demand gd "
-            + " WHERE gn.demand_id = gd.demand_id " + " AND gd.demand_id = ? " + " AND gd.demand_type_id = ? " + " AND gd.customer_id = ? ";
+    private static final String SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE = " SELECT * FROM notificationstore_notification"
+            + " WHERE demand_id = ? AND demand_type_id = ?  AND customer_id = ? ";
 
     private static final String SQL_QUERY_SELECT_LAST_NOTIFICATION = "SELECT * FROM notificationstore_notification " + " WHERE demand_id = ?"
             + " AND demand_type_id = ?" + " ORDER BY date desc, id desc " + " LIMIT 1";
