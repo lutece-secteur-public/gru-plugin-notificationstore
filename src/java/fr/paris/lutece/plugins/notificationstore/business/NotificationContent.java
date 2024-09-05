@@ -43,6 +43,7 @@ public class NotificationContent
     private int _strIdNotification;
     private String _strNotificationType;
     private Integer _strStatusId;
+    private Integer _strStatusGenericId;
     private byte [ ] _content;
 
     /**
@@ -113,12 +114,28 @@ public class NotificationContent
     }
 
     /**
-     * @param strStatus
-     *            the _strStatusId to set
+     * @param strStatusId the _strStatusId to set
      */
     public void setStatusId( Integer strStatusId )
     {
         this._strStatusId = strStatusId;
+    }
+
+    /**
+     * @return the _strStatusGenericId
+     */
+    public Integer getStatusGenericId( )
+    {
+        return _strStatusGenericId;
+    }
+
+    /**
+     * @param strStatusGenericId
+     *            the _strStatusGenericId to set
+     */
+    public void setStatusGenericId( Integer strStatusGenericId )
+    {
+        this._strStatusGenericId = strStatusGenericId;
     }
 
     /**

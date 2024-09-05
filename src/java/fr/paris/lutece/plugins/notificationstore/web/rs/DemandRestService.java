@@ -233,7 +233,7 @@ public class DemandRestService
             else
             {
                 Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
-                if ( status.isPresent( ) )
+                if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
                 {
                     return I18nService.getLocalizedString( status.get( ).getGenericStatus( ).getLabel( ), LocaleService.getDefault( ) );
                 }

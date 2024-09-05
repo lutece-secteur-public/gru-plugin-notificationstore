@@ -115,8 +115,8 @@ CREATE TABLE notificationstore_notification_content (
 id_notification_content int AUTO_INCREMENT,
 notification_id int NOT NULL,
 notification_type varchar(255) default '' NOT NULL,
-status varchar(255) default '' NOT NULL,
 status_id int default "-1",
+status_generic_id int default "-1",
 content LONG VARBINARY,
 PRIMARY KEY (id_notification_content)
 );

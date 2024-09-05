@@ -70,7 +70,7 @@ public final class StatusDAO implements IDemandStatusDAO
         {
             int nIndex = 1;
             daoUtil.setString( nIndex++, status.getStatus( ) );
-            daoUtil.setInt( nIndex++, status.getGenericStatus( ).getStatusId( ) );
+            daoUtil.setInt( nIndex++, status.getGenericStatus( ) != null ? status.getGenericStatus( ).getStatusId( ) : -1  );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )

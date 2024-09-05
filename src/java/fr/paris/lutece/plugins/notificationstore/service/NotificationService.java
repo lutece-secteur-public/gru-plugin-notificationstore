@@ -556,13 +556,9 @@ public class NotificationService
             } 
             
 	        Optional<DemandStatus> status = _demandService.getStatusByLabel( notification.getMyDashboardNotification( ).getStatusText( ) );
-	        if ( status.isPresent( ) )
+	        if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
 	        {
-	        	EnumGenericStatus genericStatus = status.get( ).getGenericStatus( );
-	            if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
-	            {
-	                    return status.get( ).getGenericStatus( ).getStatusId( );
-	            }
+	            return status.get( ).getGenericStatus( ).getStatusId( );
 	        }
 	        
 	        return -1;

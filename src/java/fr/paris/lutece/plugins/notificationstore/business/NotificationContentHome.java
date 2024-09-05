@@ -231,7 +231,7 @@ public final class NotificationContentHome
 
             if ( notification.getMyDashboardNotification( ) != null )
             {
-                demand.setStatusId( getStatusNotification( notification, EnumNotificationType.MYDASHBOARD ) );
+                demand.setStatusId( getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD ) );
                 listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.MYDASHBOARD,
                         mapperr.writeValueAsString( notification.getMyDashboardNotification( ) ) ) );
             }
@@ -284,7 +284,8 @@ public final class NotificationContentHome
         NotificationContent notificationContent = new NotificationContent( );
         notificationContent.setIdNotification( notification.getId( ) );
         notificationContent.setNotificationType( notificationType.name( ) );
-        notificationContent.setStatusId( getStatusNotification( notification, EnumNotificationType.MYDASHBOARD ) );
+        notificationContent.setStatusId( getStatusId( notification, EnumNotificationType.MYDASHBOARD ) );
+        notificationContent.setStatusGenericId( getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD ) );
         notificationContent.setContent( bytes );
 
         return notificationContent;
@@ -295,7 +296,7 @@ public final class NotificationContentHome
      * 
      * @param notification
      */
-    private static Integer getStatusNotification( Notification notification, EnumNotificationType statusType )
+    private static Integer getStatusGenericId( Notification notification, EnumNotificationType statusType )
     {
         if ( EnumNotificationType.MYDASHBOARD.equals( statusType ) && notification.getMyDashboardNotification( ) != null )
         {
@@ -306,7 +307,7 @@ public final class NotificationContentHome
             else
             {
                 Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
-                if ( status.isPresent( ) )
+                if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
                 {
                     return status.get( ).getGenericStatus( ).getStatusId( );
                 }
@@ -315,6 +316,29 @@ public final class NotificationContentHome
         }
 
         return null;
+    }
+    
+    private static Integer getStatusId ( Notification notification, EnumNotificationType statusType )
+    {
+        if ( EnumNotificationType.MYDASHBOARD.equals( statusType ) && notification.getMyDashboardNotification( ) != null )
+        {
+            Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
+            
+            if ( status.isPresent( ) )
+            {
+                return status.get( ).getId( );
+            } 
+            else
+            {
+                DemandStatus newStatus = new DemandStatus( );
+                newStatus.setStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
+                
+                newStatus = StatusHome.create( newStatus );
+                
+                return newStatus.getId( );
+            }
+        }
+        return -1;
     }
 
 }
