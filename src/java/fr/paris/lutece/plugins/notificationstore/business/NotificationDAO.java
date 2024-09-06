@@ -61,6 +61,9 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grubusiness.business.notification.SMSNotification;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
+import fr.paris.lutece.portal.business.file.File;
+import fr.paris.lutece.portal.service.file.FileService;
+import fr.paris.lutece.portal.service.file.FileServiceException;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -509,31 +512,31 @@ public final class NotificationDAO implements INotificationDAO
         {
             if ( EnumNotificationType.BACKOFFICE.name( ).equals( notifContent.getNotificationType( ) ) )
             {
-                notif.setBackofficeNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<BackofficeNotification>( )
+                notif.setBackofficeNotification( convertToObject( notifContent, new TypeReference<BackofficeNotification>( )
                 {
                 } ) );
             }
             if ( EnumNotificationType.BROADCAST_EMAIL.name( ).equals( notifContent.getNotificationType( ) ) )
             {
-                notif.setBroadcastEmail( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<List<BroadcastNotification>>( )
+                notif.setBroadcastEmail( convertToObject( notifContent, new TypeReference<List<BroadcastNotification>>( )
                 {
                 } ) );
             }
             if ( EnumNotificationType.CUSTOMER_EMAIL.name( ).equals( notifContent.getNotificationType( ) ) )
             {
-                notif.setEmailNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<EmailNotification>( )
+                notif.setEmailNotification( convertToObject( notifContent, new TypeReference<EmailNotification>( )
                 {
                 } ) );
             }
             if ( EnumNotificationType.MYDASHBOARD.name( ).equals( notifContent.getNotificationType( ) ) )
             {
-                notif.setMyDashboardNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<MyDashboardNotification>( )
+                notif.setMyDashboardNotification( convertToObject( notifContent, new TypeReference<MyDashboardNotification>( )
                 {
                 } ) );
             }
             if ( EnumNotificationType.SMS.name( ).equals( notifContent.getNotificationType( ) ) )
             {
-                notif.setSmsNotification( convertToObject( notif.getId( ), notifContent.getContent( ), new TypeReference<SMSNotification>( )
+                notif.setSmsNotification( convertToObject( notifContent, new TypeReference<SMSNotification>( )
                 {
                 } ) );
             }
@@ -543,30 +546,32 @@ public final class NotificationDAO implements INotificationDAO
     /**
      * 
      * @param <T>
-     * @param nIdNotification
-     * @param content
+     * @param notifContent
      * @param typeReference
      * @return
      */
-    private <T> T convertToObject( int nIdNotification, byte [ ] content, TypeReference<T> typeReference )
+    private <T> T convertToObject( NotificationContent notifContent, TypeReference<T> typeReference )
     {
         try
         {
+            File file = FileService.getInstance( ).getFileStoreServiceProvider( notifContent.getFileStore( ) ).getFile( notifContent.getFileKey( ) );            
+            
             String strNotification;
+            
             if ( AppPropertiesService.getPropertyBoolean( PROPERTY_DECOMPRESS_NOTIFICATION, false ) )
             {
-                strNotification = StringUtil.decompress( content );
+                strNotification = StringUtil.decompress( file.getPhysicalFile( ).getValue( ) );
             }
             else
             {
-                strNotification = new String( content, StandardCharsets.UTF_8 );
+                strNotification = new String( file.getPhysicalFile( ).getValue( ), StandardCharsets.UTF_8 );
             }
             return _mapper.readValue( strNotification, typeReference );
 
         }
-        catch( IOException e )
+        catch( FileServiceException | IOException e )
         {
-            AppLogService.error( "Error while reading JSON of notification " + nIdNotification, e );
+            AppLogService.error( "Error while reading JSON of notification " + notifContent.getIdNotification( ), e );
         }
 
         return null;

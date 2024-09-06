@@ -43,8 +43,9 @@ public class NotificationContent
     private int _strIdNotification;
     private String _strNotificationType;
     private Integer _strStatusId;
-    private Integer _strStatusGenericId;
-    private byte [ ] _content;
+    private Integer _strGenericStatusId;
+    private String _strFileKey;
+    private String _strFileStore;
 
     /**
      * Returns the Id
@@ -122,40 +123,52 @@ public class NotificationContent
     }
 
     /**
-     * @return the _strStatusGenericId
+     * @return the _strGenericStatusId
      */
-    public Integer getStatusGenericId( )
+    public Integer getGenericStatusId( )
     {
-        return _strStatusGenericId;
+        return _strGenericStatusId;
     }
 
     /**
-     * @param strStatusGenericId
-     *            the _strStatusGenericId to set
+     * @param strGenericStatusId
+     *            the _strGenericStatusId to set
      */
-    public void setStatusGenericId( Integer strStatusGenericId )
+    public void setGenericStatusId( Integer strGenericStatusId )
     {
-        this._strStatusGenericId = strStatusGenericId;
+        this._strGenericStatusId = strGenericStatusId;
     }
 
     /**
-     * Returns the Content
-     * 
-     * @return The Content
+     * @return the _strFileKey
      */
-    public byte [ ] getContent( )
+    public String getFileKey( )
     {
-        return _content;
+        return _strFileKey;
     }
 
     /**
-     * Sets the Content
-     * 
-     * @param bytes
-     *            The Content
+     * @param strFileKey the _strFileKey to set
      */
-    public void setContent( byte [ ] bytes )
+    public void setFileKey( String strFileKey )
     {
-        _content = bytes;
+        this._strFileKey = strFileKey;
     }
+
+    /**
+     * @return the _strFileStore
+     */
+    public String getFileStore( )
+    {
+        return _strFileStore;
+    }
+
+    /**
+     * @param strFileStore the _strFileStore to set
+     */
+    public void setFileStore( String strFileStore )
+    {
+        this._strFileStore = strFileStore;
+    }
+    
 }

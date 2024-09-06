@@ -348,6 +348,10 @@ public class NotificationService
         else
         {
             demand.getCustomer( ).setId( notification.getDemand( ).getCustomer( ).getId( ) );
+            if( StringUtils.isEmpty( demand.getCustomer( ).getConnectionId( ) ) )
+            {
+                demand.getCustomer( ).setConnectionId( notification.getDemand( ).getCustomer( ).getConnectionId( ) );
+            }
             demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
 
             int nNewStatusId = getNewDemandStatusIdFromNotification( notification );

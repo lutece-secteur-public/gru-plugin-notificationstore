@@ -41,6 +41,10 @@ import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
+import fr.paris.lutece.portal.business.file.File;
+import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
+import fr.paris.lutece.portal.service.file.FileService;
+import fr.paris.lutece.portal.service.file.FileServiceException;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -53,7 +57,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -268,8 +275,31 @@ public final class NotificationContentHome
     private static NotificationContent initNotificationContent( Notification notification, EnumNotificationType notificationType,
             String strNotificationContent ) throws IOException
     {
-        strNotificationContent = strNotificationContent.replaceAll( NotificationStoreConstants.CHARECTER_REGEXP_FILTER, "" );
+        NotificationContent notificationContent = new NotificationContent( );
+        notificationContent.setIdNotification( notification.getId( ) );
+        notificationContent.setNotificationType( notificationType.name( ) );
+        notificationContent.setStatusId( getStatusId( notification, EnumNotificationType.MYDASHBOARD ) );
+        notificationContent.setGenericStatusId( getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD ) );
+        notificationContent.setFileKey( saveContentInFileStore(notification, notificationType, strNotificationContent ) );
+        notificationContent.setFileStore( NotificationStoreConstants.FILE_STORE_PROVIDER );
 
+        return notificationContent;
+    }
+    
+    /**
+     * Save notification content in file store
+     * @param notification
+     * @param notificationType
+     * @param strNotificationContent
+     * @return file id
+     * @throws IOException
+     */
+    private static String saveContentInFileStore( Notification notification, EnumNotificationType notificationType,
+            String strNotificationContent) throws IOException
+    {
+        strNotificationContent = strNotificationContent.replaceAll( NotificationStoreConstants.CHARECTER_REGEXP_FILTER, "" );
+        
+        //Convert notification content to bytes
         byte [ ] bytes;
 
         if ( AppPropertiesService.getPropertyBoolean( NotificationStoreConstants.PROPERTY_COMPRESS_NOTIFICATION, false ) )
@@ -280,15 +310,28 @@ public final class NotificationContentHome
         {
             bytes = strNotificationContent.getBytes( StandardCharsets.UTF_8 );
         }
-
-        NotificationContent notificationContent = new NotificationContent( );
-        notificationContent.setIdNotification( notification.getId( ) );
-        notificationContent.setNotificationType( notificationType.name( ) );
-        notificationContent.setStatusId( getStatusId( notification, EnumNotificationType.MYDASHBOARD ) );
-        notificationContent.setStatusGenericId( getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD ) );
-        notificationContent.setContent( bytes );
-
-        return notificationContent;
+        
+        //Create file
+        File file = new File( );
+        file.setTitle( notification.getDemand( ).getDemandId( ) + "_" + notificationType.name( ) + "_" + notification.getDemand( ).getCustomer( ).getConnectionId( ) );
+        file.setSize( bytes.length );
+        file.setMimeType( MediaType.APPLICATION_JSON  );
+        
+        PhysicalFile physiqueFile = new PhysicalFile( );
+        physiqueFile.setValue( bytes );
+        
+        file.setPhysicalFile( physiqueFile );
+        
+        try
+        {
+            //Save file
+            return FileService.getInstance( ).getFileStoreServiceProvider( NotificationStoreConstants.FILE_STORE_PROVIDER ).storeFile( file );
+            
+        } catch ( FileServiceException e )
+        {
+            AppLogService.error( "An error occurred while saving the notification content, demand_id {}", notification.getDemand( ).getId( )  , e.getMessage( ) );
+        }
+        return StringUtils.EMPTY;
     }
 
     /**

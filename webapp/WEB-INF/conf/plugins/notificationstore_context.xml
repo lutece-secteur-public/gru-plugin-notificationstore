@@ -38,4 +38,14 @@
     <bean id="notificationstore.demandTypeRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandTypeRestService"/>
     <bean id="notificationstore.demandCategoryRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandCategoryRestService"/>
     
+    <!-- FileServiceProvider -->
+    <bean id="notificationstore.accessDeniedFileRBACService" class="fr.paris.lutece.plugins.notificationstore.service.file.AccessDeniedFileRBACService" />
+    
+    <bean id="notificationstore.notificationStoreDatabaseFileService" class="fr.paris.lutece.portal.service.file.implementation.LocalDatabaseFileService" >
+ 	    <constructor-arg ref="defaultFileDownloadUrlService" />
+        <constructor-arg ref="notificationstore.accessDeniedFileRBACService" />
+        <property name="default" value="true" />
+        <property name="name" value="notificationStoreDatabaseFileStoreProvider" />
+    </bean>
+    
 </beans>

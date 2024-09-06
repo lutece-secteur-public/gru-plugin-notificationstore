@@ -94,5 +94,9 @@ public class NotificationStoreConstants
     
     // Constants
     public static final String CHARECTER_REGEXP_FILTER = "[^\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\p{Sm}\\p{Sc}\\s]";
+    
+    
+    //FileStoreProvider
+    public static final String FILE_STORE_PROVIDER = "notificationStoreDatabaseFileStoreProvider";
 
 }

@@ -117,7 +117,8 @@ notification_id int NOT NULL,
 notification_type varchar(255) default '' NOT NULL,
 status_id int default "-1",
 status_generic_id int default "-1",
-content LONG VARBINARY,
+file_key VARCHAR(255) DEFAULT NULL,
+file_store VARCHAR(255) DEFAULT NULL,
 PRIMARY KEY (id_notification_content)
 );
 
