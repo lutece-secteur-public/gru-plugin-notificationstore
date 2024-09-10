@@ -82,7 +82,7 @@ public class DemandService implements IDemandServiceProvider
         {
             if ( demand != null )
             {
-                demand.setNotifications( _notificationDao.loadByDemand( demand.getDemandId( ), demand.getTypeId( ) ) );
+                demand.setNotifications( _notificationDao.loadByDemand( demand.getId( ), demand.getTypeId( ) ) );
             }
         }
         return collectionDemands;
@@ -103,7 +103,7 @@ public class DemandService implements IDemandServiceProvider
         {
             if ( demand != null )
             {
-                demand.setNotifications( _notificationDao.loadByDemand( demand.getDemandId( ), demand.getTypeId( ) ) );
+                demand.setNotifications( _notificationDao.loadByDemand( demand.getId( ), demand.getTypeId( ) ) );
             }
         }
         return collectionDemands;

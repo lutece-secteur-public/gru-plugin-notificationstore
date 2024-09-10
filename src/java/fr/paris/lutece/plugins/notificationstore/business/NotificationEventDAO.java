@@ -87,7 +87,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
             daoUtil.setString( nIndex++, notificationEvent.getEvent( ).getStatus( ) );
             daoUtil.setInt( nIndex++, notificationEvent.getEvent( ).getRedelivry( ) );
             daoUtil.setString( nIndex++, notificationEvent.getEvent( ).getMessage( ) );
-            daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getDemandId( ) ) );
+            daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getId( ) ) );
             daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getTypeId( ) ) );
             String strCustomerId = StringUtils.EMPTY;
             
@@ -300,7 +300,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
         notificationEvent.setMsgId( daoUtil.getString( nIndex++ ) );
 
         Demand demand = new Demand( );
-        demand.setDemandId( daoUtil.getString( nIndex++ ) );
+        demand.setId( daoUtil.getString( nIndex++ ) );
         demand.setTypeId( daoUtil.getString( nIndex++ ) );
         
         Customer cutomer = new Customer( );

@@ -319,7 +319,7 @@ public final class NotificationDAO implements INotificationDAO
             int nIndex = 1;
 
             daoUtil.setInt( nIndex++, notification.getId( ) );
-            daoUtil.setString( nIndex++, notification.getDemand( ).getDemandId( ) );
+            daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
             daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
             
             String strCustomerId = StringUtils.EMPTY;           

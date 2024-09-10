@@ -220,7 +220,7 @@ public class DemandRestService
      */
     private String getLabelStatus( Demand demand )
     {
-        Notification notification = NotificationHome.getLastNotifByDemandIdAndDemandTypeId( String.valueOf( demand.getDemandId( ) ),
+        Notification notification = NotificationHome.getLastNotifByDemandIdAndDemandTypeId( String.valueOf( demand.getId( ) ),
                 String.valueOf( demand.getTypeId( ) ) );
 
         if ( notification.getMyDashboardNotification( ) != null )

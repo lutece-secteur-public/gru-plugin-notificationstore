@@ -3,8 +3,8 @@
 --
 DROP TABLE IF EXISTS notificationstore_demand;
 CREATE TABLE notificationstore_demand (
-id int  AUTO_INCREMENT,
-demand_id varchar(50) NOT NULL,               -- old "id" column
+uid int  AUTO_INCREMENT,
+id varchar(50) NOT NULL,               -- old "id" column
 demand_type_id varchar(50) NOT NULL,   -- old "type_id" column
 subtype_id varchar(50) NULL,
 reference varchar(50) NOT NULL,    
@@ -15,7 +15,7 @@ closure_date timestamp NULL,
 max_steps int NULL,
 current_step int NULL,
 modify_date timestamp NULL,
-PRIMARY KEY ( id )
+PRIMARY KEY ( uid )
 );
 
 CREATE UNIQUE INDEX notificationstore_demand_unique_index on notificationstore_demand ( demand_type_id, demand_id, customer_id );

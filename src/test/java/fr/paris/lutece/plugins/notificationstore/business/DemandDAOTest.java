@@ -84,7 +84,7 @@ public class DemandDAOTest extends LuteceTestCase
     {
         // Create test
         Demand demand = new Demand( );
-        demand.setDemandId( DEMAND_ID_1 );
+        demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         demand.setReference( DEMAND_REFERENCE_1 );
@@ -100,7 +100,7 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.insert( demand );
 
-        Demand demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getDemandId( ), demand.getTypeId( ) );
+        Demand demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getId( ), demand.getId( ) );
         assertEquals( demandStored.getTypeId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );
@@ -113,7 +113,7 @@ public class DemandDAOTest extends LuteceTestCase
         assertEquals( demandStored.getCurrentStep( ), demand.getCurrentStep( ) );
 
         // Update test
-        demand.setDemandId( DEMAND_ID_2 );
+        demand.setId( DEMAND_ID_2 );
         demand.setTypeId( DEMAND_TYPE_ID_2 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_2 );
         demand.setReference( DEMAND_REFERENCE_2 );
@@ -128,15 +128,15 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.store( demand );
 
-        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getDemandId( ), demand.getTypeId( ) );
+        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getId( ), demand.getTypeId( ) );
         assertNull( demandStored );
 
-        demand.setDemandId( DEMAND_ID_1 );
+        demand.setId( DEMAND_ID_1 );
         demand.setTypeId( DEMAND_TYPE_ID_1 );
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         _demandDao.store( demand );
 
-        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getDemandId( ), demand.getTypeId( ) );
+        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getId( ), demand.getId( ) );
         assertEquals( demandStored.getTypeId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );

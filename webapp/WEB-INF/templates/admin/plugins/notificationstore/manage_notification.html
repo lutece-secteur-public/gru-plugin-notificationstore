@@ -53,7 +53,7 @@
         		<#list notification_list as notification >
 	        		<tr>
 			               <td>
-                                   ${notification.demand.demandId!''}<br>
+                                   ${notification.demand.id!''}<br>
                                    <br>
                                    type: ${notification.demand.typeId!''}<br>
                                    <br>
@@ -123,7 +123,7 @@
                            </td>
                            <td>
                                    <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageDemand.jsp" >
-                                           <input type="hidden" id="demand_id" name="demand_id" value="${notification.demand.demandId}"/>
+                                           <input type="hidden" id="demand_id" name="demand_id" value="${notification.demand.id}"/>
                                            <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notification.demand.typeId}"/>
 
                                            <@formGroup>
@@ -131,7 +131,7 @@
                                            </@formGroup>
                                    </@tform>
                                    <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotificationEvent.jsp" >
-                                           <input type="hidden" id="demand_id" name="demand_id" value="${notification.demand.demandId}"/>
+                                           <input type="hidden" id="demand_id" name="demand_id" value="${notification.demand.id}"/>
                                            <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notification.demand.typeId}"/>
                                            <input type="hidden" id="notification_date" name="notification_date" value="${notification.date}"/>
 

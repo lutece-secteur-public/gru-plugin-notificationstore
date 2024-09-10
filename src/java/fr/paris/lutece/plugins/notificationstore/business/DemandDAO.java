@@ -55,8 +55,8 @@ import org.apache.commons.lang3.StringUtils;
 public final class DemandDAO implements IDemandDAO
 {
     // Columns
-    private static final String COLUMN_ID = "id";
-    private static final String COLUMN_DEMAND_ID = "demand_id";
+    private static final String COLUMN_UID = "uid";
+    private static final String COLUMN_DEMAND_ID = "id";
     private static final String COLUMN_TYPE_ID = "demand_type_id";
     private static final String COLUMN_SUBTYPE_ID = "subtype_id";
     private static final String COLUMN_REFERENCE = "reference";
@@ -68,41 +68,41 @@ public final class DemandDAO implements IDemandDAO
     private static final String COLUMN_CURRENT_STEP = "current_step";
     private static final String COLUMN_MODIFY_DATE = "modify_date";
     // SQL queries
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " id, demand_id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " demand_id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " uid, id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM notificationstore_demand WHERE id = ? ";
+            + " FROM notificationstore_demand WHERE uid = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM notificationstore_demand WHERE demand_id = ? ";
+            + " FROM notificationstore_demand WHERE id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID_AND_TYPE_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM notificationstore_demand WHERE demand_id = ? AND  demand_type_id = ? ";
+            + " FROM notificationstore_demand WHERE id = ? AND  demand_type_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM notificationstore_demand";
-    private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT id FROM notificationstore_demand ";
-    private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where id in ( %s )";
+    private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT uid FROM notificationstore_demand ";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where uid in ( %s )";
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO notificationstore_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE id = ? AND demand_type_id = ?";
-    private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE demand_id = ? AND demand_type_id = ? ";
+    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE uid = ? AND demand_type_id = ?";
+    private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE id = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE customer_id = ?";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_REFERENCE = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE reference = ?";
 
-    private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.id) "
+    private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.uid) "
             + " FROM notificationstore_demand gd, notificationstore_notification gn, notificationstore_notification_content gc "
-            + " WHERE gd.demand_id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? ";
+            + " WHERE gd.id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? ";
 
-    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct(gd.id) "
+    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct(gd.uid) "
             + " FROM notificationstore_demand gd, notificationstore_notification gn, notificationstore_notification_content gc "
-            + " WHERE gd.demand_id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? " + " AND gc.status_id IN ( ";
+            + " WHERE gd.id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? " + " AND gc.status_id IN ( ";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
-    private static final String SQL_FILTER_BY_DEMAND_ID = " AND demand_id = ? ";
+    private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
     private static final String SQL_FILTER_BY_START_DATE = " AND creation_date >= ? ";
     private static final String SQL_FILTER_BY_END_DATE = " AND creation_date <= ? ";
     private static final String SQL_FILTER_NOTIFICATION_TYPE = " AND gc.notification_type = ? ";
-    private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY id ASC";
+    private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY uid ASC";
     private static final String SQL_QUERY_DATE_ORDER = " ORDER BY modify_date DESC";
 
     /**
@@ -273,7 +273,7 @@ public final class DemandDAO implements IDemandDAO
 
             int nIndex = 1;
 
-            daoUtil.setString( nIndex++, demand.getDemandId( ) );
+            daoUtil.setString( nIndex++, demand.getId( ) );
             daoUtil.setString( nIndex++, demand.getTypeId( ) );
             daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
             daoUtil.setString( nIndex++, demand.getReference( ) );
@@ -288,7 +288,7 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
             {
-                demand.setId( daoUtil.getGeneratedKeyInt( 1 ) );
+                demand.setUID( daoUtil.getGeneratedKeyInt( 1 ) );
             }
         }
 
@@ -314,7 +314,7 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
     
             // where primary_key
-            daoUtil.setInt( nIndex++, demand.getId( ) );
+            daoUtil.setInt( nIndex++, demand.getUID( ) );
             daoUtil.setString( nIndex++, demand.getTypeId( ) );
     
             daoUtil.executeUpdate( );
@@ -352,7 +352,7 @@ public final class DemandDAO implements IDemandDAO
     
             while ( daoUtil.next( ) )
             {
-                collectionIds.add( String.valueOf( dao2Demand( daoUtil ).getDemandId( ) ) );
+                collectionIds.add( String.valueOf( dao2Demand( daoUtil ).getId( ) ) );
             }
         
             return collectionIds;
@@ -412,8 +412,8 @@ public final class DemandDAO implements IDemandDAO
     {
         Demand demand = new Demand( );
 
-        demand.setId( daoUtil.getInt( COLUMN_ID ) );
-        demand.setDemandId( daoUtil.getString( COLUMN_DEMAND_ID ) );
+        demand.setUID( daoUtil.getInt( COLUMN_UID ) );
+        demand.setId( daoUtil.getString( COLUMN_DEMAND_ID ) );
         demand.setTypeId( daoUtil.getString( COLUMN_TYPE_ID ) );
         demand.setSubtypeId( daoUtil.getString( COLUMN_SUBTYPE_ID ) );
         demand.setStatusId( daoUtil.getInt( COLUMN_STATUS_ID ) );

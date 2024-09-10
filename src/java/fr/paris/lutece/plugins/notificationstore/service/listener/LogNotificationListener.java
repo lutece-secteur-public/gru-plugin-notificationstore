@@ -52,7 +52,7 @@ public class LogNotificationListener implements INotificationListener
         String strDemandId = "null";
         if ( notification.getDemand( ) != null )
         {
-            strDemandId = notification.getDemand( ).getDemandId( );
+            strDemandId = notification.getDemand( ).getId( );
         }
         AppLogService.info( "Notification [" + notification.getId( ) + "] for demand [" + strDemandId + "] has been created" );
     }
@@ -66,7 +66,7 @@ public class LogNotificationListener implements INotificationListener
         String strDemandId = "null";
         if ( notification.getDemand( ) != null )
         {
-            strDemandId = notification.getDemand( ).getDemandId( );
+            strDemandId = notification.getDemand( ).getId( );
         }
         AppLogService.info( "Notification [" + notification.getId( ) + "] for demand [" + strDemandId + "] has been updated" );
     }

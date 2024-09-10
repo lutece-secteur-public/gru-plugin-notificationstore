@@ -57,7 +57,7 @@
                                         ${demand.creationDate?number_to_datetime!''}
                                 </td>
                                 <td>
-                                        ${demand.demandId!''}
+                                        ${demand.id!''}
                                 </td>
                                 <td>
                                         ${demand.typeId!''}
@@ -76,7 +76,7 @@
                                 </td>
                                 <td>
                                         <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" >
-                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.demandId}"/>
+                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.id}"/>
                                                 <input type="hidden" id="demand_type_id" name="demand_type_id" value="${demand.typeId}"/>
 
                                                 <@formGroup>
@@ -84,7 +84,7 @@
                                                 </@formGroup>
                                         </@tform>
                                         <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotificationEvent.jsp" >
-                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.demandId}"/>
+                                                <input type="hidden" id="demand_id" name="demand_id" value="${demand.id}"/>
                                                 <input type="hidden" id="demand_type_id" name="demand_type_id" value="${demand.typeId}"/>
 
                                                 <@formGroup>

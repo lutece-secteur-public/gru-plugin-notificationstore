@@ -191,7 +191,7 @@ public class NotificationService
 	 */
 	private void checkNotification(Notification notification, List<StatusMessage> warnings) {
 		// notification should be associated to a demand id
-		if ( StringUtils.isBlank( notification.getDemand( ).getDemandId( ) ) )
+		if ( StringUtils.isBlank( notification.getDemand( ).getId( ) ) )
 		{
 			StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_WARNING, MESSAGE_MISSING_MANDATORY_FIELD, WARNING_DEMAND_ID_MANDATORY );
 			warnings.add( msg );
@@ -320,7 +320,7 @@ public class NotificationService
      */
     private void store( Notification notification )
     {
-        Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getDemandId( ), notification.getDemand( ).getTypeId( ) );
+        Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getId( ), notification.getDemand( ).getTypeId( ) );
                 
         if ( demand == null || 
         		( demand.getCustomer( ) != null && demand.getCustomer( ).getId( ) != null 
@@ -328,7 +328,7 @@ public class NotificationService
         {
             demand = new Demand( );
 
-            demand.setDemandId( notification.getDemand( ).getDemandId( ) );
+            demand.setId( notification.getDemand( ).getId( ) );
             demand.setTypeId( notification.getDemand( ).getTypeId( ) );
             demand.setSubtypeId( notification.getDemand( ).getSubtypeId( ) );
             demand.setReference( notification.getDemand( ).getReference( ) );
@@ -396,7 +396,7 @@ public class NotificationService
 		}
 
 		// check if Demand remote id and demand type id are present
-		if ( StringUtils.isBlank( notif.getDemand( ).getDemandId( ) ) || StringUtils.isBlank( notif.getDemand( ).getTypeId( ) ) )
+		if ( StringUtils.isBlank( notif.getDemand( ).getId( ) ) || StringUtils.isBlank( notif.getDemand( ).getTypeId( ) ) )
 		{
 			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_MISSING_DEMAND_ID );
 		}
@@ -529,7 +529,7 @@ public class NotificationService
 	{
 		StringBuilder message = new StringBuilder();
 		message.append( "\n" );
-		message.append( "Demande id " + notification.getDemand( ).getDemandId( ) + "\n" );
+		message.append( "Demande id " + notification.getDemand( ).getId( ) + "\n" );
 		message.append( "Notification id " + notification.getId( ) + "\n" );
 		message.append( "Status: " + strResponseStatus.getStatusCode( ) + " " + strResponseStatus.getReasonPhrase( ) + "\n" );
 		message.append( "Error: " + strErrorMessage  + "\n" );

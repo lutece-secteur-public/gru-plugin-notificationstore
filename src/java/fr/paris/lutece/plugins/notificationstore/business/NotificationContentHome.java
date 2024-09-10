@@ -313,7 +313,7 @@ public final class NotificationContentHome
         
         //Create file
         File file = new File( );
-        file.setTitle( notification.getDemand( ).getDemandId( ) + "_" + notificationType.name( ) + "_" + notification.getDemand( ).getCustomer( ).getConnectionId( ) );
+        file.setTitle( notification.getDemand( ).getId( ) + "_" + notificationType.name( ) + "_" + notification.getDemand( ).getCustomer( ).getConnectionId( ) );
         file.setSize( bytes.length );
         file.setMimeType( MediaType.APPLICATION_JSON  );
         
