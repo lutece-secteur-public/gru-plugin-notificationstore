@@ -20,7 +20,7 @@
 				<@input type='text' id='label' name='label'  maxlength=255 value='${demandtype.label!\'\'}' tabIndex='1' />
 			</@formGroup>
 			<@formGroup labelFor='category' labelKey='#i18n{notificationstore.modify_demandtype.labelCodeCategory}' mandatory=true>
-				<@select name='category' id='category' default_value=demandtype.category items=demandCategories />
+				<@input type='text' name='category' id='category' value='${demandtype.category!\'\'}'  tabIndex='1' />
 			</@formGroup>
 			<@formGroup labelFor='url' labelKey='#i18n{notificationstore.modify_demandtype.labelUrl}' mandatory=true>
 				<@input type='url' id='url' name='url'  maxlength=255 value='${demandtype.url!\'\'}' tabIndex='1' />

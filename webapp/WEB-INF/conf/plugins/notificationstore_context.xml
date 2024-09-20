@@ -10,7 +10,6 @@
     <bean id="notificationstore.notificationEventDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationEventDAO" />
     <bean id="notificationstore.statusDao"  class="fr.paris.lutece.plugins.notificationstore.business.StatusDAO" />
     <bean id="notificationstore.demandTypeDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandTypeDAO"/>
-	<bean id="notificationstore.demandCategoryDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandCategoryDAO"/>
     <bean id="notificationstore.notificationContentDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationContentDAO"/>
 
 	<bean id="notificationstore.demandService" class="fr.paris.lutece.plugins.notificationstore.service.DemandService" >
@@ -36,7 +35,6 @@
     <bean id="notificationstore.demandRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandRestService"/>
     <bean id="notificationstore.grurestdatabase" class="fr.paris.lutece.plugins.notificationstore.web.rs.NotificationRestService"/>
     <bean id="notificationstore.demandTypeRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandTypeRestService"/>
-    <bean id="notificationstore.demandCategoryRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandCategoryRestService"/>
     
     <!-- FileServiceProvider -->
     <bean id="notificationstore.accessDeniedFileRBACService" class="fr.paris.lutece.plugins.notificationstore.service.file.AccessDeniedFileRBACService" />

@@ -53,7 +53,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
-import fr.paris.lutece.plugins.notificationstore.business.DemandCategoryHome;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 
 /**
@@ -175,7 +174,6 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
 
         Map<String, Object> model = getModel( );
         model.put( MARK_DEMANDTYPE, _demandtype );
-        model.put( MARK_DEMANDCATEGORIES, DemandCategoryHome.getDemandCategoriesReferenceList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_DEMANDTYPE ) );
 
         return getPage( PROPERTY_PAGE_TITLE_CREATE_DEMANDTYPE, TEMPLATE_CREATE_DEMANDTYPE, model );
@@ -270,7 +268,6 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
 
         Map<String, Object> model = getModel( );
         model.put( MARK_DEMANDTYPE, _demandtype );
-        model.put( MARK_DEMANDCATEGORIES, DemandCategoryHome.getDemandCategoriesReferenceList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_DEMANDTYPE ) );
 
         return getPage( PROPERTY_PAGE_TITLE_MODIFY_DEMANDTYPE, TEMPLATE_MODIFY_DEMANDTYPE, model );

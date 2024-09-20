@@ -50,7 +50,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
@@ -109,7 +108,6 @@ public class DemandTypeRestService
      * @return the DemandType if created
      */
     @POST
-    @Path( StringUtils.EMPTY )
     @Produces( MediaType.APPLICATION_JSON )
     public Response createDemandType( @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE ) String strIdDemandType,
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_LABEL ) String strLabel,
@@ -130,13 +128,7 @@ public class DemandTypeRestService
         demandtype.setLabel( strLabel );
         demandtype.setUrl( strUrl );
         demandtype.setAppCode( strAppCode );
-        if( StringUtils.isEmpty( strCategory ) )
-        {
-            demandtype.setCategory( "ALL" );
-        } else
-        {
-            demandtype.setCategory( strCategory );
-        }
+        demandtype.setCategory( strCategory );
         
         DemandTypeHome.create( demandtype );
 
@@ -175,7 +167,7 @@ public class DemandTypeRestService
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_CATEGORY ) String strCategory )
     {
         if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) 
-                || StringUtils.isEmpty( strUrl ) || StringUtils.isEmpty( strAppCode ) )
+                || StringUtils.isEmpty( strUrl ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                     .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
@@ -195,15 +187,8 @@ public class DemandTypeRestService
             demandtype.setIdDemandType( Integer.parseInt( strIdDemandType ) );
             demandtype.setLabel( strLabel );
             demandtype.setUrl( strUrl );
-            demandtype.setAppCode( strAppCode );
-            
-            if( StringUtils.isEmpty( strCategory ) )
-            {
-                demandtype.setCategory( "ALL" );
-            } else
-            {
-                demandtype.setCategory( strCategory );
-            }
+            demandtype.setAppCode( StringUtils.isEmpty( strAppCode ) ? StringUtils.EMPTY : strAppCode );
+            demandtype.setCategory( StringUtils.isEmpty( strCategory ) ? StringUtils.EMPTY : strCategory );
             
             DemandTypeHome.update( demandtype );
 
