@@ -100,7 +100,8 @@ public class DemandCategoryRestService
     @POST
     @Produces( MediaType.APPLICATION_JSON )
     public Response createDemandCategory( @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_CODE ) String code, 
-            @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_LABEL ) String label )
+            @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_LABEL ) String label,
+            @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_DEFAULT ) String isDefault )
     {
         if ( StringUtils.isEmpty( code ) || StringUtils.isEmpty( label ) )
         {
@@ -112,6 +113,8 @@ public class DemandCategoryRestService
         DemandCategory demandcategory = new DemandCategory( );
         demandcategory.setCode( code );
         demandcategory.setLabel( label );
+        demandcategory.setDefault( Boolean.parseBoolean( isDefault ) );
+        
         DemandCategoryHome.create( demandcategory );
         
         return Response.status( Response.Status.OK )
@@ -133,7 +136,8 @@ public class DemandCategoryRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response modifyDemandCategory( @PathParam( NotificationStoreConstants.ID ) Integer id,
             @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_CODE ) String code,
-            @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_LABEL ) String label )
+            @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_LABEL ) String label,
+            @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_DEFAULT ) String isDefault )
     {
         if ( StringUtils.isEmpty( code ) || StringUtils.isEmpty( label ) )
         {
@@ -155,6 +159,8 @@ public class DemandCategoryRestService
             DemandCategory demandcategory = optDemandCategory.get( );
             demandcategory.setCode( code );
             demandcategory.setLabel( label );
+            demandcategory.setDefault( Boolean.parseBoolean( isDefault ) );
+
             DemandCategoryHome.update( demandcategory );
             
             return Response.status( Response.Status.OK )

@@ -130,13 +130,7 @@ public class DemandTypeRestService
         demandtype.setLabel( strLabel );
         demandtype.setUrl( strUrl );
         demandtype.setAppCode( strAppCode );
-        if( StringUtils.isEmpty( strCategory ) )
-        {
-            demandtype.setCategory( "ALL" );
-        } else
-        {
-            demandtype.setCategory( strCategory );
-        }
+        demandtype.setCategory( strCategory );
         
         DemandTypeHome.create( demandtype );
 
@@ -175,7 +169,7 @@ public class DemandTypeRestService
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_CATEGORY ) String strCategory )
     {
         if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) 
-                || StringUtils.isEmpty( strUrl ) || StringUtils.isEmpty( strAppCode ) )
+                || StringUtils.isEmpty( strUrl ) )
         {
             return Response.status( Response.Status.BAD_REQUEST )
                     .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
@@ -195,15 +189,8 @@ public class DemandTypeRestService
             demandtype.setIdDemandType( Integer.parseInt( strIdDemandType ) );
             demandtype.setLabel( strLabel );
             demandtype.setUrl( strUrl );
-            demandtype.setAppCode( strAppCode );
-            
-            if( StringUtils.isEmpty( strCategory ) )
-            {
-                demandtype.setCategory( "ALL" );
-            } else
-            {
-                demandtype.setCategory( strCategory );
-            }
+            demandtype.setAppCode( StringUtils.isEmpty( strAppCode ) ? StringUtils.EMPTY : strAppCode );
+            demandtype.setCategory( StringUtils.isEmpty( strCategory ) ? StringUtils.EMPTY : strCategory );
             
             DemandTypeHome.update( demandtype );
 

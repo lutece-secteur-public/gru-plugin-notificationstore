@@ -70,6 +70,7 @@ public class NotificationStoreConstants
     //Demand category attributes
     public static final String DEMANDCATEGORY_ATTRIBUTE_CODE = "code";
     public static final String DEMANDCATEGORY_ATTRIBUTE_LABEL = "label";
+    public static final String DEMANDCATEGORY_ATTRIBUTE_DEFAULT = "isDefault";
     
     // EXIT STATUS
     public static final String STATUS_201 = "{" + "\"status\":" + "\"201\"" + "}";

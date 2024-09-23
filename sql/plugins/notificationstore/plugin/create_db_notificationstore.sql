@@ -101,6 +101,7 @@ CREATE TABLE notificationstore_demand_category (
 id_demand_category int AUTO_INCREMENT,
 code varchar(255) default '' NOT NULL,
 label long varchar NOT NULL,
+is_default SMALLINT NOT NULL default 0,
 PRIMARY KEY (id_demand_category)
 );
 

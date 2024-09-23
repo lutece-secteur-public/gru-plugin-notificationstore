@@ -36,6 +36,8 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
+
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandCategory;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandCategoryDAO;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -148,6 +150,7 @@ public final class DemandCategoryHome
     {
 
         ReferenceList list = new ReferenceList( );
+        list.addItem( StringUtils.EMPTY, StringUtils.EMPTY );;
         getDemandCategoriesList( ).stream( ).forEach( c -> list.addItem( c.getCode( ), c.getLabel( ) ) );
 
         return list;

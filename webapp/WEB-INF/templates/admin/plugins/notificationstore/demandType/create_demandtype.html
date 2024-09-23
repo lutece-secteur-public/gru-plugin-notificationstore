@@ -18,13 +18,12 @@
 		<@formGroup labelFor='label' labelKey='#i18n{notificationstore.modify_demandtype.labelLabel}' mandatory=true>
 			<@input type='text' id='label' name='label'  maxlength=255 value='${demandtype.label!\'\'}' tabIndex='1' />
 		</@formGroup>
-		<@formGroup labelFor='category' labelKey='#i18n{notificationstore.modify_demandtype.labelCodeCategory}' mandatory=true>
-			<@select name='category' id='category' default_value=demandtype.category items=demandCategories />
-		</@formGroup>
 		<@formGroup labelFor='url' labelKey='#i18n{notificationstore.modify_demandtype.labelUrl}' mandatory=true>
 			<@input type='url' id='url' name='url'  maxlength=255 value='${demandtype.url!\'\'}' tabIndex='1' />
 		</@formGroup>
-				
+		<@formGroup labelFor='category' labelKey='#i18n{notificationstore.modify_demandtype.labelCodeCategory}'>
+			<@select name='category' id='category' default_value=demandtype.category items=demandCategories />
+		</@formGroup>				
 		<@actionButtons button1Name="action_createDemandType" button2Name="view_manageDemandType"/>
     </@tform>
 	</@boxBody>

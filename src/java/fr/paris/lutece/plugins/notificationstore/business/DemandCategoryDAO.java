@@ -49,13 +49,13 @@ import java.util.Optional;
 public final class DemandCategoryDAO implements IDemandCategoryDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_demand_category, code, label FROM notificationstore_demand_category WHERE id_demand_category = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_category ( code, label ) VALUES ( ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_demand_category, code, label, is_default FROM notificationstore_demand_category WHERE id_demand_category = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_category ( code, label, is_default ) VALUES ( ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_demand_category WHERE id_demand_category = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_category SET code = ?, label = ? WHERE id_demand_category = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_demand_category, code, label FROM notificationstore_demand_category";
+    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_category SET code = ?, label = ?, is_default = ? WHERE id_demand_category = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_demand_category, code, label, is_default FROM notificationstore_demand_category";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_demand_category FROM notificationstore_demand_category";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_demand_category, code, label FROM notificationstore_demand_category WHERE id_demand_category IN (  ";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_demand_category, code, label, is_default FROM notificationstore_demand_category WHERE id_demand_category IN (  ";
 
     /**
      * {@inheritDoc }
@@ -68,6 +68,7 @@ public final class DemandCategoryDAO implements IDemandCategoryDAO
             int nIndex = 1;
             daoUtil.setString( nIndex++, demandCategory.getCode( ) );
             daoUtil.setString( nIndex++, demandCategory.getLabel( ) );
+            daoUtil.setBoolean( nIndex++, demandCategory.isDefault( ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
@@ -97,7 +98,8 @@ public final class DemandCategoryDAO implements IDemandCategoryDAO
 
                 demandCategory.setId( daoUtil.getInt( nIndex++ ) );
                 demandCategory.setCode( daoUtil.getString( nIndex++ ) );
-                demandCategory.setLabel( daoUtil.getString( nIndex ) );
+                demandCategory.setLabel( daoUtil.getString( nIndex++ ) );
+                demandCategory.setDefault( daoUtil.getBoolean( nIndex ) );
             }
 
             return Optional.ofNullable( demandCategory );
@@ -129,8 +131,9 @@ public final class DemandCategoryDAO implements IDemandCategoryDAO
 
             daoUtil.setString( nIndex++, demandCategory.getCode( ) );
             daoUtil.setString( nIndex++, demandCategory.getLabel( ) );
-            daoUtil.setInt( nIndex, demandCategory.getId( ) );
-
+            daoUtil.setBoolean( nIndex++, demandCategory.isDefault( ) );
+            daoUtil.setInt( nIndex++, demandCategory.getId( ) );
+            
             daoUtil.executeUpdate( );
         }
     }
@@ -153,7 +156,8 @@ public final class DemandCategoryDAO implements IDemandCategoryDAO
 
                 demandCategory.setId( daoUtil.getInt( nIndex++ ) );
                 demandCategory.setCode( daoUtil.getString( nIndex++ ) );
-                demandCategory.setLabel( daoUtil.getString( nIndex ) );
+                demandCategory.setLabel( daoUtil.getString( nIndex++ ) );
+                demandCategory.setDefault( daoUtil.getBoolean( nIndex ) );
 
                 demandCategoryList.add( demandCategory );
             }
@@ -218,8 +222,9 @@ public final class DemandCategoryDAO implements IDemandCategoryDAO
 
                     demandCategory.setId( daoUtil.getInt( nIndex++ ) );
                     demandCategory.setCode( daoUtil.getString( nIndex++ ) );
-                    demandCategory.setLabel( daoUtil.getString( nIndex ) );
-
+                    demandCategory.setLabel( daoUtil.getString( nIndex++ ) );
+                    demandCategory.setDefault( daoUtil.getBoolean( nIndex ) );
+                    
                     demandCategoryList.add( demandCategory );
                 }
 
