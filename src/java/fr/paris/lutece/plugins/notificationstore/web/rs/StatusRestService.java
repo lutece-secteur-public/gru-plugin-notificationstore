@@ -49,8 +49,6 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
@@ -70,14 +68,6 @@ import fr.paris.lutece.util.json.JsonUtil;
 @Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND_STATUS )
 public class StatusRestService
 {
-
-    private static ObjectMapper _mapper = new ObjectMapper( );
-
-    private StatusRestService( )
-    {
-        _mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false );
-        _mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
-    }
 
     /**
      * Gets list status
@@ -130,7 +120,7 @@ public class StatusRestService
 
         try
         {
-            DemandStatus status = _mapper.readValue( strStatus, DemandStatus.class );
+            DemandStatus status = NotificationStoreUtils.getMapper( ).readValue( strStatus, DemandStatus.class );
 
             if ( isStatusCompleted( status ) )
             {
