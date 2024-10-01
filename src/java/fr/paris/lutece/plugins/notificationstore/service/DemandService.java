@@ -47,8 +47,15 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationLi
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
+import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
+import fr.paris.lutece.plugins.notificationstore.business.NotificationContent;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationContentHome;
+import fr.paris.lutece.plugins.notificationstore.business.NotificationEventHome;
+import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
+import fr.paris.lutece.portal.service.file.FileService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.util.sql.TransactionManager;
 
 import java.util.Collection;
 import java.util.List;
@@ -308,6 +315,53 @@ public class DemandService implements IDemandServiceProvider
     public Optional<DemandStatus> getStatusByLabel( String strStatusLabel )
     {
         return _statusDao.loadByStatus( strStatusLabel );
+    }
+
+    @Override
+    public void deleteAllDemandByCustomerId( String strCustomerId )
+    {
+        try
+        {
+            //Début de la transaction
+            TransactionManager.beginTransaction( null );
+            
+            Collection<Demand> demands = DemandHome.getDemandIdCustomer( strCustomerId );
+            
+            for( Demand demand :  demands )
+            {
+                List<Notification> listNotification = NotificationHome.findByDemand( demand.getId( ), null );
+                for( Notification notification : listNotification )
+                {                 
+                    List<NotificationContent> listNotificationContent = NotificationContentHome.getNotificationContentsByIdNotification( notification.getId( ) );
+                    
+                    for( NotificationContent notifContent : listNotificationContent )
+                    {
+                        //Remove File
+                        FileService.getInstance( ).getFileStoreServiceProvider( notifContent.getFileStore( ) ).delete( notifContent.getFileKey( ) );
+
+                        //Remove notification content
+                        NotificationContentHome.remove( notifContent.getId( ) );
+                    }
+                    //Remove notification
+                    NotificationHome.remove( notification.getId( ) );
+                }
+                //Remove deman
+                DemandHome.deleteByUid( demand.getUID( ) );
+            }
+            //Remove notification event
+            NotificationEventHome.deleteByCustomerId( strCustomerId );
+            
+            //Commit de la transaction
+            TransactionManager.commitTransaction( null );
+        }
+        catch (Exception e)
+        {
+            //Roll back
+            TransactionManager.rollBack( null );
+            
+            AppLogService.error( "Une erreur s'est produite lors de la suppression des demandes et des données liées de l'usager {}", strCustomerId , e.getMessage( ) );
+        }
+        
     }
 
 }

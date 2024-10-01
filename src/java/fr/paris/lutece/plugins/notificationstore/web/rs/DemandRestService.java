@@ -35,12 +35,18 @@ package fr.paris.lutece.plugins.notificationstore.web.rs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -50,12 +56,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
-import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
+import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandDisplay;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
-import fr.paris.lutece.plugins.grubusiness.business.web.rs.NotificationResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.SearchResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.responseStatus.ResponseStatusFactory;
 import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
@@ -68,6 +73,9 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.Paginator;
+import fr.paris.lutece.util.json.ErrorJsonResponse;
+import fr.paris.lutece.util.json.JsonResponse;
+import fr.paris.lutece.util.json.JsonUtil;
 
 /**
  * 
@@ -78,6 +86,10 @@ import fr.paris.lutece.util.html.Paginator;
 public class DemandRestService
 {
 
+    @Inject
+    @Named( "notificationstore.demandService" )
+    private IDemandServiceProvider _demandService;
+    
     /**
      * Return list of demand
      * 
@@ -154,6 +166,28 @@ public class DemandRestService
         List<Integer> listIds = DemandHome.getIdsByStatus( strCustomerId, listStatus, strNotificationType, strIdDemandType );
 
         return getResponse( result, nIndex, nDefaultItemsPerPage, listIds );
+    }
+    
+    @DELETE
+    @Path( NotificationStoreConstants.PATH_CUSTOMER_ID )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    public Response doDeleteAllDemands ( @PathParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String  strCustomerId )
+    {
+        
+        if( StringUtils.isNotEmpty( strCustomerId ) )
+        {
+            _demandService.deleteAllDemandByCustomerId( strCustomerId );
+            
+            return Response.status( Response.Status.OK )
+                    .entity( JsonUtil.buildJsonResponse( new JsonResponse( Response.Status.OK ) ) ).build( );            
+        } else
+        {
+            return Response.status( Response.Status.BAD_REQUEST )
+                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
+
+        }
+                
     }
 
     /**

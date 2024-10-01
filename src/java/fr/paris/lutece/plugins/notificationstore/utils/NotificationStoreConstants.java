@@ -49,6 +49,7 @@ public class NotificationStoreConstants
     public static final String PATH_LIST = "/list";
     public static final String PATH_TYPE_NOTIFICATION = "notificationType";
     public static final String PATH_ID = "/{" + NotificationStoreConstants.ID + "}";
+    public static final String PATH_CUSTOMER_ID = "/{" + NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID + "}";
     
     public static final String ID = "id";
 

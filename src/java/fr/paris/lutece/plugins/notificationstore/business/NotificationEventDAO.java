@@ -60,6 +60,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
     private static final String SQL_QUERY_SELECTALL = "SELECT id, event_date, type, status, redelivry, message, msg_id, demand_id, demand_type_id, customer_id, notification_date FROM notificationstore_notification_event ";
     private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification_event ( event_date, type, status, redelivry, message, demand_id, demand_type_id, customer_id, notification_date, msg_id ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification_event WHERE id = ? ";
+    private static final String SQL_QUERY_DELETE_BY_CUSTOMER_ID = "DELETE FROM notificationstore_notification_event WHERE customer_id = ? ";
     private static final String SQL_QUERY_DELETE_BY_DATE = "DELETE FROM notificationstore_notification_event WHERE event_date < ? ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND = SQL_QUERY_SELECTALL + " WHERE demand_id = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_SELECT_BY_NOTIFICATION = SQL_QUERY_SELECTALL
@@ -162,6 +163,19 @@ public final class NotificationEventDAO implements INotificationEventDAO
             daoUtil.setInt( 1, nKey );
             daoUtil.executeUpdate( );
             daoUtil.free( );
+        }
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void deleteByCustomerId( String strCustomerId )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_CUSTOMER_ID, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            daoUtil.setString( 1, strCustomerId );
+            daoUtil.executeUpdate( );
         }
     }
 

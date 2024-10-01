@@ -83,6 +83,7 @@ public final class DemandDAO implements IDemandDAO
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE uid = ? AND demand_type_id = ?";
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE id = ? AND demand_type_id = ? ";
+    private static final String SQL_QUERY_DEMAND_DELETE_BY_UID = "DELETE FROM notificationstore_demand WHERE uid = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE customer_id = ?";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_REFERENCE = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
@@ -333,6 +334,20 @@ public final class DemandDAO implements IDemandDAO
         {
             daoUtil.setString( 1, strDemandId );
             daoUtil.setString( 2, strDemandTypeId );
+    
+            daoUtil.executeUpdate( );
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteByUid( int nUid )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE_BY_UID, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            daoUtil.setInt( 1, nUid );
     
             daoUtil.executeUpdate( );
         }

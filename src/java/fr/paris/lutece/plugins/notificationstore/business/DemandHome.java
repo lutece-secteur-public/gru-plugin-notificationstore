@@ -166,4 +166,13 @@ public final class DemandHome
     {
         return _dao.store( demand );
     }
+    
+    /**
+     * Delete a demand by uid
+     * @param nUid
+     */
+    public static void deleteByUid ( int nUid )
+    {
+        _dao.deleteByUid( nUid );
+    }
 }
