@@ -100,6 +100,7 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
+    private static final String SQL_FILTER_BY_DEMAND_TYPE_GD_ID = " AND gd.demand_type_id = ? ";
     private static final String SQL_FILTER_BY_START_DATE = " AND creation_date >= ? ";
     private static final String SQL_FILTER_BY_END_DATE = " AND creation_date <= ? ";
     private static final String SQL_FILTER_NOTIFICATION_TYPE = " AND gc.notification_type = ? ";
@@ -522,7 +523,7 @@ public final class DemandDAO implements IDemandDAO
 
         if ( StringUtils.isNotEmpty( strIdDemandType ) )
         {
-            strSql += SQL_FILTER_BY_DEMAND_TYPE_ID;
+            strSql += SQL_FILTER_BY_DEMAND_TYPE_GD_ID;
         }
 
         strSql += SQL_QUERY_DATE_ORDER;
@@ -570,7 +571,7 @@ public final class DemandDAO implements IDemandDAO
         }
         if ( StringUtils.isNotEmpty( strIdDemandType ) )
         {
-            strQuery += SQL_FILTER_BY_DEMAND_TYPE_ID;
+            strQuery += SQL_FILTER_BY_DEMAND_TYPE_GD_ID;
         }
 
         strQuery += SQL_QUERY_DATE_ORDER;

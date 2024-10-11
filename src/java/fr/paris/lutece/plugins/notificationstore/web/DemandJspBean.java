@@ -178,7 +178,9 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
     private void initDemandTypes( )
     {
         _listDemandTypeId = new ReferenceList( );
-        DemandTypeHome.getDemandTypesList( ).stream( ).forEach( dt -> _listDemandTypeId.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getLabel( ) ) );
+        _listDemandTypeId.addItem( "" , " ");
+        
+        DemandTypeHome.getDemandTypesList( ).stream( ).forEach( dt -> _listDemandTypeId.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getIdDemandType( ) + ": " +  dt.getLabel( ) ) );
     }
 
     @Override
