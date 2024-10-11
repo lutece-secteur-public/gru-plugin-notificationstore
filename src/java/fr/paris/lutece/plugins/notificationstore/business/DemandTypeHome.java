@@ -150,7 +150,9 @@ public final class DemandTypeHome
     public static ReferenceList getDemandTypesReferenceList( )
     {
         ReferenceList listDemandType = new ReferenceList( );
-        getDemandTypesList( ).stream( ).forEach( dt -> listDemandType.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getLabel( ) ) );
+        listDemandType.addItem( "" , " ");
+        
+        getDemandTypesList( ).stream( ).forEach( dt -> listDemandType.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getIdDemandType( ) + ": " + dt.getLabel( ) ) );
 
         return listDemandType;
     }

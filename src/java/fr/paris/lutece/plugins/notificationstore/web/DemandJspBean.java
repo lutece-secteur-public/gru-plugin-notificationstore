@@ -103,7 +103,7 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
     {
         if ( _listDemandTypeId == null )
         {
-            initDemandTypes( );
+            _listDemandTypeId = DemandTypeHome.getDemandTypesReferenceList( );
         }
 
         // initial call (no pagination)
@@ -170,17 +170,6 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
         }
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_DEMAND, TEMPLATE_MANAGE_DEMAND, model );
-    }
-
-    /**
-     * init demand types
-     */
-    private void initDemandTypes( )
-    {
-        _listDemandTypeId = new ReferenceList( );
-        _listDemandTypeId.addItem( "" , " ");
-        
-        DemandTypeHome.getDemandTypesList( ).stream( ).forEach( dt -> _listDemandTypeId.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getIdDemandType( ) + ": " +  dt.getLabel( ) ) );
     }
 
     @Override
