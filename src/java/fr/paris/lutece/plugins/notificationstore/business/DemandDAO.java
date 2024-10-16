@@ -43,6 +43,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -101,6 +102,7 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_GD_ID = " AND gd.demand_type_id = ? ";
+    private static final String SQL_FILTER_BY_DEMAND_TYPE_GD_ID_IN = " AND gd.demand_type_id IN ( ";
     private static final String SQL_FILTER_BY_START_DATE = " AND creation_date >= ? ";
     private static final String SQL_FILTER_BY_END_DATE = " AND creation_date <= ? ";
     private static final String SQL_FILTER_NOTIFICATION_TYPE = " AND gc.notification_type = ? ";
@@ -569,9 +571,13 @@ public final class DemandDAO implements IDemandDAO
         {
             strQuery += SQL_FILTER_NOTIFICATION_TYPE;
         }
+        List<Integer> listIdsDemandType = new ArrayList<>();
         if ( StringUtils.isNotEmpty( strIdDemandType ) )
         {
-            strQuery += SQL_FILTER_BY_DEMAND_TYPE_GD_ID;
+            listIdsDemandType = Arrays.stream(strIdDemandType.split(",")).map(Integer::parseInt).collect(Collectors.toList());           
+            strQuery += SQL_FILTER_BY_DEMAND_TYPE_GD_ID_IN;
+            strQuery += listIdsDemandType.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " ) ";
+
         }
 
         strQuery += SQL_QUERY_DATE_ORDER;
@@ -590,9 +596,11 @@ public final class DemandDAO implements IDemandDAO
             {
                 daoUtil.setString( nIndexIn++, strNotificationType );
             }
-            if ( StringUtils.isNotEmpty( strIdDemandType ) )
+            
+            for ( Integer nIdDemandType : listIdsDemandType )
             {
-                daoUtil.setString( nIndexIn++, strIdDemandType );
+                daoUtil.setInt( nIndexIn, nIdDemandType );
+                nIndexIn++;
             }
 
             daoUtil.executeQuery( );

@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.notificationstore.web.rs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +63,7 @@ import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.SearchResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.responseStatus.ResponseStatusFactory;
 import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
+import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import fr.paris.lutece.plugins.notificationstore.business.StatusHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
@@ -141,7 +141,8 @@ public class DemandRestService
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIST_STATUS ) String strListStatus,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
+            @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
+            @QueryParam( NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE ) String strCategoryCode )
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );
@@ -149,8 +150,27 @@ public class DemandRestService
         {
             nDefaultItemsPerPage = Integer.parseInt( strLimitResult );
         }
-
+        
         DemandResult result = new DemandResult( );
+        
+        //Récupération des types de demande liés à la catégorie en paramètre.
+        StringBuilder sbIdsTypeDemand = new StringBuilder( );
+        if(StringUtils.isNotEmpty( strIdDemandType ))
+        {
+            sbIdsTypeDemand.append( Integer.parseInt( strIdDemandType ) + "," );
+        }
+        if( StringUtils.isNotEmpty( strCategoryCode ) )
+        {
+            DemandTypeHome.getDemandTypesListByCategoryCode( strCategoryCode ).stream( ).forEach( dt -> sbIdsTypeDemand.append( dt.getIdDemandType( ) + "," ) );
+        }
+        
+        //Si aucun type de demande n'est trouvé pour la catégorie en paramètre
+        if( StringUtils.isNotEmpty( strCategoryCode ) && sbIdsTypeDemand.length( ) < 1  )
+        {
+            result.setStatus( ResponseStatusFactory.noResult( ).setMessageKey( "no_result" ) );      
+            return Response.status( result.getStatus( ).getHttpCode( ) ).entity( result ).build( );
+        }
+               
         if ( StringUtils.isEmpty( strCustomerId ) || StringUtils.isEmpty( strListStatus ) )
         {
         	result.setStatus( ResponseStatusFactory.badRequest( ) );
@@ -163,7 +183,7 @@ public class DemandRestService
         }
 
         List<String> listStatus = Arrays.asList( strListStatus.split( "," ) );
-        List<Integer> listIds = DemandHome.getIdsByStatus( strCustomerId, listStatus, strNotificationType, strIdDemandType );
+        List<Integer> listIds = DemandHome.getIdsByStatus( strCustomerId, listStatus, strNotificationType, sbIdsTypeDemand.toString( ) );
 
         return getResponse( result, nIndex, nDefaultItemsPerPage, listIds );
     }

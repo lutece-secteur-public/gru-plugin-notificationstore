@@ -42,6 +42,7 @@ import fr.paris.lutece.util.ReferenceList;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class provides instances management methods (create, find, ...) for DemandType objects
@@ -155,6 +156,19 @@ public final class DemandTypeHome
         getDemandTypesList( ).stream( ).forEach( dt -> listDemandType.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getIdDemandType( ) + ": " + dt.getLabel( ) ) );
 
         return listDemandType;
+    }
+    
+    /**
+     * Load the data of all the demandType objects by category code and returns them as a list
+     * 
+     * @param strCategoryCode
+     * 
+     * @return the list which contains the data of all the demandType objects by category code
+     */
+    public static List<DemandType> getDemandTypesListByCategoryCode( String strCategoryCode )
+    {
+        return getDemandTypesList( ).stream( ).filter( dt -> strCategoryCode.equals( dt.getCategory( ) ) ).collect( Collectors.toList( ) );
+
     }
 
 }
