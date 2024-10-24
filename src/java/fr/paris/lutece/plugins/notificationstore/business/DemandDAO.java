@@ -94,9 +94,18 @@ public final class DemandDAO implements IDemandDAO
             + " FROM notificationstore_demand gd, notificationstore_notification gn, notificationstore_notification_content gc "
             + " WHERE gd.id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? ";
 
-    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct(gd.uid) "
-            + " FROM notificationstore_demand gd, notificationstore_notification gn, notificationstore_notification_content gc "
-            + " WHERE gd.id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? " + " AND gc.status_id IN ( ";
+    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct gd.uid "
+            + " FROM notificationstore_demand gd "
+            + " JOIN notificationstore_notification gn ON gd.id = gn.demand_id "
+            + " JOIN notificationstore_notification_content gc ON gn.id = gc.notification_id "
+            + " JOIN ( "
+            + "        SELECT demand_id, MAX(date) AS max_date "
+            + "        FROM notificationstore_notification "
+            + "        WHERE customer_id = ? "
+            + "        GROUP BY demand_id "
+            + "      ) AS latest_notifications ON gn.demand_id = latest_notifications.demand_id "
+            + " AND gn.date = latest_notifications.max_date "
+            + " WHERE gd.customer_id = ? " + " AND gc.status_id IN ( ";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
@@ -586,7 +595,8 @@ public final class DemandDAO implements IDemandDAO
         {
             int nIndexIn = 1;
             daoUtil.setString( nIndexIn++, strCustomerId );
-
+            daoUtil.setString( nIndexIn++, strCustomerId );
+            
             for ( String strStatus : listStatus )
             {
                 daoUtil.setString( nIndexIn, strStatus );
