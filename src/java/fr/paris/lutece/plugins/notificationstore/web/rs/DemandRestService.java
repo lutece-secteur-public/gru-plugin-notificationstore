@@ -70,6 +70,7 @@ import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstant
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.Paginator;
@@ -274,25 +275,31 @@ public class DemandRestService
      */
     private String getLabelStatus( Demand demand )
     {
-        Notification notification = NotificationHome.getLastNotifByDemandIdAndDemandTypeId( String.valueOf( demand.getId( ) ),
-                String.valueOf( demand.getTypeId( ) ) );
-
-        if ( notification.getMyDashboardNotification( ) != null )
-        {
-            EnumGenericStatus enumGenericStatus = EnumGenericStatus.getByStatusId( notification.getMyDashboardNotification( ).getStatusId( ) );
-            if ( enumGenericStatus != null )
+        try {
+            Notification notification = NotificationHome.getLastNotifByDemandIdAndDemandTypeId( String.valueOf( demand.getId( ) ),
+                    String.valueOf( demand.getTypeId( ) ) );
+    
+            if ( notification != null && notification.getMyDashboardNotification( ) != null )
             {
-                return I18nService.getLocalizedString( enumGenericStatus.getLabel( ), LocaleService.getDefault( ) );
-            }
-            else
-            {
-                Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
-                if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
+                EnumGenericStatus enumGenericStatus = EnumGenericStatus.getByStatusId( notification.getMyDashboardNotification( ).getStatusId( ) );
+                if ( enumGenericStatus != null )
                 {
-                    return I18nService.getLocalizedString( status.get( ).getGenericStatus( ).getLabel( ), LocaleService.getDefault( ) );
+                    return I18nService.getLocalizedString( enumGenericStatus.getLabel( ), LocaleService.getDefault( ) );
                 }
+                else
+                {
+                    Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
+                    if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
+                    {
+                        return I18nService.getLocalizedString( status.get( ).getGenericStatus( ).getLabel( ), LocaleService.getDefault( ) );
+                    }
+                }
+                return notification.getMyDashboardNotification( ).getStatusText( );
             }
-            return notification.getMyDashboardNotification( ).getStatusText( );
+        }
+        catch ( Exception e )
+        {
+            AppLogService.error( "Une erreur s'est produite lors de la récupération du statut de la dernière notification de la demande {}", demand.getId( ), e.getMessage( ) );
         }
 
         return StringUtils.EMPTY;
