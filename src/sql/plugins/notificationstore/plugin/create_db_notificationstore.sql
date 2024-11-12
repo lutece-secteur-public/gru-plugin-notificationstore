@@ -28,7 +28,7 @@ CREATE INDEX notificationstore_demand_customer_index ON notificationstore_demand
 --
 DROP TABLE IF EXISTS notificationstore_notification;
 CREATE TABLE notificationstore_notification (
-id int NOT NULL,
+id int  AUTO_INCREMENT,
 demand_id varchar(100) NOT NULL,
 demand_type_id varchar(50) NOT NULL,
 customer_id varchar(100) NULL,

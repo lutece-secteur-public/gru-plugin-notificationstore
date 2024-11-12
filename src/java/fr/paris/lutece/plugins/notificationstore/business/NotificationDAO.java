@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.notificationstore.business;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_AND = " AND ";
     private static final String SQL_QUERY_FILTER_NOTIFICATION_TYPE = " id IN (SELECT notification_id FROM notificationstore_notification_content WHERE notification_type in (  ";
 
-    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification ( id, demand_id, demand_type_id, customer_id, date ) VALUES ( ?, ?, ?, ?, ? );";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification ( demand_id, demand_type_id, customer_id, date ) VALUES (  ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification WHERE id = ?";
     private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM notificationstore_notification WHERE demand_id = ? AND demand_type_id = ? AND customer_id = ? ";
     private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM notificationstore_notification ORDER BY demand_type_id ";
@@ -323,15 +324,12 @@ public final class NotificationDAO implements INotificationDAO
     @Override
     public synchronized Notification insert( Notification notification )
     {
-        int nNotificationId = newPrimaryKey( );
-        notification.setId( nNotificationId );
-
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, NotificationStorePlugin.getPlugin( ) ) )
+        
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
         {
 
             int nIndex = 1;
 
-            daoUtil.setInt( nIndex++, notification.getId( ) );
             daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
             daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
             
@@ -346,6 +344,11 @@ public final class NotificationDAO implements INotificationDAO
             daoUtil.setTimestamp( nIndex++, notification.getDate( ) > 0 ? new Timestamp( notification.getDate( ) ) : null );
 
             daoUtil.executeUpdate( );
+            
+            if ( daoUtil.nextGeneratedKey( ) )
+            {
+            	notification.setId( daoUtil.getGeneratedKeyInt( 1 ) );
+            }
         }
 
         return notification;
@@ -381,28 +384,7 @@ public final class NotificationDAO implements INotificationDAO
         }
     }
 
-    /**
-     * Generates a new primary key
-     *
-     * @return the primary key
-     */
-    private int newPrimaryKey( )
-    {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_NEW_PK, NotificationStorePlugin.getPlugin( ) ) )
-        {
-            daoUtil.executeQuery( );
 
-            int nKey = 1;
-
-            if ( daoUtil.next( ) )
-            {
-                nKey = daoUtil.getInt( 1 ) + 1;
-            }
-
-            return nKey;
-        }
-
-    }
 
     /**
      * {@inheritDoc}
