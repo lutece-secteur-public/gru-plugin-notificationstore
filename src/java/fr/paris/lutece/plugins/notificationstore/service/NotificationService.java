@@ -220,37 +220,49 @@ public class NotificationService
 	 * @throws IdentityStoreException
 	 */
 	private void processCustomer(Notification notification) throws IdentityStoreException {
+		
 		Customer customerEncrypted = notification.getDemand( ).getCustomer( );
 
 		if ( CustomerProvider.instance( ).hasIdentityService( ) )
 		{
-			Customer customerDecrypted = CustomerProvider.instance( ).decrypt( customerEncrypted, notification.getDemand( ) );
-
-			if ( customerDecrypted != null && StringUtils.isNotEmpty( customerDecrypted.getConnectionId( ) )
-					&& StringUtils.isEmpty( customerDecrypted.getId( ) ) )
+			Customer customer = CustomerProvider.instance( ).decrypt( customerEncrypted, notification.getDemand( ) );
+			
+			try
 			{
-				try 
+				if ( customer != null )
 				{
-					Customer customerTmp = CustomerProvider.instance( ).get( customerDecrypted.getConnectionId( ), StringUtils.EMPTY );
-					customerDecrypted.setId( customerTmp.getId( ) );
-				}
-				catch ( IdentityNotFoundException e )
-				{
-					// customer not found in IDS
-					AppLogService.debug( "Customer not found with connection_id : " + customerDecrypted.getConnectionId( ) );
-					customerDecrypted = null;
+					if ( StringUtils.isEmpty( customer.getCustomerId( ) ) && StringUtils.isNotEmpty( customer.getConnectionId() ) )
+					{
+						// search by connection id (GUID)
+						Customer customerTmp = CustomerProvider.instance( ).get( customer.getConnectionId( ), StringUtils.EMPTY );
+						if ( customerTmp != null )
+						{
+							customer.setCustomerId( customerTmp.getCustomerId( ) );
+						}
+						else
+						{
+							// reset customer (a valid customer must have at least a customer_id or a connection_id)
+							customer = null;
+							AppLogService.debug( "Customer not found with connection_id : " + customer.getConnectionId( ) );
+						}
+					}
 				}
 			}
-
-			if ( customerDecrypted == null )
+			catch( IdentityStoreException e )
 			{
-				customerDecrypted = new Customer( );
-				customerDecrypted.setConnectionId( StringUtils.EMPTY );
-				customerDecrypted.setId( StringUtils.EMPTY );
-				notification.getDemand().setCustomer( customerDecrypted );
+				customer = null;
+				AppLogService.error( "An error occured while accessing IdentityStore", e  );
 			}
 
-			notification.getDemand( ).setCustomer( customerDecrypted );
+			if ( customer == null )
+			{
+				customer = new Customer( );
+				customer.setConnectionId( StringUtils.EMPTY );
+				customer.setId( StringUtils.EMPTY );
+				notification.getDemand().setCustomer( customer );				
+			}
+
+			notification.getDemand( ).setCustomer( customer );
 		}
 		else
 		{

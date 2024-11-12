@@ -252,6 +252,7 @@ public class CustomerProvider
         Map<String,String> attributeMap = getAttributeMap( identityDto );
 
         customer.setId( identityDto.getCustomerId( ) );
+        customer.setCustomerId( identityDto.getCustomerId( ) );
         customer.setConnectionId( identityDto.getConnectionId( ) );
         
         customer.setLastname( attributeMap.get( ATTRIBUTE_IDENTITY_NAME_FAMILLY ) );
