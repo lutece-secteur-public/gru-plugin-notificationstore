@@ -69,9 +69,9 @@ public final class NotificationHome
      * @param strDemandTypeId
      * @return the notification list
      */
-    public static List<Notification> findByDemand( String strDemandId, String strDemandTypeId )
+    public static List<Notification> findByDemand( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
-        return _dao.loadByDemand( strDemandId, strDemandTypeId );
+        return _dao.loadByDemand( strDemandId, strDemandTypeId, strCustomerId);
     }
 
     /**

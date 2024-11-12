@@ -121,9 +121,9 @@ public final class DemandHome
      * @param strDemandTypeId
      * @return the list which contains the id of all the project objects
      */
-    public static Demand getDemandByDemandIdAndTypeId( String strDemandId, String strDemandTypeId )
+    public static Demand getDemandByDemandIdAndTypeIdAndCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
-        return _dao.loadByDemandIdAndTypeId( strDemandId, strDemandTypeId );
+        return _dao.loadByDemandIdAndTypeIdAndCustomerId( strDemandId, strDemandTypeId, strCustomerId );
     }
 
     

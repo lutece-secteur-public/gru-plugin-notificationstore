@@ -332,7 +332,9 @@ public class NotificationService
      */
     private void store( Notification notification )
     {
-        Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getId( ), notification.getDemand( ).getTypeId( ) );
+        Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getId( ), 
+        		notification.getDemand( ).getTypeId( ),
+        		notification.getDemand( ).getCustomer( ).getCustomerId( ));
                 
         if ( demand == null || 
         		( demand.getCustomer( ) != null && demand.getCustomer( ).getId( ) != null 

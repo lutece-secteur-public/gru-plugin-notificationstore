@@ -100,7 +100,7 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.insert( demand );
 
-        Demand demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getId( ), demand.getTypeId( ) );
+        Demand demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId( ) );
         assertEquals( demandStored.getId( ), demand.getId( ) );
         assertEquals( demandStored.getTypeId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );
@@ -128,7 +128,7 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.store( demand );
 
-        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getId( ), demand.getTypeId( ) );
+        demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId() );
         assertNull( demandStored );
 
         demand.setId( DEMAND_ID_1 );
@@ -136,7 +136,7 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         _demandDao.store( demand );
 
-        demandStored = _demandDao.loadByDemandIdAndTypeId( demand.getId( ), demand.getTypeId( ) );
+        demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId() );
         assertEquals( demandStored.getId( ), demand.getId( ) );
         assertEquals( demandStored.getTypeId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );
@@ -169,8 +169,8 @@ public class DemandDAOTest extends LuteceTestCase
         assertEquals( demandStored.getSubtypeId( ), DEMAND_SUBTYPE_ID_1 );
 
         // Delete test
-        _demandDao.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
-        demandStored = _demandDao.loadByDemandIdAndTypeId( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
+        _demandDao.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1, CUSTOMER_ID_1 );
+        demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( DEMAND_ID_1, DEMAND_TYPE_ID_1, CUSTOMER_ID_1 );
         assertEquals( demandStored, nullValue( ) );
     }
 }

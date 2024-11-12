@@ -155,10 +155,11 @@ public class NotificationDAOTest extends LuteceTestCase
 
         String strDemandId = notification.getDemand( ).getId( );
         String strDemandTypeId = notification.getDemand( ).getTypeId( );
+        String strCustomerId = notification.getDemand( ).getCustomer( ).getCustomerId( );
         NotificationFilter filterDemand = new NotificationFilter( );
         filterDemand.setDemandId( strDemandId );
         filterDemand.setDemandTypeId( strDemandTypeId );
-        List<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        List<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
         assertEquals( collectionNotificationStored.size( ), 1 );
 
         Iterator<Notification> iterator = collectionNotificationStored.iterator( );
@@ -189,7 +190,7 @@ public class NotificationDAOTest extends LuteceTestCase
         notification.setBackofficeNotification( backofficeNotification );
         _notificationDAO.insert( notification );
 
-        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
         assertEquals( collectionNotificationStored.size( ), 2 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
@@ -219,7 +220,7 @@ public class NotificationDAOTest extends LuteceTestCase
         notification.setSmsNotification( smsNotification );
         _notificationDAO.insert( notification );
 
-        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
         assertEquals( collectionNotificationStored.size( ), 3 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
@@ -254,7 +255,7 @@ public class NotificationDAOTest extends LuteceTestCase
         notification.setEmailNotification( emailNotification );
         _notificationDAO.insert( notification );
 
-        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
         assertEquals( collectionNotificationStored.size( ), 4 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
@@ -293,7 +294,7 @@ public class NotificationDAOTest extends LuteceTestCase
         notification.setMyDashboardNotification( myDashboardNotification );
         _notificationDAO.insert( notification );
 
-        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
         assertEquals( collectionNotificationStored.size( ), 5 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
@@ -367,7 +368,7 @@ public class NotificationDAOTest extends LuteceTestCase
         notification.setBroadcastEmail( listBroadcastNotifications );
         _notificationDAO.insert( notification );
 
-        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
         assertEquals( collectionNotificationStored.size( ), 6 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
@@ -401,8 +402,8 @@ public class NotificationDAOTest extends LuteceTestCase
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
         assertEquals( collectionNotificationStored.size( ), 1 );
 
-        _notificationDAO.deleteByDemand( strDemandId, strDemandTypeId );
-        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId );
+        _notificationDAO.deleteByDemand( strDemandId, strDemandTypeId, strCustomerId );
+        collectionNotificationStored = _notificationDAO.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
         assertEquals( collectionNotificationStored.size( ), 0 );
 
         collectionNotificationStored = _notificationDAO.loadByFilter( filterDemand );
@@ -418,7 +419,7 @@ public class NotificationDAOTest extends LuteceTestCase
         collectionNotificationStored = _notificationDAO.loadByFilter( _filterBroadcast );
         assertEquals( collectionNotificationStored.size( ), 0 );
 
-        _demandDAO.delete( strDemandId, strDemandTypeId );
+        _demandDAO.delete( strDemandId, strDemandTypeId, strCustomerId );
     }
 
     /**
@@ -463,28 +464,28 @@ public class NotificationDAOTest extends LuteceTestCase
         notification.setDate( NOTIFICATION_DATE_2 );
         _notificationDAO.insert( notification );
 
-        Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
+        Collection<Notification> collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1, CUSTOMER_ID_1 );
         assertEquals( collectionNotificationStored.size( ), 1 );
 
         Iterator<Notification> iterator = collectionNotificationStored.iterator( );
         Notification notificationStored = iterator.next( );
         assertSame( notificationStored.getDate( ), NOTIFICATION_DATE_1 );
 
-        collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
+        collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2, CUSTOMER_ID_2 );
         assertEquals( collectionNotificationStored.size( ), 1 );
         iterator = collectionNotificationStored.iterator( );
         notificationStored = iterator.next( );
         assertSame( notificationStored.getDate( ), NOTIFICATION_DATE_2 );
 
-        _notificationDAO.deleteByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
-        collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
+        _notificationDAO.deleteByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1, CUSTOMER_ID_1 );
+        collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_1, DEMAND_TYPE_ID_1, CUSTOMER_ID_1 );
         assertEquals( collectionNotificationStored.size( ), 0 );
 
-        _notificationDAO.deleteByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
-        collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
+        _notificationDAO.deleteByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2, CUSTOMER_ID_2 );
+        collectionNotificationStored = _notificationDAO.loadByDemand( DEMAND_ID_2, DEMAND_TYPE_ID_2, CUSTOMER_ID_2 );
         assertEquals( collectionNotificationStored.size( ), 0 );
 
-        _demandDAO.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1 );
-        _demandDAO.delete( DEMAND_ID_2, DEMAND_TYPE_ID_2 );
+        _demandDAO.delete( DEMAND_ID_1, DEMAND_TYPE_ID_1, CUSTOMER_ID_1 );
+        _demandDAO.delete( DEMAND_ID_2, DEMAND_TYPE_ID_2, CUSTOMER_ID_2 );
     }
 }

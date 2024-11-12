@@ -89,7 +89,7 @@ public class DemandService implements IDemandServiceProvider
         {
             if ( demand != null )
             {
-                demand.setNotifications( _notificationDao.loadByDemand( demand.getId( ), demand.getTypeId( ) ) );
+                demand.setNotifications( _notificationDao.loadByDemand( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getConnectionId( ) ) );
             }
         }
         return collectionDemands;
@@ -110,7 +110,7 @@ public class DemandService implements IDemandServiceProvider
         {
             if ( demand != null )
             {
-                demand.setNotifications( _notificationDao.loadByDemand( demand.getId( ), demand.getTypeId( ) ) );
+                demand.setNotifications( _notificationDao.loadByDemand( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId( ) ) );
             }
         }
         return collectionDemands;
@@ -125,13 +125,13 @@ public class DemandService implements IDemandServiceProvider
      *            the demand type id
      * @return the demand if found, {@code null} otherwise
      */
-    public Demand findByPrimaryKey( String strDemandId, String strDemandTypeId )
+    public Demand findByPrimaryKey( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
-        Demand demand = _demandDao.loadByDemandIdAndTypeId( strDemandId, strDemandTypeId );
+        Demand demand = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( strDemandId, strDemandTypeId, strCustomerId );
 
         if ( demand != null )
         {
-            demand.setNotifications( _notificationDao.loadByDemand( strDemandId, strDemandTypeId ) );
+            demand.setNotifications( _notificationDao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId ) );
         }
 
         return demand;
@@ -212,14 +212,14 @@ public class DemandService implements IDemandServiceProvider
      * @param strDemandTypeId
      *            the demand type id
      */
-    public void remove( String strDemandId, String strDemandTypeId )
+    public void remove( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
-        _notificationDao.deleteByDemand( strDemandId, strDemandTypeId );
+        _notificationDao.deleteByDemand( strDemandId, strDemandTypeId, strCustomerId );
         for ( INotificationListener iNotificationListener : SpringContextService.getBeansOfType( INotificationListener.class ) )
         {
             iNotificationListener.onDeleteDemand( strDemandId, strDemandTypeId );
         }
-        _demandDao.delete( strDemandId, strDemandTypeId );
+        _demandDao.delete( strDemandId, strDemandTypeId, strCustomerId );
         for ( IDemandListener iDemandListener : SpringContextService.getBeansOfType( IDemandListener.class ) )
         {
             iDemandListener.onDeleteDemand( strDemandId, strDemandTypeId );
@@ -325,30 +325,33 @@ public class DemandService implements IDemandServiceProvider
             //Début de la transaction
             TransactionManager.beginTransaction( null );
             
-            Collection<Demand> demands = DemandHome.getDemandIdCustomer( strCustomerId );
+            // Notifications
+            List<Notification> listNotification = NotificationHome.findByDemand( null, null, strCustomerId );
+            for( Notification notification : listNotification )
+            {                 
+                List<NotificationContent> listNotificationContent = NotificationContentHome.getNotificationContentsByIdNotification( notification.getId( ) );
+                
+                for( NotificationContent notifContent : listNotificationContent )
+                {
+                    //Remove File
+                    FileService.getInstance( ).getFileStoreServiceProvider( notifContent.getFileStore( ) ).delete( notifContent.getFileKey( ) );
+
+                    //Remove notification content
+                    NotificationContentHome.remove( notifContent.getId( ) );
+                }
+                //Remove notification
+                NotificationHome.remove( notification.getId( ) );
+            }
             
+            // Demands
+            Collection<Demand> demands = DemandHome.getDemandIdCustomer( strCustomerId );
             for( Demand demand :  demands )
             {
-                List<Notification> listNotification = NotificationHome.findByDemand( demand.getId( ), null );
-                for( Notification notification : listNotification )
-                {                 
-                    List<NotificationContent> listNotificationContent = NotificationContentHome.getNotificationContentsByIdNotification( notification.getId( ) );
-                    
-                    for( NotificationContent notifContent : listNotificationContent )
-                    {
-                        //Remove File
-                        FileService.getInstance( ).getFileStoreServiceProvider( notifContent.getFileStore( ) ).delete( notifContent.getFileKey( ) );
-
-                        //Remove notification content
-                        NotificationContentHome.remove( notifContent.getId( ) );
-                    }
-                    //Remove notification
-                    NotificationHome.remove( notification.getId( ) );
-                }
-                //Remove deman
+                //Remove demand
                 DemandHome.deleteByUid( demand.getUID( ) );
             }
-            //Remove notification event
+            
+            // Events
             NotificationEventHome.deleteByCustomerId( strCustomerId );
             
             //Commit de la transaction

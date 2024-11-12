@@ -76,14 +76,14 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID_AND_TYPE_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM notificationstore_demand WHERE id = ? AND  demand_type_id = ? ";
+            + " FROM notificationstore_demand WHERE id = ? AND  demand_type_id = ? AND customer_id  = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM notificationstore_demand";
     private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT uid FROM notificationstore_demand ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where uid in ( %s )";
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO notificationstore_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE uid = ? AND demand_type_id = ?";
-    private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE id = ? AND demand_type_id = ? ";
+    private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE id = ? AND demand_type_id = ? AND customer_id = ? ";
     private static final String SQL_QUERY_DEMAND_DELETE_BY_UID = "DELETE FROM notificationstore_demand WHERE uid = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE customer_id = ?";
@@ -340,13 +340,14 @@ public final class DemandDAO implements IDemandDAO
      * {@inheritDoc}
      */
     @Override
-    public void delete( String strDemandId, String strDemandTypeId )
+    public void delete( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
         try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setString( 1, strDemandId );
             daoUtil.setString( 2, strDemandTypeId );
-    
+            daoUtil.setString( 2, strCustomerId );
+            
             daoUtil.executeUpdate( );
         }
     }
@@ -409,7 +410,7 @@ public final class DemandDAO implements IDemandDAO
     }
     
     @Override
-    public Demand loadByDemandIdAndTypeId( String strDemandId, String strDemandTypeId )
+    public Demand loadByDemandIdAndTypeIdAndCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
         Demand demand = null;
 
@@ -417,6 +418,7 @@ public final class DemandDAO implements IDemandDAO
         {
             daoUtil.setString( 1, strDemandId );
             daoUtil.setString( 2, strDemandTypeId );
+            daoUtil.setString( 3, strCustomerId );
             daoUtil.executeQuery( );
     
             while ( daoUtil.next( ) )
@@ -623,5 +625,4 @@ public final class DemandDAO implements IDemandDAO
             return listIds;
         }
     }
-
 }

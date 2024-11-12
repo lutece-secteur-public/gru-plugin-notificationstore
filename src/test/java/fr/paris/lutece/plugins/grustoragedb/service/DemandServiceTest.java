@@ -104,8 +104,8 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand1 ) );
         assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 1 );
-        assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ) ) );
-        assertNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ) ) );
+        assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( )  ) );
+        assertNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 1 );
         assertEquals( serviceTest.findByReference( demand2.getReference( ) ).size( ), 0 );
 
@@ -115,19 +115,19 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand2 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand2 ) );
         assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 2 );
-        assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ) ) );
-        assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ) ) );
+        assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) ) );
+        assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 1 );
         assertEquals( serviceTest.findByReference( demand2.getReference( ) ).size( ), 1 );
 
         // suppression demand1
-        serviceTest.remove( demand1.getId( ), demand1.getTypeId( ) );
+        serviceTest.remove( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.CREATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand1 ) );
         assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 1 );
-        assertNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ) ) );
-        assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ) ) );
+        assertNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) ) );
+        assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 0 );
         assertEquals( serviceTest.findByReference( demand2.getReference( ) ).size( ), 1 );
 
@@ -139,8 +139,8 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand2 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand2 ) );
         assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 1 );
-        assertNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ) ) );
-        assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ) ) );
+        assertNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) ) );
+        assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 0 );
         assertEquals( serviceTest.findByReference( demand2.getReference( ) ).size( ), 1 );
         assertEquals( serviceTest.findByReference( strOldRef ).size( ), 0 );
