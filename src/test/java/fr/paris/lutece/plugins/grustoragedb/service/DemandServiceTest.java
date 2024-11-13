@@ -84,7 +84,7 @@ public class DemandServiceTest extends TestCase
         // Notification.Demand avec la Demand comme ci dessus
 
         Customer customer1 = new Customer( );
-        customer1.setId( "cust_1" );
+        customer1.setCustomerId( "cust_1" );
 
         Demand demand1 = new Demand( );
         demand1.setTitle( "type_1" );
@@ -103,7 +103,7 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.CREATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand1 ) );
-        assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 1 );
+        assertEquals( serviceTest.findByCustomerId( customer1.getCustomerId( ) ).size( ), 1 );
         assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( )  ) );
         assertNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 1 );
@@ -114,7 +114,7 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.CREATE, demand2 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand2 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand2 ) );
-        assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 2 );
+        assertEquals( serviceTest.findByCustomerId( customer1.getCustomerId( ) ).size( ), 2 );
         assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) ) );
         assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 1 );
@@ -125,7 +125,7 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.CREATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand1 ) );
-        assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 1 );
+        assertEquals( serviceTest.findByCustomerId( customer1.getCustomerId( ) ).size( ), 1 );
         assertNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) ) );
         assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 0 );
@@ -138,7 +138,7 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.CREATE, demand2 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand2 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand2 ) );
-        assertEquals( serviceTest.findByCustomerId( customer1.getId( ) ).size( ), 1 );
+        assertEquals( serviceTest.findByCustomerId( customer1.getCustomerId( ) ).size( ), 1 );
         assertNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) ) );
         assertNotNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 0 );

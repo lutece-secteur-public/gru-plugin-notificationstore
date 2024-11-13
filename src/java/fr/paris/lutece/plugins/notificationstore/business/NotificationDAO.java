@@ -337,9 +337,9 @@ public final class NotificationDAO implements INotificationDAO
             
             String strCustomerId = StringUtils.EMPTY;           
             if( notification.getDemand( ).getCustomer( ) != null 
-                    && StringUtils.isNotEmpty( notification.getDemand( ).getCustomer( ).getId( ) ) )
+                    && StringUtils.isNotEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) )
             {
-                strCustomerId = notification.getDemand( ).getCustomer( ).getId( );
+                strCustomerId = notification.getDemand( ).getCustomer( ).getCustomerId( );
             }           
             daoUtil.setString( nIndex++, strCustomerId );
             
@@ -505,7 +505,8 @@ public final class NotificationDAO implements INotificationDAO
             setNotificationContent( notification, notificationFilter );
             
             Customer customer = new Customer ();
-            customer.setId( daoUtil.getString( COLUMN_CUSTOMER ) );
+            customer.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER ) );
+            customer.setId( customer.getCustomerId( ) );
             notification.getDemand( ).setCustomer( customer );
 
             listNotifications.add( notification );
@@ -616,7 +617,7 @@ public final class NotificationDAO implements INotificationDAO
                 setNotificationContent( notification, new NotificationFilter( ) );
                 
                 Customer customer = new Customer ();
-                customer.setId( daoUtil.getString( COLUMN_CUSTOMER ) );
+                customer.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER ) );
                 notification.getDemand( ).setCustomer( customer );
                 
                 listNotifications.add( notification );

@@ -93,9 +93,9 @@ public final class NotificationEventDAO implements INotificationEventDAO
             String strCustomerId = StringUtils.EMPTY;
             
             if( notificationEvent.getDemand( ).getCustomer( ) != null 
-                    && StringUtils.isNotEmpty( notificationEvent.getDemand( ).getCustomer( ).getId( ) ) )
+                    && StringUtils.isNotEmpty( notificationEvent.getDemand( ).getCustomer( ).getCustomerId( ) ) )
             {
-                strCustomerId = notificationEvent.getDemand( ).getCustomer( ).getId( );
+                strCustomerId = notificationEvent.getDemand( ).getCustomer( ).getCustomerId( );
             }
             daoUtil.setString( nIndex++, strCustomerId );
             daoUtil.setTimestamp( nIndex++, notificationEvent.getNotificationDate( ) > 0 ? new Timestamp ( notificationEvent.getNotificationDate( ) ) : null );
@@ -317,9 +317,11 @@ public final class NotificationEventDAO implements INotificationEventDAO
         demand.setId( daoUtil.getString( nIndex++ ) );
         demand.setTypeId( daoUtil.getString( nIndex++ ) );
         
-        Customer cutomer = new Customer( );
-        cutomer.setId(  daoUtil.getString( nIndex++ ) );
-        demand.setCustomer( cutomer );
+        Customer customer = new Customer( );
+        customer.setCustomerId(  daoUtil.getString( nIndex++ ) );
+        customer.setId( customer.getCustomerId( ) );
+        
+        demand.setCustomer( customer );
         
         notificationEvent.setDemand( demand );
 

@@ -91,7 +91,7 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setStatusId( EnumGenericStatus.ONGOING.getStatusId( ) );
 
         Customer customer = new Customer( );
-        customer.setId( CUSTOMER_ID_1 );
+        customer.setCustomerId( CUSTOMER_ID_1 );
         demand.setCustomer( customer );
         demand.setCreationDate( DEMAND_CREATION_DATE_1 );
         demand.setClosureDate( DEMAND_CLOSURE_DATE_1 );
@@ -106,7 +106,7 @@ public class DemandDAOTest extends LuteceTestCase
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );
         assertEquals( demandStored.getReference( ), demand.getReference( ) );
         assertEquals( demandStored.getStatusId( ), demand.getStatusId( ) );
-        assertEquals( demandStored.getCustomer( ).getId( ), demand.getCustomer( ).getId( ) );
+        assertEquals( demandStored.getCustomer( ).getCustomerId( ), demand.getCustomer( ).getCustomerId( ) );
         assertEquals( demandStored.getCreationDate( ), demand.getCreationDate( ) );
         assertEquals( demandStored.getClosureDate( ), demand.getClosureDate( ) );
         assertEquals( demandStored.getMaxSteps( ), demand.getMaxSteps( ) );
@@ -119,7 +119,7 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setReference( DEMAND_REFERENCE_2 );
         demand.setStatusId( EnumGenericStatus.CLOSED.getStatusId( ) );
         customer = new Customer( );
-        customer.setId( CUSTOMER_ID_2 );
+        customer.setCustomerId( CUSTOMER_ID_2 );
         demand.setCustomer( customer );
         demand.setCreationDate( DEMAND_CREATION_DATE_2 );
         demand.setClosureDate( DEMAND_CLOSURE_DATE_2 );
@@ -142,7 +142,7 @@ public class DemandDAOTest extends LuteceTestCase
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );
         assertNotSame( demandStored.getReference( ), demand.getReference( ) );
         assertEquals( demandStored.getStatusId( ), demand.getStatusId( ) );
-        assertEquals( demandStored.getCustomer( ).getId( ), demand.getCustomer( ).getId( ) );
+        assertEquals( demandStored.getCustomer( ).getCustomerId( ), demand.getCustomer( ).getCustomerId( ) );
         assertNotSame( demandStored.getCreationDate( ), demand.getCreationDate( ) );
         assertEquals( demandStored.getClosureDate( ), demand.getClosureDate( ) );
         assertNotSame( demandStored.getMaxSteps( ), demand.getMaxSteps( ) );

@@ -141,7 +141,7 @@ public class NotificationDAOTest extends LuteceTestCase
         demand.setStatusId( DEMAND_STATUS_ID_1 );
 
         Customer customer = new Customer( );
-        customer.setId( CUSTOMER_ID_1 );
+        customer.setCustomerId( CUSTOMER_ID_1 );
         demand.setCustomer( customer );
 
         _demandDAO.insert( demand );
@@ -436,7 +436,7 @@ public class NotificationDAOTest extends LuteceTestCase
         demand.setStatusId( DEMAND_STATUS_ID_1 );
 
         Customer customer = new Customer( );
-        customer.setId( CUSTOMER_ID_1 );
+        customer.setCustomerId( CUSTOMER_ID_1 );
         demand.setCustomer( customer );
 
         _demandDAO.insert( demand );
@@ -449,7 +449,7 @@ public class NotificationDAOTest extends LuteceTestCase
         demand2.setStatusId( DEMAND_STATUS_ID_2 );
 
         Customer customer2 = new Customer( );
-        customer2.setId( CUSTOMER_ID_2 );
+        customer2.setCustomerId( CUSTOMER_ID_2 );
         demand2.setCustomer( customer2 );
 
         _demandDAO.insert( demand2 );

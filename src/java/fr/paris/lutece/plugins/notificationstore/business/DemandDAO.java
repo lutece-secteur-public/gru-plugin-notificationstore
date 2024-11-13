@@ -291,7 +291,7 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
             daoUtil.setString( nIndex++, demand.getReference( ) );
             daoUtil.setInt( nIndex++, demand.getStatusId( ) );
-            daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
+            daoUtil.setString( nIndex++, demand.getCustomer( ).getCustomerId( ) );
             daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) > 0 ? new Timestamp( demand.getCreationDate( ) )  : null );
             daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp(demand.getClosureDate( ) ) : null );
             daoUtil.setInt( nIndex++, demand.getMaxSteps( ) );
@@ -320,7 +320,7 @@ public final class DemandDAO implements IDemandDAO
     
             // update
             daoUtil.setInt( nIndex++, demand.getStatusId( ) );
-            daoUtil.setString( nIndex++, demand.getCustomer( ).getId( ) );
+            daoUtil.setString( nIndex++, demand.getCustomer( ).getCustomerId( ) );
             daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp(demand.getClosureDate( ) ) : null );
             daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
             daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
@@ -448,7 +448,7 @@ public final class DemandDAO implements IDemandDAO
         demand.setStatusId( daoUtil.getInt( COLUMN_STATUS_ID ) );
 
         Customer customer = new Customer( );
-        customer.setId( daoUtil.getString( COLUMN_CUSTOMER_ID ) );
+        customer.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER_ID ) );
         demand.setCustomer( customer );
 
         demand.setReference( daoUtil.getString( COLUMN_REFERENCE ) );

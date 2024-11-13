@@ -215,7 +215,7 @@ public class NotificationService
 	}
 
 	/**
-	 * 
+	 * Process customer data
 	 * @param notification
 	 * @throws IdentityStoreException
 	 */
@@ -226,6 +226,11 @@ public class NotificationService
 		if ( CustomerProvider.instance( ).hasIdentityService( ) )
 		{
 			Customer customer = CustomerProvider.instance( ).decrypt( customerEncrypted, notification.getDemand( ) );
+			
+			if ( StringUtils.isEmpty( customer.getCustomerId( ) ) && !StringUtils.isEmpty( customer.getId( ) ) )
+			{
+				customer.setCustomerId( customer.getId( ) );
+			}
 			
 			try
 			{
@@ -258,7 +263,7 @@ public class NotificationService
 			{
 				customer = new Customer( );
 				customer.setConnectionId( StringUtils.EMPTY );
-				customer.setId( StringUtils.EMPTY );
+				customer.setCustomerId( StringUtils.EMPTY );
 				notification.getDemand().setCustomer( customer );				
 			}
 
@@ -337,8 +342,8 @@ public class NotificationService
         		notification.getDemand( ).getCustomer( ).getCustomerId( ));
                 
         if ( demand == null || 
-        		( demand.getCustomer( ) != null && demand.getCustomer( ).getId( ) != null 
-        		  && !demand.getCustomer( ).getId( ).equals( notification.getDemand( ).getCustomer( ).getId( ) ) ) )
+        		( demand.getCustomer( ) != null && demand.getCustomer( ).getCustomerId( ) != null 
+        		  && !demand.getCustomer( ).getCustomerId( ).equals( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) ) )
         {
             demand = new Demand( );
 
@@ -352,7 +357,8 @@ public class NotificationService
             demand.setStatusId( getNewDemandStatusIdFromNotification( notification ) );
 
             Customer customerDemand = new Customer( );
-            customerDemand.setId( notification.getDemand( ).getCustomer( ).getId( ) );
+            customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getId( ) );
+            customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getCustomerId( ) );
             customerDemand.setConnectionId( notification.getDemand( ).getCustomer( ).getConnectionId( ) );
             demand.setCustomer( customerDemand );
             
@@ -361,12 +367,8 @@ public class NotificationService
         }
         else
         {
-            demand.getCustomer( ).setId( notification.getDemand( ).getCustomer( ).getId( ) );
-            if( StringUtils.isEmpty( demand.getCustomer( ).getConnectionId( ) ) )
-            {
-                demand.getCustomer( ).setConnectionId( notification.getDemand( ).getCustomer( ).getConnectionId( ) );
-            }
-            demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
+        	// update demand status
+        	demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
 
             int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
             
