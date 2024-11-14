@@ -96,16 +96,9 @@ public final class DemandDAO implements IDemandDAO
 
     private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct gd.uid "
             + " FROM notificationstore_demand gd "
-            + " JOIN notificationstore_notification gn ON gd.id = gn.demand_id "
+            + " JOIN notificationstore_notification gn ON ( gd.id = gn.demand_id and gd.demand_type_id=gn.demand_type_id and gd.customer_id=gn.customer_id) "
             + " JOIN notificationstore_notification_content gc ON gn.id = gc.notification_id "
-            + " JOIN ( "
-            + "        SELECT demand_id, MAX(date) AS max_date "
-            + "        FROM notificationstore_notification "
-            + "        WHERE customer_id = ? "
-            + "        GROUP BY demand_id "
-            + "      ) AS latest_notifications ON gn.demand_id = latest_notifications.demand_id "
-            + " AND gn.date = latest_notifications.max_date "
-            + " WHERE gd.customer_id = ? " + " AND gc.status_id IN ( ";
+            + " WHERE gd.customer_id = ? " + " AND gd.status_id IN ( ";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
@@ -577,11 +570,7 @@ public final class DemandDAO implements IDemandDAO
         {
             strQuery += listStatus.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " ) ";
         }
-
-        if ( StringUtils.isNotEmpty( strNotificationType ) )
-        {
-            strQuery += SQL_FILTER_NOTIFICATION_TYPE;
-        }
+        
         List<Integer> listIdsDemandType = new ArrayList<>();
         if ( StringUtils.isNotEmpty( strIdDemandType ) )
         {
@@ -591,12 +580,16 @@ public final class DemandDAO implements IDemandDAO
 
         }
 
+        if ( StringUtils.isNotEmpty( strNotificationType ) )
+        {
+            strQuery += SQL_FILTER_NOTIFICATION_TYPE;
+        }
+
         strQuery += SQL_QUERY_DATE_ORDER;
 
         try ( DAOUtil daoUtil = new DAOUtil( strQuery, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndexIn = 1;
-            daoUtil.setString( nIndexIn++, strCustomerId );
             daoUtil.setString( nIndexIn++, strCustomerId );
             
             for ( String strStatus : listStatus )
@@ -604,16 +597,15 @@ public final class DemandDAO implements IDemandDAO
                 daoUtil.setString( nIndexIn, strStatus );
                 nIndexIn++;
             }
-            if ( StringUtils.isNotEmpty( strNotificationType ) )
-            {
-                daoUtil.setString( nIndexIn++, strNotificationType );
-            }
-            
             for ( Integer nIdDemandType : listIdsDemandType )
             {
                 daoUtil.setInt( nIndexIn, nIdDemandType );
                 nIndexIn++;
             }
+            if ( StringUtils.isNotEmpty( strNotificationType ) )
+            {
+                daoUtil.setString( nIndexIn++, strNotificationType );
+            }           
 
             daoUtil.executeQuery( );
 

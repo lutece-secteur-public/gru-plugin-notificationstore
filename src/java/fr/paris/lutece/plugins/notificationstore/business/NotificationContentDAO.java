@@ -51,12 +51,12 @@ import java.sql.Statement;
 public final class NotificationContentDAO implements INotificationContentDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id_notification_content, notification_id, notification_type, status_id, status_generic_id, file_key, file_store FROM notificationstore_notification_content WHERE id_notification_content = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification_content ( notification_id, notification_type, status_id, status_generic_id, file_key, file_store ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_SELECT = "SELECT id_notification_content, notification_id, notification_type, id_temporary_status, status_id, file_key, file_store FROM notificationstore_notification_content WHERE id_notification_content = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification_content ( notification_id, notification_type, id_temporary_status, status_id, file_key, file_store ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification_content WHERE id_notification_content = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_notification_content SET notification_type = ?, status_id = ?, status_generic_id = ?, file_key = ?, file_store = ? WHERE id_notification_content = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_content, notification_id, notification_type, status_id, status_generic_id, file_key, file_store FROM notificationstore_notification_content";
-    private static final String SQL_QUERY_SELECT_BY_ID_NOTIF = "SELECT id_notification_content, notification_id, notification_type, status_id, status_generic_id, file_key, file_store FROM notificationstore_notification_content WHERE notification_id = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_notification_content SET notification_type = ?, id_temporary_status = ?, status_id = ?, file_key = ?, file_store = ? WHERE id_notification_content = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_content, notification_id, notification_type, id_temporary_status, status_id, file_key, file_store FROM notificationstore_notification_content";
+    private static final String SQL_QUERY_SELECT_BY_ID_NOTIF = "SELECT id_notification_content, notification_id, notification_type, id_temporary_status, status_id, file_key, file_store FROM notificationstore_notification_content WHERE notification_id = ?";
     private static final String SQL_PARAM_QUERY_TYPE_NOTIF = " AND notification_type IN (";
 
     /**
@@ -70,8 +70,8 @@ public final class NotificationContentDAO implements INotificationContentDAO
             int nIndex = 0;
             daoUtil.setInt( ++nIndex, notificationContent.getIdNotification( ) );
             daoUtil.setString( ++nIndex, notificationContent.getNotificationType( ) );
+            daoUtil.setInt( ++nIndex, notificationContent.getIdTemporaryStatus( ) != null ? notificationContent.getIdTemporaryStatus( ) : -1 );
             daoUtil.setInt( ++nIndex, notificationContent.getStatusId( ) != null ? notificationContent.getStatusId( ) : -1 );
-            daoUtil.setInt( ++nIndex, notificationContent.getGenericStatusId( ) != null ? notificationContent.getGenericStatusId( ) : -1 );
             daoUtil.setString( ++nIndex, notificationContent.getFileKey( ) );
             daoUtil.setString( ++nIndex, notificationContent.getFileStore( ) );
 
@@ -128,8 +128,8 @@ public final class NotificationContentDAO implements INotificationContentDAO
         {
             int nIndex = 0;
             daoUtil.setString( ++nIndex, notificationContent.getNotificationType( ) );
+            daoUtil.setInt( ++nIndex, notificationContent.getIdTemporaryStatus( ) );
             daoUtil.setInt( ++nIndex, notificationContent.getStatusId( ) );
-            daoUtil.setInt( ++nIndex, notificationContent.getGenericStatusId( ) );
             daoUtil.setString( ++nIndex, notificationContent.getFileKey( ) );
             daoUtil.setString( ++nIndex, notificationContent.getFileStore( ) );
             daoUtil.setInt( ++nIndex, notificationContent.getId( ) );
@@ -227,8 +227,8 @@ public final class NotificationContentDAO implements INotificationContentDAO
         notificationContent.setId( daoUtil.getInt( "id_notification_content" ) );
         notificationContent.setIdNotification( daoUtil.getInt( "notification_id" ) );
         notificationContent.setNotificationType( daoUtil.getString( "notification_type" ) );
+        notificationContent.setIdTemporaryStatus( daoUtil.getInt( "id_temporary_status" ) );
         notificationContent.setStatusId( daoUtil.getInt( "status_id" ) );
-        notificationContent.setGenericStatusId( daoUtil.getInt( "status_generic_id" ) );
         notificationContent.setFileKey( daoUtil.getString( "file_key" ) );
         notificationContent.setFileStore( daoUtil.getString( "file_store" ) );
 
