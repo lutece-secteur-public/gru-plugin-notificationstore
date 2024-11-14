@@ -50,15 +50,15 @@ import fr.paris.lutece.util.sql.DAOUtil;
 public final class StatusDAO implements IDemandStatusDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECT = "SELECT id, status, status_id FROM notificationstore_status WHERE id = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_status ( status, status_id ) VALUES ( ?, ? ) ";
-    private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_status WHERE id = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_status SET status = ?, status_id = ? WHERE id = ?";
-    private static final String SQL_QUERY_SELECTALL = "SELECT id, status, status_id FROM notificationstore_status";
-    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id FROM notificationstore_status";
-    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id, status, status_id FROM notificationstore_status WHERE id IN (  ";
-    private static final String SQL_QUERY_SELECT_BY_STATUS_ID = "SELECT id, status, status_id FROM notificationstore_status WHERE status_id = ?";
-    private static final String SQL_QUERY_SELECT_BY_STATUS = "SELECT id, status, status_id FROM notificationstore_status WHERE status = ?";
+    private static final String SQL_QUERY_SELECT = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE id_temporary_status = ?";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_temporary_status ( status, status_id ) VALUES ( ?, ? ) ";
+    private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_temporary_status WHERE id_temporary_status = ? ";
+    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_temporary_status SET status = ?, status_id = ? WHERE id_temporary_status = ?";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status";
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_temporary_status FROM notificationstore_temporary_status";
+    private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE id_temporary_status IN (  ";
+    private static final String SQL_QUERY_SELECT_BY_STATUS_ID = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE status_id = ?";
+    private static final String SQL_QUERY_SELECT_BY_STATUS = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE status = ?";
 
     /**
      * {@inheritDoc }

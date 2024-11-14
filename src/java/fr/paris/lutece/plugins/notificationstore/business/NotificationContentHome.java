@@ -238,9 +238,11 @@ public final class NotificationContentHome
 
             if ( notification.getMyDashboardNotification( ) != null )
             {
-                demand.setStatusId( getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD ) );
-                listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.MYDASHBOARD,
-                        mapperr.writeValueAsString( notification.getMyDashboardNotification( ) ) ) );
+                NotificationContent notificationContent = initNotificationContent( notification, EnumNotificationType.MYDASHBOARD,
+                        mapperr.writeValueAsString( notification.getMyDashboardNotification( ) ) );
+                listNotificationContent.add( notificationContent );
+                //Update demand status only for mydashboard notification
+                demand.setStatusId( notificationContent.getStatusId( ) );
             }
 
             if ( notification.getEmailNotification( ) != null )
@@ -248,6 +250,7 @@ public final class NotificationContentHome
                 listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.CUSTOMER_EMAIL,
                         mapperr.writeValueAsString( notification.getEmailNotification( ) ) ) );
             }
+            //Update modify date of demand
             demand.setModifyDate( new Date( ).getTime( ) );
             DemandHome.update( demand );
 
@@ -265,7 +268,7 @@ public final class NotificationContentHome
     }
 
     /**
-     * Init Notification content
+     * Initialization of notification content and retrieval of temporary and generic status
      * 
      * @param nNotificationId
      * @param notificationType
@@ -278,11 +281,20 @@ public final class NotificationContentHome
         NotificationContent notificationContent = new NotificationContent( );
         notificationContent.setIdNotification( notification.getId( ) );
         notificationContent.setNotificationType( notificationType.name( ) );
-        notificationContent.setStatusId( getStatusId( notification, EnumNotificationType.MYDASHBOARD ) );
-        notificationContent.setGenericStatusId( getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD ) );
         notificationContent.setFileKey( saveContentInFileStore(notification, notificationType, strNotificationContent ) );
         notificationContent.setFileStore( NotificationStoreConstants.FILE_STORE_PROVIDER );
 
+        //Calculate status
+        Integer nStatusId = getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD );
+        notificationContent.setStatusId( nStatusId );
+        notificationContent.setIdTemporaryStatus( -1 );
+        
+        //If no generic status found.
+        if( nStatusId == -1 )
+        {
+            notificationContent.setIdTemporaryStatus( getTemporaryStatusId( notification, EnumNotificationType.MYDASHBOARD ) );
+        }
+        
         return notificationContent;
     }
     
@@ -358,10 +370,16 @@ public final class NotificationContentHome
             }
         }
 
-        return null;
+        return -1;
     }
     
-    private static Integer getStatusId ( Notification notification, EnumNotificationType statusType )
+    /**
+     * Returns the id of the temporary status if it exists, otherwise we create it
+     * @param notification
+     * @param statusType
+     * @return temporary status id
+     */
+    private static Integer getTemporaryStatusId ( Notification notification, EnumNotificationType statusType )
     {
         if ( EnumNotificationType.MYDASHBOARD.equals( statusType ) && notification.getMyDashboardNotification( ) != null )
         {
@@ -373,6 +391,7 @@ public final class NotificationContentHome
             } 
             else
             {
+                //Create temporary status if not exist
                 DemandStatus newStatus = new DemandStatus( );
                 newStatus.setStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
                 

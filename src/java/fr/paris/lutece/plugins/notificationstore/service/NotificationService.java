@@ -354,7 +354,7 @@ public class NotificationService
             demand.setCreationDate( notification.getDate( ) );
             demand.setMaxSteps( notification.getDemand( ).getMaxSteps( ) );
             demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
-            demand.setStatusId( getNewDemandStatusIdFromNotification( notification ) );
+            demand.setStatusId( -1 );
 
             Customer customerDemand = new Customer( );
             customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getId( ) );

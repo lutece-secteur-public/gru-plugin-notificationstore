@@ -63,19 +63,19 @@ CREATE INDEX IDX_NOTIFICATION_EVENT_DATE on notificationstore_notification_event
 
    
 --
--- Structure for table notificationstore_status
+-- Structure for table notificationstore_temporary_status
 --
 
 
-DROP TABLE IF EXISTS notificationstore_status;
-CREATE TABLE notificationstore_status (
-id int AUTO_INCREMENT,
+DROP TABLE IF EXISTS notificationstore_temporary_status;
+CREATE TABLE notificationstore_temporary_status (
+id_temporary_status int AUTO_INCREMENT,
 status long varchar NOT NULL,
 status_id int default '-1',
 PRIMARY KEY (id)
 );
 
-CREATE INDEX IDX_notificationstore_status_text on  notificationstore_status (status(200), status_id) ;
+CREATE INDEX IDX_notificationstore_status_text on  notificationstore_temporary_status (status(200), status_id) ;
 
 --
 -- Structure for table notificationstore_demand_type
@@ -117,8 +117,8 @@ CREATE TABLE notificationstore_notification_content (
 id_notification_content int AUTO_INCREMENT,
 notification_id int NOT NULL,
 notification_type varchar(100) default '' NOT NULL,
+id_temporary_status int default "-1",
 status_id int default "-1",
-status_generic_id int default "-1",
 file_key VARCHAR(255) DEFAULT NULL,
 file_store VARCHAR(255) DEFAULT NULL,
 PRIMARY KEY (id_notification_content)

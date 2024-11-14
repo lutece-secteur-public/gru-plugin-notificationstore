@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -54,9 +53,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
-import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandDisplay;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
@@ -64,13 +61,10 @@ import fr.paris.lutece.plugins.grubusiness.business.web.rs.SearchResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.responseStatus.ResponseStatusFactory;
 import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
-import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
-import fr.paris.lutece.plugins.notificationstore.business.StatusHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.l10n.LocaleService;
 import fr.paris.lutece.util.html.Paginator;
@@ -154,7 +148,7 @@ public class DemandRestService
         
         DemandResult result = new DemandResult( );
         
-        //Récupération des types de demande liés à la catégorie en paramètre.
+        //Retrieving request types related to the category as a parameter.
         StringBuilder sbIdsTypeDemand = new StringBuilder( );
         if(StringUtils.isNotEmpty( strIdDemandType ))
         {
@@ -165,7 +159,7 @@ public class DemandRestService
             DemandTypeHome.getDemandTypesListByCategoryCode( strCategoryCode ).stream( ).forEach( dt -> sbIdsTypeDemand.append( dt.getIdDemandType( ) + "," ) );
         }
         
-        //Si aucun type de demande n'est trouvé pour la catégorie en paramètre
+        //If no request type is found for the parameter category
         if( StringUtils.isNotEmpty( strCategoryCode ) && sbIdsTypeDemand.length( ) < 1  )
         {
             result.setStatus( ResponseStatusFactory.noResult( ).setMessageKey( "no_result" ) );      
@@ -240,10 +234,6 @@ public class DemandRestService
         }
         
         return Response.status( result.getStatus( ).getHttpCode( ) ).entity( result ).build( );
-        
-        // extends ResponseDto
-        //return Response.status( Response.Status.OK  ).entity( entity ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
-        //return Response.status( entity.getStatus( ).getHttpCode( ) ).entity( entity ).type( MediaType.APPLICATION_JSON_TYPE ).build( );
     }
 
     /**
@@ -268,40 +258,18 @@ public class DemandRestService
     }
 
     /**
-     * Get status label
+     * Get status label by demand status id
      * 
      * @param demand
-     * @return status
+     * @return Generic status label
      */
     private String getLabelStatus( Demand demand )
     {
-        try {
-            Notification notification = NotificationHome.getLastNotifByDemandIdAndDemandTypeId( String.valueOf( demand.getId( ) ),
-                    String.valueOf( demand.getTypeId( ) ) );
-    
-            if ( notification != null && notification.getMyDashboardNotification( ) != null )
-            {
-                EnumGenericStatus enumGenericStatus = EnumGenericStatus.getByStatusId( notification.getMyDashboardNotification( ).getStatusId( ) );
-                if ( enumGenericStatus != null )
-                {
-                    return I18nService.getLocalizedString( enumGenericStatus.getLabel( ), LocaleService.getDefault( ) );
-                }
-                else
-                {
-                    Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
-                    if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
-                    {
-                        return I18nService.getLocalizedString( status.get( ).getGenericStatus( ).getLabel( ), LocaleService.getDefault( ) );
-                    }
-                }
-                return notification.getMyDashboardNotification( ).getStatusText( );
-            }
-        }
-        catch ( Exception e )
+        EnumGenericStatus enumGenericStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
+        if ( enumGenericStatus != null )
         {
-            AppLogService.error( "Une erreur s'est produite lors de la récupération du statut de la dernière notification de la demande {}", demand.getId( ), e.getMessage( ) );
+            return I18nService.getLocalizedString( enumGenericStatus.getLabel( ), LocaleService.getDefault( ) );
         }
-
         return StringUtils.EMPTY;
     }
 

@@ -42,8 +42,8 @@ public class NotificationContent
     private int _nId;
     private int _strIdNotification;
     private String _strNotificationType;
+    private Integer _strIdTemporaryStatus;
     private Integer _strStatusId;
-    private Integer _strGenericStatusId;
     private String _strFileKey;
     private String _strFileStore;
 
@@ -107,6 +107,22 @@ public class NotificationContent
     }
 
     /**
+     * @return the _strIdTemporaryStatus
+     */
+    public Integer getIdTemporaryStatus( )
+    {
+        return _strIdTemporaryStatus;
+    }
+
+    /**
+     * @param strIdTemporaryStatus the _strIdTemporaryStatus to set
+     */
+    public void setIdTemporaryStatus( Integer strIdTemporaryStatus )
+    {
+        this._strIdTemporaryStatus = strIdTemporaryStatus;
+    }
+
+    /**
      * @return the _strStatusId
      */
     public Integer getStatusId( )
@@ -115,28 +131,12 @@ public class NotificationContent
     }
 
     /**
-     * @param strStatusId the _strStatusId to set
+     * @param strStatusId
+     *            the _strStatusId to set
      */
     public void setStatusId( Integer strStatusId )
     {
         this._strStatusId = strStatusId;
-    }
-
-    /**
-     * @return the _strGenericStatusId
-     */
-    public Integer getGenericStatusId( )
-    {
-        return _strGenericStatusId;
-    }
-
-    /**
-     * @param strGenericStatusId
-     *            the _strGenericStatusId to set
-     */
-    public void setGenericStatusId( Integer strGenericStatusId )
-    {
-        this._strGenericStatusId = strGenericStatusId;
     }
 
     /**
