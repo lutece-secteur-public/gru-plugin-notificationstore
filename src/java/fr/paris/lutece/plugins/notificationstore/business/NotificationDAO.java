@@ -52,6 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
+import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BackofficeNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.BroadcastNotification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EmailNotification;
@@ -78,7 +79,7 @@ public final class NotificationDAO implements INotificationDAO
     private static final String COLUMN_NOTIFICATION_ID = "id";
     private static final String COLUMN_DEMAND_ID = "demand_id";
     private static final String COLUMN_DEMAND_TYPE_ID = "demand_type_id";
-    private static final String COLUMN_CUSTOMER_ID = "demand_type_id";
+    private static final String COLUMN_CUSTOMER_ID = "customer_id";
     private static final String COLUMN_DATE = "date";
     private static final String COLUMN_CUSTOMER = "customer_id";
     
@@ -483,12 +484,20 @@ public final class NotificationDAO implements INotificationDAO
             String strDemandTypeId = daoUtil.getString( COLUMN_DEMAND_TYPE_ID );
             String strCustomerId = daoUtil.getString( COLUMN_CUSTOMER_ID );
             
-            notification.setDemand( DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( strIdDemand, strDemandTypeId, strCustomerId ) );
+            Demand demand = DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( strIdDemand, strDemandTypeId, strCustomerId ); 
+            if ( demand == null )
+            {
+            	demand = new Demand( );
+            	demand.setId( strIdDemand );
+            	demand.setTypeId( strDemandTypeId );
+            }
+            notification.setDemand( demand );
+            
             setNotificationContent( notification, notificationFilter );
             
-            Customer customer = new Customer ();
-            customer.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER ) );
-            customer.setId( customer.getCustomerId( ) );
+            Customer customer = new Customer ( );
+            customer.setCustomerId( strCustomerId );
+            customer.setId( strCustomerId );
             notification.getDemand( ).setCustomer( customer );
 
             listNotifications.add( notification );

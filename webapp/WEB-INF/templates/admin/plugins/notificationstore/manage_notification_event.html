@@ -98,7 +98,7 @@
                             <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" >
                                     <input type="hidden" id="demand_id" name="demand_id" value="${notificationEvent.demand.id}"/>
                                     <input type="hidden" id="demand_type_id" name="demand_type_id" value="${notificationEvent.demand.typeId}"/>
-                                    <input type="hidden" id="demand_type_id" name="notification_date" value="${notificationEvent.notificationDate}"/>
+                                    <input type="hidden" id="notification_date" name="notification_date" value="${notificationEvent.notificationDate}"/>
 
                                     <@formGroup>
                                             <@button type='submit' title='#i18n{notificationstore.manage_notification.pageTitle}' buttonIcon='envelope' />

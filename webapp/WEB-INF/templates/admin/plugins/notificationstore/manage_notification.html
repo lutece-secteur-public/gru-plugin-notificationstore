@@ -57,19 +57,20 @@
                                    <br>
                                    type: ${notification.demand.typeId!''}<br>
                                    <br>
+                                   
+                                   <#if notification.demand.customer?? && notification.demand.customer.connectionId?? >
                                    connection_id: <br>
-                                   <#if notification.demand.customer ?? >
-                                   ${notification.demand.customer.connectionId!''}
+                                   ${notification.demand.customer.connectionId!'?'}<br>
+                                   </#if>
+                                   <#if notification.demand.customer ?? && notification.demand.customer.customerId?? >
+                                   customer_id: <br>
+                                   ${notification.demand.customer.customerId!'?'}<br>
                                    </#if>
                            </td>
                            <td>
                                    ${notification.date?number_to_datetime!''}
                            </td>
-                           <td>
-                                   <#if notification.demand.customer ?? >
-                                   ${notification.demand.customer.connectionId!''}
-                                   </#if>
-                           </td>
+                          
                            <td><#if notification.backofficeNotification ?? >
                                Status : ${notification.backofficeNotification.statusText!''}<br>
                                message : ${notification.backofficeNotification.message!''}
