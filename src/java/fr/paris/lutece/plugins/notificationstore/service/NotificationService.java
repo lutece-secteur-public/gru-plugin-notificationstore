@@ -88,7 +88,7 @@ public class NotificationService
     private static final String WARNING_CUSTOMER_ID_MANDATORY = "Notification connection_id field is mandatory";
     private static final String MESSAGE_MISSING_MANDATORY_FIELD = "Missing value";
     private static final String MESSAGE_MISSING_DEMAND_ID = "Demand Id and Demand type Id are mandatory";
-    private static final String MESSAGE_MISSING_USER_ID = "User connection id is mandatory";
+    private static final String MESSAGE_MISSING_USER_ID = "User connection id or customer id is mandatory";
     private static final String MESSAGE_INCORRECT_DEMAND_ID = "Demand Type Id not found";
 
 	// instance variables
@@ -403,10 +403,15 @@ public class NotificationService
 	 * @param notif
 	 * @return The message error
 	 */
-	private String checkNotification( Notification notif )
+	private String checkMyDashboardNotification( Notification notif )
 	{        
 		// check if connection id is present
-		if ( notif.getDemand( ) == null || notif.getDemand( ).getCustomer( ) == null || StringUtils.isBlank( notif.getDemand( ).getCustomer( ).getConnectionId( ) ) )
+		if ( notif.getDemand( ) == null 
+				|| notif.getDemand( ).getCustomer( ) == null 
+				|| ( StringUtils.isBlank( notif.getDemand( ).getCustomer( ).getConnectionId( ) )
+						&& StringUtils.isBlank( notif.getDemand( ).getCustomer( ).getCustomerId( ) )
+						&& StringUtils.isBlank( notif.getDemand( ).getCustomer( ).getId( ) ) )
+				)
 		{
 			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_MISSING_USER_ID );
 		}
@@ -445,7 +450,7 @@ public class NotificationService
 			event.setType( TYPE_GUICHET );
 			event.setEventDate( notification.getDate( ) );
 			
-			String strMessage = checkNotification( notification ); 
+			String strMessage = checkMyDashboardNotification( notification ); 
 
 			if( StringUtils.isNotEmpty( strMessage ))
 			{
