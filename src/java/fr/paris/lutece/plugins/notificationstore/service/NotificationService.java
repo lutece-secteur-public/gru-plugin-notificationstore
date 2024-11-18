@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Event;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
@@ -580,7 +580,7 @@ public class NotificationService
                 return notification.getMyDashboardNotification( ).getStatusId( );
             } 
             
-	        Optional<DemandStatus> status = _demandService.getStatusByLabel( notification.getMyDashboardNotification( ).getStatusText( ) );
+	        Optional<TemporaryStatus> status = _demandService.getStatusByLabel( notification.getMyDashboardNotification( ).getStatusText( ) );
 	        if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
 	        {
 	            return status.get( ).getGenericStatus( ).getStatusId( );

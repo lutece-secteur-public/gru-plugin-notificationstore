@@ -54,16 +54,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
-import fr.paris.lutece.plugins.notificationstore.business.StatusHome;
+import fr.paris.lutece.plugins.notificationstore.service.TemporaryStatusService;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 
 /**
  * This class provides the user interface to manage Status features ( manage, create, modify, remove )
  */
 @Controller( controllerJsp = "ManageStatus.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "NOTIFICATIONSTORE_MANAGEMENT" )
-public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
+public class StatusJspBean extends AbstractManageJspBean<Integer, TemporaryStatus>
 {
     /**
      * 
@@ -116,7 +116,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
     private static final String ERROR_RESOURCE_NOT_FOUND = "Resource not found";
 
     // Session variable to store working values
-    private DemandStatus _status;
+    private TemporaryStatus _status;
     private List<Integer> _listIdStatuss;
 
     /**
@@ -133,7 +133,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
 
         if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdStatuss.isEmpty( ) )
         {
-            _listIdStatuss = StatusHome.getIdStatusList( );
+            _listIdStatuss = TemporaryStatusService.getInstance( ).getIdStatusList( );
         }
 
         Map<String, Object> model = getPaginatedListModel( request, MARK_STATUS_LIST, _listIdStatuss, JSP_MANAGE_STATUS );
@@ -148,9 +148,9 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
      * @return the populated list of items corresponding to the id List
      */
     @Override
-    List<DemandStatus> getItemsFromIds( List<Integer> listIds )
+    List<TemporaryStatus> getItemsFromIds( List<Integer> listIds )
     {
-        List<DemandStatus> listStatus = StatusHome.getStatusListByIds( listIds );
+        List<TemporaryStatus> listStatus = TemporaryStatusService.getInstance( ).getStatusListByIds( listIds );
 
         // keep original order
         return listStatus.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).collect( Collectors.toList( ) );
@@ -174,7 +174,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
     @View( VIEW_CREATE_STATUS )
     public String getCreateStatus( HttpServletRequest request )
     {
-        _status = ( _status != null ) ? _status : new DemandStatus( );
+        _status = ( _status != null ) ? _status : new TemporaryStatus( );
 
         Map<String, Object> model = getModel( );
         model.put( MARK_STATUS, _status );
@@ -210,7 +210,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
             return redirectView( request, VIEW_CREATE_STATUS );
         }
 
-        StatusHome.create( _status );
+        TemporaryStatusService.getInstance( ).create( _status );
         addInfo( INFO_STATUS_CREATED, getLocale( ) );
         resetListId( );
 
@@ -248,7 +248,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_STATUS ) );
 
-        StatusHome.remove( nId );
+        TemporaryStatusService.getInstance( ).remove( nId );
         addInfo( INFO_STATUS_REMOVED, getLocale( ) );
         resetListId( );
 
@@ -269,7 +269,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
 
         if ( _status == null || ( _status.getId( ) != nId ) )
         {
-            Optional<DemandStatus> optStatus = StatusHome.findByPrimaryKey( nId );
+            Optional<TemporaryStatus> optStatus =  TemporaryStatusService.getInstance( ).findByPrimaryKey( nId );
             _status = optStatus.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
         }
 
@@ -307,7 +307,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, DemandStatus>
             return redirect( request, VIEW_MODIFY_STATUS, PARAMETER_ID_STATUS, _status.getId( ) );
         }
 
-        StatusHome.update( _status );
+        TemporaryStatusService.getInstance( ).update( _status );
         addInfo( INFO_STATUS_UPDATED, getLocale( ) );
         resetListId( );
 

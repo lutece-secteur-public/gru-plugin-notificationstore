@@ -8,7 +8,7 @@
     <bean id="notificationstore.demandDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandDAO" />
     <bean id="notificationstore.notificationDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationDAO" />
     <bean id="notificationstore.notificationEventDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationEventDAO" />
-    <bean id="notificationstore.statusDao"  class="fr.paris.lutece.plugins.notificationstore.business.StatusDAO" />
+    <bean id="notificationstore.temporaryStatusDao"  class="fr.paris.lutece.plugins.notificationstore.business.TemporaryStatusDAO" />
     <bean id="notificationstore.demandTypeDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandTypeDAO"/>
 	<bean id="notificationstore.demandCategoryDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandCategoryDAO"/>
     <bean id="notificationstore.notificationContentDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationContentDAO"/>
@@ -24,7 +24,7 @@
 			<ref bean="notificationstore.notificationEventDao" />
 		</property>
 		<property name="statusDao">
-			<ref bean="notificationstore.statusDao" />
+			<ref bean="notificationstore.temporaryStatusDao" />
 		</property>
 		<property name="demandTypeDao">
 			<ref bean="notificationstore.demandTypeDao" />

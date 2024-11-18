@@ -50,9 +50,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
-import fr.paris.lutece.plugins.notificationstore.business.StatusHome;
+import fr.paris.lutece.plugins.notificationstore.service.TemporaryStatusService;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
@@ -79,7 +79,7 @@ public class StatusRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getListStatus( )
     {
-        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( StatusHome.getStatusList( ) ) ) ).build( );
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse(  TemporaryStatusService.getInstance( ).getStatusList( ) ) ) ).build( );
     }
 
     /**
@@ -94,7 +94,7 @@ public class StatusRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getStatus( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
-        Optional<DemandStatus> status = StatusHome.findByPrimaryKey( nId );
+        Optional<TemporaryStatus> status =  TemporaryStatusService.getInstance( ).findByPrimaryKey( nId );
 
         if ( status.isPresent( ) )
         {
@@ -120,11 +120,11 @@ public class StatusRestService
 
         try
         {
-            DemandStatus status = NotificationStoreUtils.getMapper( ).readValue( strStatus, DemandStatus.class );
+            TemporaryStatus status = NotificationStoreUtils.getMapper( ).readValue( strStatus, TemporaryStatus.class );
 
             if ( isStatusCompleted( status ) )
             {
-                StatusHome.create( status );
+                TemporaryStatusService.getInstance( ).create( status );
                 return Response.status( Response.Status.CREATED ).entity( JsonUtil.buildJsonResponse( new JsonResponse( status ) ) ).build( );
             }
 
@@ -154,11 +154,11 @@ public class StatusRestService
 
         try
         {
-            DemandStatus status = NotificationStoreUtils.getMapper( ).readValue( strStatus, DemandStatus.class );
+            TemporaryStatus status = NotificationStoreUtils.getMapper( ).readValue( strStatus, TemporaryStatus.class );
 
-            if ( isStatusCompleted( status ) && StatusHome.findByPrimaryKey( status.getId( ) ).isPresent( ) )
+            if ( isStatusCompleted( status ) &&  TemporaryStatusService.getInstance( ).findByPrimaryKey( status.getId( ) ).isPresent( ) )
             {
-                StatusHome.update( status );
+                TemporaryStatusService.getInstance( ).update( status );
                 return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( status ) ) ).build( );
             }
             return Response.status( Response.Status.NOT_MODIFIED ).entity( JsonUtil
@@ -185,9 +185,9 @@ public class StatusRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response doDeleteStatus( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
-        if ( StatusHome.findByPrimaryKey( nId ).isPresent( ) )
+        if (  TemporaryStatusService.getInstance( ).findByPrimaryKey( nId ).isPresent( ) )
         {
-            StatusHome.remove( nId );
+            TemporaryStatusService.getInstance( ).remove( nId );
             return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( Response.Status.OK ) ) ).build( );
         }
         return Response.status( Response.Status.NOT_FOUND )
@@ -218,7 +218,7 @@ public class StatusRestService
      * @param status
      * @return true if status is completed
      */
-    private boolean isStatusCompleted( DemandStatus status )
+    private boolean isStatusCompleted( TemporaryStatus status )
     {
         return status != null && StringUtils.isNotEmpty( status.getStatus( ) )
                 && EnumGenericStatus.getByStatusId( status.getGenericStatus( ).getStatusId( ) ) != null;

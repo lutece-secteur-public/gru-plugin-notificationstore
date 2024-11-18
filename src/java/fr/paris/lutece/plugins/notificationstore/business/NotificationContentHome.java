@@ -34,17 +34,19 @@
 package fr.paris.lutece.plugins.notificationstore.business;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
+import fr.paris.lutece.plugins.notificationstore.service.TemporaryStatusService;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.portal.business.file.File;
 import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
 import fr.paris.lutece.portal.service.file.FileService;
 import fr.paris.lutece.portal.service.file.FileServiceException;
+import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -138,7 +140,21 @@ public final class NotificationContentHome
 
         return notificationContent;
     }
+    
+    /**
+     * Update the record in the table
+     * 
+     * @param nNewStatusId
+     *            the new status id
+     * @param nTemporaryStatusId
+     *            This nTemporaryStatusId is allows to filter on the notifications to be updated
+     */
 
+    public static void updateStatusId( int nNewStatusId, int nTemporaryStatusId )
+    {
+        _dao.updateStatusId( nNewStatusId, nTemporaryStatusId, NotificationStorePlugin.getPlugin( ) );
+    }
+    
     /**
      * Remove the notificationContent whose identifier is specified in parameter
      * 
@@ -361,7 +377,7 @@ public final class NotificationContentHome
             }
             else
             {
-                Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
+                Optional<TemporaryStatus> status =  TemporaryStatusService.getInstance( ).findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
                 if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
                 {
                     return status.get( ).getGenericStatus( ).getStatusId( );
@@ -383,7 +399,7 @@ public final class NotificationContentHome
     {
         if ( EnumNotificationType.MYDASHBOARD.equals( statusType ) && notification.getMyDashboardNotification( ) != null )
         {
-            Optional<DemandStatus> status = StatusHome.findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
+            Optional<TemporaryStatus> status =  TemporaryStatusService.getInstance( ).findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
             
             if ( status.isPresent( ) )
             {
@@ -392,10 +408,10 @@ public final class NotificationContentHome
             else
             {
                 //Create temporary status if not exist
-                DemandStatus newStatus = new DemandStatus( );
+                TemporaryStatus newStatus = new TemporaryStatus( );
                 newStatus.setStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
                 
-                newStatus = StatusHome.create( newStatus );
+                newStatus =  TemporaryStatusService.getInstance( ).create( newStatus );
                 
                 return newStatus.getId( );
             }
