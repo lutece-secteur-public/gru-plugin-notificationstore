@@ -38,8 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
-import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandStatusDAO;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
+import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
@@ -47,7 +47,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 /**
  * This class provides Data Access methods for Status objects
  */
-public final class StatusDAO implements IDemandStatusDAO
+public final class TemporaryStatusDAO implements ITemporaryStatusDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE id_temporary_status = ?";
@@ -64,7 +64,7 @@ public final class StatusDAO implements IDemandStatusDAO
      * {@inheritDoc }
      */
     @Override
-    public void insert( DemandStatus status )
+    public void insert( TemporaryStatus status )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
         {
@@ -85,13 +85,13 @@ public final class StatusDAO implements IDemandStatusDAO
      * {@inheritDoc }
      */
     @Override
-    public Optional<DemandStatus> load( int nKey )
+    public Optional<TemporaryStatus> load( int nKey )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeQuery( );
-            DemandStatus status = null;
+            TemporaryStatus status = null;
 
             if ( daoUtil.next( ) )
             {
@@ -119,7 +119,7 @@ public final class StatusDAO implements IDemandStatusDAO
      * {@inheritDoc }
      */
     @Override
-    public void store( DemandStatus status )
+    public void store( TemporaryStatus status )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, NotificationStorePlugin.getPlugin( ) ) )
         {
@@ -137,9 +137,9 @@ public final class StatusDAO implements IDemandStatusDAO
      * {@inheritDoc }
      */
     @Override
-    public List<DemandStatus> selectStatusList( )
+    public List<TemporaryStatus> selectStatusList( )
     {
-        List<DemandStatus> statusList = new ArrayList<>( );
+        List<TemporaryStatus> statusList = new ArrayList<>( );
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.executeQuery( );
@@ -177,9 +177,9 @@ public final class StatusDAO implements IDemandStatusDAO
      * {@inheritDoc }
      */
     @Override
-    public List<DemandStatus> selectStatusListByIds( List<Integer> listIds )
+    public List<TemporaryStatus> selectStatusListByIds( List<Integer> listIds )
     {
-        List<DemandStatus> statusList = new ArrayList<>( );
+        List<TemporaryStatus> statusList = new ArrayList<>( );
 
         StringBuilder builder = new StringBuilder( );
 
@@ -213,13 +213,13 @@ public final class StatusDAO implements IDemandStatusDAO
     }
 
     @Override
-    public Optional<DemandStatus> loadByStatusId( int nStatusId )
+    public Optional<TemporaryStatus> loadByStatusId( int nStatusId )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_STATUS_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setInt( 1, nStatusId );
             daoUtil.executeQuery( );
-            DemandStatus status = null;
+            TemporaryStatus status = null;
 
             if ( daoUtil.next( ) )
             {
@@ -231,13 +231,13 @@ public final class StatusDAO implements IDemandStatusDAO
     }
 
     @Override
-    public Optional<DemandStatus> loadByStatus( String strStatus )
+    public Optional<TemporaryStatus> loadByStatus( String strStatus )
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_STATUS, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setString( 1, strStatus );
             daoUtil.executeQuery( );
-            DemandStatus status = null;
+            TemporaryStatus status = null;
 
             if ( daoUtil.next( ) )
             {
@@ -254,9 +254,9 @@ public final class StatusDAO implements IDemandStatusDAO
      * @param daoUtil
      * @return
      */
-    private DemandStatus loadFromDaoUtil( DAOUtil daoUtil )
+    private TemporaryStatus loadFromDaoUtil( DAOUtil daoUtil )
     {
-        DemandStatus status = new DemandStatus( );
+        TemporaryStatus status = new TemporaryStatus( );
         int nIndex = 1;
 
         status.setId( daoUtil.getInt( nIndex++ ) );

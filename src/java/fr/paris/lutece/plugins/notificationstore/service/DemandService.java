@@ -39,8 +39,8 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandListener;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandTypeDAO;
-import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandStatusDAO;
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
+import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationEventDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationListener;
@@ -72,7 +72,7 @@ public class DemandService implements IDemandServiceProvider
     private INotificationDAO _notificationDao;
     private INotificationEventDAO _notificationEventDao;
     private IDemandTypeDAO _demandTypeDao;
-    private IDemandStatusDAO _statusDao;
+    private ITemporaryStatusDAO _statusDao;
 
     /**
      * Finds demands for the specified customer id
@@ -203,6 +203,19 @@ public class DemandService implements IDemandServiceProvider
         }
         return demandDao;
     }
+    
+    /**
+     * Update status demand 
+     * 
+     * @param nNewStatusId
+     *            the new status id
+     * @param nTemporaryStatusId
+     *            To find Demands that are linked to notifications that have the temporary status in parameter
+     */
+    public void updateDemandsStatusId( int nNewStatusId, int nTemporaryStatusId )
+    {
+        _demandDao.updateDemandsStatusId( nNewStatusId, nTemporaryStatusId );
+    }
 
     /**
      * Removes a demand with the specified id and type id
@@ -306,13 +319,13 @@ public class DemandService implements IDemandServiceProvider
     }
 
     @Override
-    public void setStatusDao( IDemandStatusDAO dao )
+    public void setStatusDao( ITemporaryStatusDAO dao )
     {
         _statusDao = dao;
     }
 
     @Override
-    public Optional<DemandStatus> getStatusByLabel( String strStatusLabel )
+    public Optional<TemporaryStatus> getStatusByLabel( String strStatusLabel )
     {
         return _statusDao.loadByStatus( strStatusLabel );
     }

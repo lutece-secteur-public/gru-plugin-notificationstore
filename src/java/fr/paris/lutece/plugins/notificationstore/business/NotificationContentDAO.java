@@ -58,6 +58,7 @@ public final class NotificationContentDAO implements INotificationContentDAO
     private static final String SQL_QUERY_SELECTALL = "SELECT id_notification_content, notification_id, notification_type, id_temporary_status, status_id, file_key, file_store FROM notificationstore_notification_content";
     private static final String SQL_QUERY_SELECT_BY_ID_NOTIF = "SELECT id_notification_content, notification_id, notification_type, id_temporary_status, status_id, file_key, file_store FROM notificationstore_notification_content WHERE notification_id = ?";
     private static final String SQL_PARAM_QUERY_TYPE_NOTIF = " AND notification_type IN (";
+    private static final String SQL_QUERY_UPDATE_STATUS = "UPDATE notificationstore_notification_content SET id_temporary_status = -1, status_id = ? WHERE id_temporary_status = ?";
 
     /**
      * {@inheritDoc }
@@ -233,6 +234,18 @@ public final class NotificationContentDAO implements INotificationContentDAO
         notificationContent.setFileStore( daoUtil.getString( "file_store" ) );
 
         return notificationContent;
+    }
+
+    @Override
+    public void updateStatusId( int nNewStatusId, int nTemporaryStatusId, Plugin plugin )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_STATUS, plugin ) )
+        {
+            daoUtil.setInt( 1, nNewStatusId );
+            daoUtil.setInt( 2, nTemporaryStatusId );
+            
+            daoUtil.executeUpdate( );
+        }
     }
 
 }

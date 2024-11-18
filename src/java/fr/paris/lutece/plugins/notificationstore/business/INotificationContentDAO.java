@@ -67,6 +67,17 @@ public interface INotificationContentDAO
     void store( NotificationContent notificationContent, Plugin plugin );
 
     /**
+     * Update nofications status
+     * 
+     * @param nNewStatusId
+     *            the new status id
+     * @param nTemporaryStatusId
+     *            This nTemporaryStatusId is allows to filter on the notifications to be updated
+     */
+
+    void updateStatusId( int nNewStatusId, int nTemporaryStatusId, Plugin plugin );
+    
+    /**
      * Delete a record from the table
      * 
      * @param nIdNotificationContent

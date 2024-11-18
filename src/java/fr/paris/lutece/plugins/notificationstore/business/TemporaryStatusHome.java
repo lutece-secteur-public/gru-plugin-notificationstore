@@ -36,22 +36,22 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import java.util.List;
 import java.util.Optional;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandStatus;
-import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandStatusDAO;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
+import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 /**
  * This class provides instances management methods (create, find, ...) for Status objects
  */
-public final class StatusHome
+public final class TemporaryStatusHome
 {
     // Static variable pointed at the DAO instance
-    private static IDemandStatusDAO _dao = SpringContextService.getBean( "notificationstore.statusDao" );
+    private static ITemporaryStatusDAO _dao = SpringContextService.getBean( "notificationstore.temporaryStatusDao" );
 
     /**
      * Private constructor - this class need not be instantiated
      */
-    private StatusHome( )
+    private TemporaryStatusHome( )
     {
     }
 
@@ -62,7 +62,7 @@ public final class StatusHome
      *            The instance of the Status which contains the informations to store
      * @return The instance of status which has been created with its primary key.
      */
-    public static DemandStatus create( DemandStatus status )
+    public static TemporaryStatus create( TemporaryStatus status )
     {
         _dao.insert( status );
 
@@ -76,7 +76,7 @@ public final class StatusHome
      *            The instance of the Status which contains the data to store
      * @return The instance of the status which has been updated
      */
-    public static DemandStatus update( DemandStatus status )
+    public static TemporaryStatus update( TemporaryStatus status )
     {
         _dao.store( status );
 
@@ -101,7 +101,7 @@ public final class StatusHome
      *            The status primary key
      * @return an instance of Status
      */
-    public static Optional<DemandStatus> findByPrimaryKey( int nKey )
+    public static Optional<TemporaryStatus> findByPrimaryKey( int nKey )
     {
         return _dao.load( nKey );
     }
@@ -113,7 +113,7 @@ public final class StatusHome
      *            The status name
      * @return an instance of Status
      */
-    public static Optional<DemandStatus> findByStatusId( int nStatusId )
+    public static Optional<TemporaryStatus> findByStatusId( int nStatusId )
     {
         return _dao.loadByStatusId( nStatusId );
     }
@@ -125,7 +125,7 @@ public final class StatusHome
      *            The status name
      * @return an instance of Status
      */
-    public static Optional<DemandStatus> findByStatus( String strStatus )
+    public static Optional<TemporaryStatus> findByStatus( String strStatus )
     {
         return _dao.loadByStatus( strStatus );
     }
@@ -135,7 +135,7 @@ public final class StatusHome
      * 
      * @return the list which contains the data of all the status objects
      */
-    public static List<DemandStatus> getStatusList( )
+    public static List<TemporaryStatus> getStatusList( )
     {
         return _dao.selectStatusList( );
     }
@@ -157,7 +157,7 @@ public final class StatusHome
      *            liste of ids
      * @return the list which contains the data of all the avant objects
      */
-    public static List<DemandStatus> getStatusListByIds( List<Integer> listIds )
+    public static List<TemporaryStatus> getStatusListByIds( List<Integer> listIds )
     {
         return _dao.selectStatusListByIds( listIds );
     }

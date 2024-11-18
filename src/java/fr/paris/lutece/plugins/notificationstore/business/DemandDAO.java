@@ -99,6 +99,14 @@ public final class DemandDAO implements IDemandDAO
             + " JOIN notificationstore_notification gn ON ( gd.id = gn.demand_id and gd.demand_type_id=gn.demand_type_id and gd.customer_id=gn.customer_id) "
             + " JOIN notificationstore_notification_content gc ON gn.id = gc.notification_id "
             + " WHERE gd.customer_id = ? " + " AND gd.status_id IN ( ";
+    
+    private static final String SQL_QUERY_DEMAND_UPDATE_STATUS_ID = "UPDATE notificationstore_demand "
+            + " SET status_id = ? "
+            + " WHERE id IN ( "
+            + "   SELECT nn.demand_id "
+            + "   FROM notificationstore_notification nn "
+            + "   JOIN notificationstore_notification_content nnc ON nn.id = nnc.notification_id "
+            + "   WHERE nnc.id_temporary_status = ? ) ";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
@@ -616,5 +624,17 @@ public final class DemandDAO implements IDemandDAO
 
             return listIds;
         }
+    }
+
+    @Override
+    public void updateDemandsStatusId( int nNewStatusId, int nTemporaryStatusId )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE_STATUS_ID, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            daoUtil.setInt( 1, nNewStatusId );
+            daoUtil.setInt( 2, nTemporaryStatusId );
+            
+            daoUtil.executeUpdate( );
+        }       
     }
 }
