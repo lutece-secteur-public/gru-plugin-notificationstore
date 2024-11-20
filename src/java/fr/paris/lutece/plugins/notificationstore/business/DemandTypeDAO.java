@@ -50,7 +50,8 @@ public final class DemandTypeDAO implements IDemandTypeDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECTALL = "SELECT id, demande_type_id, label, code_category, url, application_code FROM notificationstore_demand_type ";
-    private static final String SQL_QUERY_SELECT = SQL_QUERY_SELECTALL + "  WHERE id = ?";
+    private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + "  WHERE id = ?";
+    private static final String SQL_QUERY_SELECT_BY_TYPE_ID = SQL_QUERY_SELECTALL + "  WHERE demande_type_id = ?";
     private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_type ( demande_type_id, label, code_category, url, application_code ) VALUES ( ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_demand_type WHERE id = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_type SET demande_type_id = ?, label = ?, code_category = ? , url = ?, application_code = ? WHERE id = ?";
@@ -88,9 +89,38 @@ public final class DemandTypeDAO implements IDemandTypeDAO
     @Override
     public Optional<DemandType> load( int nKey )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setInt( 1, nKey );
+            daoUtil.executeQuery( );
+            DemandType demandType = null;
+
+            if ( daoUtil.next( ) )
+            {
+                demandType = new DemandType( );
+                int nIndex = 1;
+
+                demandType.setId( daoUtil.getInt( nIndex++ ) );
+                demandType.setIdDemandType( daoUtil.getInt( nIndex++ ) );
+                demandType.setLabel( daoUtil.getString( nIndex++ ) );
+                demandType.setCategory( daoUtil.getString( nIndex++ ) );
+                demandType.setUrl( daoUtil.getString( nIndex++ ) );
+                demandType.setAppCode( daoUtil.getString( nIndex++ ) );
+            }
+
+            return Optional.ofNullable( demandType );
+        }
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Optional<DemandType> selectByTypeId( String sKey )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_TYPE_ID, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            daoUtil.setString( 1, sKey );
             daoUtil.executeQuery( );
             DemandType demandType = null;
 

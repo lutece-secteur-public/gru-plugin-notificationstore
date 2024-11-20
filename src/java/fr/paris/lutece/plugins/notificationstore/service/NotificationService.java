@@ -205,8 +205,12 @@ public class NotificationService
 		}
 
 		// notification should be associated to a customer id
-		if ( notification.getDemand( ).getCustomer( ) != null 
-				&& StringUtils.isBlank( notification.getDemand( ).getCustomer( ).getConnectionId( ) ) )
+		if ( notification.getDemand( ).getCustomer( ) == null || 
+				( StringUtils.isBlank( notification.getDemand( ).getCustomer( ).getConnectionId( ) ) 
+					&&	StringUtils.isBlank( notification.getDemand( ).getCustomer( ).getCustomerId( ) )
+					&&	StringUtils.isBlank( notification.getDemand( ).getCustomer( ).getId( ) )
+				)
+			)
 		{
 			StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_WARNING, MESSAGE_MISSING_MANDATORY_FIELD, WARNING_CUSTOMER_ID_MANDATORY );
 			warnings.add( msg );
@@ -429,7 +433,7 @@ public class NotificationService
 		}
 
 		// check if demand type id exists
-		if ( !_demandService.getDemandType( Integer.parseInt( notif.getDemand( ).getTypeId( ) ) ).isPresent( ) )
+		if ( !_demandService.getDemandType( notif.getDemand( ).getTypeId( ) ).isPresent( ) )
 		{
 			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_INCORRECT_DEMAND_ID );
 		}

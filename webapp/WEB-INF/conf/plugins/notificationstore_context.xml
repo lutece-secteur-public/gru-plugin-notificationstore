@@ -26,9 +26,6 @@
 		<property name="statusDao">
 			<ref bean="notificationstore.temporaryStatusDao" />
 		</property>
-		<property name="demandTypeDao">
-			<ref bean="notificationstore.demandTypeDao" />
-		</property>
 	</bean>
 	
 		<!--  Status REST  -->

@@ -38,7 +38,6 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandListener;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
-import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandTypeDAO;
 import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
 import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
@@ -48,10 +47,12 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
+import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationContent;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationContentHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationEventHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
+import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
 import fr.paris.lutece.portal.service.file.FileService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -65,16 +66,48 @@ import java.util.Optional;
  * This class manages demands
  *
  */
-public class DemandService implements IDemandServiceProvider
+public class DemandService  extends AbstractCacheableService implements IDemandServiceProvider 
 {
 
     private IDemandDAO _demandDao;
     private INotificationDAO _notificationDao;
     private INotificationEventDAO _notificationEventDao;
-    private IDemandTypeDAO _demandTypeDao;
     private ITemporaryStatusDAO _statusDao;
 
-    /**
+    private static final String SERVICE_NAME = "DemandRefCacheService";
+	private static final String DEMAND_TYPE_CACHE_PREFIX = "DEMAND_TYPE_";
+	private static final String DEMAND_TYPE_LIST_CACHE_KEY = "DEMAND_TYPE_LIST";
+    
+	/**
+	 * Constructor
+	 * 
+	 */
+    public DemandService() {
+		super();
+		
+		initCache();
+	}
+    
+	/**
+	 * Constructor
+	 * 
+	 * @param _demandDao
+	 * @param _notificationDao
+	 * @param _notificationEventDao
+	 * @param _statusDao
+	 */
+    public DemandService(IDemandDAO _demandDao, INotificationDAO _notificationDao,
+			INotificationEventDAO _notificationEventDao, ITemporaryStatusDAO _statusDao) {
+		super();
+		this._demandDao = _demandDao;
+		this._notificationDao = _notificationDao;
+		this._notificationEventDao = _notificationEventDao;
+		this._statusDao = _statusDao;
+		
+		initCache();
+	}
+
+	/**
      * Finds demands for the specified customer id
      * 
      * @param strCustomerId
@@ -268,8 +301,17 @@ public class DemandService implements IDemandServiceProvider
      */
     public List<DemandType> getDemandTypesList( )
     {
-
-        return _demandTypeDao.selectDemandTypesList( );
+    	List<DemandType> demandTypeList = (List<DemandType>) getFromCache( DEMAND_TYPE_LIST_CACHE_KEY );
+    	if ( demandTypeList == null )
+    	{
+    		demandTypeList = DemandTypeHome.getDemandTypesList( );
+    		if ( demandTypeList != null )
+    		{
+    			putInCache(DEMAND_TYPE_LIST_CACHE_KEY, demandTypeList);
+    		}
+    	}
+    	
+        return demandTypeList;
     }
 
     /**
@@ -277,10 +319,23 @@ public class DemandService implements IDemandServiceProvider
      * 
      * @return the demand type list
      */
-    public Optional<DemandType> getDemandType( int id )
+    public Optional<DemandType> getDemandType( String type_id )
     {
-
-        return _demandTypeDao.load( id );
+    	DemandType dt = (DemandType) getFromCache( DEMAND_TYPE_CACHE_PREFIX + type_id );
+    	
+    	if ( dt != null )
+    	{
+    		return Optional.of( dt );
+    	}
+    	else
+    	{
+    		Optional<DemandType> odt = DemandTypeHome.getDemandType( type_id );
+    		if ( odt.isPresent( ) ) 
+    		{
+    			putInCache( DEMAND_TYPE_CACHE_PREFIX + type_id, odt.get( ) );
+    		}
+    		return odt;
+    	}
     }
 
     /**
@@ -298,12 +353,6 @@ public class DemandService implements IDemandServiceProvider
     public void setDemandDao( IDemandDAO dao )
     {
         _demandDao = dao;
-    }
-
-    @Override
-    public void setDemandTypeDao( IDemandTypeDAO dao )
-    {
-        _demandTypeDao = dao;
     }
 
     @Override
@@ -379,5 +428,11 @@ public class DemandService implements IDemandServiceProvider
         }
         
     }
+
+	@Override
+	public String getName( ) 
+	{
+		return SERVICE_NAME;
+	}
 
 }
