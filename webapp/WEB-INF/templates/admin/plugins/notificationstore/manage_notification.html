@@ -8,28 +8,28 @@
 	
         
         	
-	<@tform class='form-horizontal' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" name="manage_notification">
+	<@tform class='form-horizontal' type='inline' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" name="manage_notification">
 	 	
-	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{notificationstore.manage_demand.demand_id.label}' >
+	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{notificationstore.manage_demand.demand_id.label}'  formStyle='inline'>
 		 	<@input type='text' id="demand_id" name="demand_id" value=demand_id!'' />
-                </@formGroup>
+        </@formGroup>
                 
-		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{notificationstore.manage_demand.demand_type_id.label}' >		 	
+		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{notificationstore.manage_demand.demand_type_id.label}'  formStyle='inline' >		 	
                         <@select name="demand_type_id" id="demand_type_id" items=demand_type_id_list![] default_value=demand_type_id!'' />
                 </@formGroup>
                 
-		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.start_date.label}' >
+		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.start_date.label}'  formStyle='inline'>
 		    <#if !start_date??><#assign start_date = .now /></#if>
 		    <#assign start_date_value = start_date?string["dd/MM/yyyy"] />		    
 		 	<@input type='date' id="start_date" name="start_date" language=.lang value=start_date_value />
                 </@formGroup>
                 
-		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.end_date.label}' >
+		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.end_date.label}'  formStyle='inline'>
 			<#if end_date??><#assign end_date_value = end_date?string["dd/MM/yyyy"] /></#if>
 		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date_value!'' />
                 </@formGroup>
            	
-		<@formGroup>
+		<@formGroup formStyle='inline'>
                         <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
 		</@formGroup>
 	</@tform>
