@@ -71,14 +71,14 @@
                                    ${notification.date?number_to_datetime!''}
                            </td>
                           
-                           <td><#if notification.backofficeNotification ?? >
+                           <td  class="text-break"><#if notification.backofficeNotification ?? >
                                Status : ${notification.backofficeNotification.statusText!''}<br>
                                message : ${notification.backofficeNotification.message!''}
                                <#else>
                                -
                                </#if>
                            </td>
-                           <td><#if notification.SMSNotification ?? >
+                           <td  class="text-break"><#if notification.SMSNotification ?? >
                                Sender : ${notification.SMSNotification.sender!''}<br>
                                Phone number : ${notification.SMSNotification.phoneNumber!''}<br>
                                message : ${notification.SMSNotification.message!''}
@@ -86,7 +86,7 @@
                                -
                                </#if>
                            </td>
-                           <td><#if notification.emailNotification ?? >
+                           <td  class="text-break"><#if notification.emailNotification ?? >
                                Sender name : ${notification.emailNotification.senderName!''}<br>
                                Sernder mail : ${notification.emailNotification.senderEmail!''}<br>
                                Recipient : ${notification.emailNotification.recipient!''}<br>
@@ -98,7 +98,7 @@
                                -
                                </#if>
                            </td>
-                           <td><#if notification.myDashboardNotification ?? >
+                           <td  class="text-break"><#if notification.myDashboardNotification ?? >
                                Status : ${notification.myDashboardNotification.statusText!''}<br>
                                Subject : ${notification.myDashboardNotification.subject!''}<br>
                                Sender name : ${notification.myDashboardNotification.senderName!''}<br>
@@ -108,7 +108,7 @@
                                -
                                </#if>
                            </td>
-<td><#if notification.broadcastEmail ?? >
+							<td  class="text-break"><#if notification.broadcastEmail ?? >
                                <#list notification.broadcastEmail as broadcastEmailItem >
                                    Sender name : ${broadcastEmailItem.senderName!''}<br>
                                    Sernder mail : ${broadcastEmailItem.senderEmail!''}<br>
