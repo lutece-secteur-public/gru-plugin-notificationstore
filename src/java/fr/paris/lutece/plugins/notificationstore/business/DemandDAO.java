@@ -521,12 +521,12 @@ public final class DemandDAO implements IDemandDAO
 
         if ( filter.containsStartDate( ) )
         {
-            daoUtil.setLong( i++, filter.getStartDate( ) );
+            daoUtil.setTimestamp( i++, new Timestamp( filter.getStartDate( ) ) );
         }
 
         if ( filter.containsEndDate( ) )
         {
-            daoUtil.setLong( i++, filter.getEndDate( ) );
+            daoUtil.setTimestamp( i++, new Timestamp( filter.getEndDate( ) ) );
         }
     }
 
