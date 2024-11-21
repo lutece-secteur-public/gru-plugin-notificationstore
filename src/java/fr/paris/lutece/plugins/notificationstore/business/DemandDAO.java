@@ -100,13 +100,19 @@ public final class DemandDAO implements IDemandDAO
             + " JOIN notificationstore_notification_content gc ON gn.id = gc.notification_id "
             + " WHERE gd.customer_id = ? " + " AND gd.status_id IN ( ";
     
-    private static final String SQL_QUERY_DEMAND_UPDATE_STATUS_ID = "UPDATE notificationstore_demand "
-            + " SET status_id = ? "
-            + " WHERE id IN ( "
-            + "   SELECT nn.demand_id "
-            + "   FROM notificationstore_notification nn "
-            + "   JOIN notificationstore_notification_content nnc ON nn.id = nnc.notification_id "
-            + "   WHERE nnc.id_temporary_status = ? ) ";
+    private static final String SQL_QUERY_DEMAND_UPDATE_STATUS_ID = "UPDATE notificationstore_demand d"
+            + " INNER JOIN notificationstore_notification n2 ON (d.id = n2.demand_id AND d.demand_type_id = n2.demand_type_id AND d.customer_id = n2.customer_id ) "
+            + " INNER JOIN notificationstore_notification_content c2 ON (n2.id = c2.notification_id  AND c2.notification_type ='MYDASHBOARD' AND c2.id_temporary_status = ? ) "
+            + " SET d.status_id = ?"
+            + " WHERE n2.id IN ("
+            + "    SELECT MAX(n.id) "
+            + "    FROM notificationstore_notification n "
+            + "    INNER JOIN notificationstore_notification_content c ON (n.id = c.notification_id "
+            + "    AND c.notification_type ='MYDASHBOARD') "
+            + "    WHERE d.id = n.demand_id "
+            + "    AND d.demand_type_id = n.demand_type_id "
+            + "    AND d.customer_id = n.customer_id "
+            + "    GROUP BY n.demand_id, n.demand_type_id, n.customer_id)";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
@@ -631,8 +637,8 @@ public final class DemandDAO implements IDemandDAO
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE_STATUS_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
-            daoUtil.setInt( 1, nNewStatusId );
-            daoUtil.setInt( 2, nTemporaryStatusId );
+            daoUtil.setInt( 1, nTemporaryStatusId );
+            daoUtil.setInt( 2, nNewStatusId );
             
             daoUtil.executeUpdate( );
         }       
