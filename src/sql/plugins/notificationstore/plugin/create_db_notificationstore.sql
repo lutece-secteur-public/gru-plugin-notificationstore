@@ -125,4 +125,5 @@ PRIMARY KEY (id_notification_content)
 );
 
 CREATE UNIQUE INDEX index_notification_id ON notificationstore_notification_content (notification_id, notification_type);
+CREATE UNIQUE INDEX index_notificationstore_notification_content_id_temporary_status ON notificationstore_notification_content ( id_temporary_status );
 
