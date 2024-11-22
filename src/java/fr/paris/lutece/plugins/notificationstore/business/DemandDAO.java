@@ -91,8 +91,10 @@ public final class DemandDAO implements IDemandDAO
             + " FROM notificationstore_demand WHERE reference = ?";
 
     private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.uid) "
-            + " FROM notificationstore_demand gd, notificationstore_notification gn, notificationstore_notification_content gc "
-            + " WHERE gd.id = gn.demand_id and gn.id = gc.notification_id " + " AND gd.customer_id = ? ";
+            + " FROM notificationstore_demand gd "
+            + " INNER JOIN notificationstore_notification gn ON ( gd.id = gn.demand_id and gd.demand_type_id = gn.demand_type_id and gd.customer_id = gn.customer_id ) "
+            + " INNER JOIN notificationstore_notification_content gc ON ( gn.id = gc.notification_id ) "
+            + " WHERE gd.customer_id = ? ";
 
     private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct gd.uid "
             + " FROM notificationstore_demand gd "
