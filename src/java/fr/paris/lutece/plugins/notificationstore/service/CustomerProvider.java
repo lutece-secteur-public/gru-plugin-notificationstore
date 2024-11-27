@@ -33,6 +33,13 @@
  */
 package fr.paris.lutece.plugins.notificationstore.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+
 import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.service.encryption.ICustomerEncryptionService;
@@ -46,16 +53,6 @@ import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreExceptio
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.glassfish.jersey.http.ResponseStatus;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * This class provides customers
@@ -143,26 +140,26 @@ public class CustomerProvider
      * Provides a customer with the specified GUID / CID
      * 
      * @param strGuid
-     *            the GUID
-     * @param strCid
+     *            the connection id
+     * @param strCuid
      *            the customer id
      * @return the customer
      * @throws IdentityStoreException 
      */
-    public Customer get( String strGuid, String strCid ) throws IdentityStoreException
+    public Customer get( String strGuid, String strCuid ) throws IdentityStoreException
     {
     	IdentityDto identityDto = null;
     	
-        if ( !StringUtils.isBlank( strCid ) )
+        if ( isCustomerIdValid( strCuid ) )
         {
-        	IdentitySearchResponse response = _identityService.getIdentityByCustomerId( strCid, APPLICATION_CODE, _requestAuthor );
+        	IdentitySearchResponse response = _identityService.getIdentityByCustomerId( strCuid, APPLICATION_CODE, _requestAuthor );
         	if (response.getStatus( ).getHttpCode( ) < 300 && !response.getIdentities( ).isEmpty( ) )
         	{
         		identityDto = response.getIdentities( ).get( 0 );
         	}
         }
         
-        if (identityDto == null &&  !StringUtils.isBlank( strGuid ) )
+        if (identityDto == null && isConnectionIdValid( strGuid ) )
         {
         	IdentitySearchResponse response = _identityService.getIdentityByConnectionId( strGuid, APPLICATION_CODE, _requestAuthor );
         	if (response.getStatus( ).getHttpCode( ) < 300 && !response.getIdentities( ).isEmpty( ) )
@@ -224,19 +221,19 @@ public class CustomerProvider
      *            the demand for which the {@code Customer} is decrypted. Must not be {@code null}
      * @return the decrypted {@code Customer}
      */
-    public Customer decrypt( Customer customer, Demand demand )
+    public Customer decrypt( Demand demand )
     {
-        Customer customerResult = customer;
+        Customer rawCustomer = demand.getCustomer( );
 
-        if ( customerResult != null )
+        if ( rawCustomer != null && _listCustomerEncryption != null )
         {
             for ( ICustomerEncryptionService customerEncryptionService : _listCustomerEncryption )
             {
-                customerResult = customerEncryptionService.decrypt( customerResult, demand );
+                return customerEncryptionService.decrypt( rawCustomer, demand );
             }
         }
 
-        return customerResult;
+        return rawCustomer;
     }
 
     /**
@@ -279,5 +276,25 @@ public class CustomerProvider
     {
 
         return identityDto.getAttributes( ).stream( ).collect(Collectors.toMap(AttributeDto::getKey, AttributeDto::getValue));
+    }
+    
+    /**
+     * check customer ID : must contains 36 chars
+     * @param strId
+     * @return true if valid
+     */
+    public static boolean isCustomerIdValid( String strId ) 
+    {
+    	return strId != null && strId.length() == 36 ;
+    }
+    
+    /**
+     * check connection ID : must contains at least 36 chars 
+     * @param strId
+     * @return true if valid
+     */
+    public static boolean isConnectionIdValid( String strId ) 
+    {
+    	return strId != null && strId.length() >= 36 ;
     }
 }

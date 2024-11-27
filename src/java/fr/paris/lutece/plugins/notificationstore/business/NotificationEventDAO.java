@@ -418,7 +418,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_DATE, NotificationStorePlugin.getPlugin( ) ) )
         {
-            daoUtil.setLong( 1, lDate );
+            daoUtil.setTimestamp( 1, new Timestamp(  lDate ) );
             daoUtil.executeUpdate( );
             daoUtil.free( );
         }

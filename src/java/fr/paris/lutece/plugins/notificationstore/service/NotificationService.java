@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.notificationstore.service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +52,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
-import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Event;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
@@ -60,7 +61,6 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.StatusMessage;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.grubusiness.service.notification.INotifyerServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.service.notification.NotificationException;
-import fr.paris.lutece.plugins.identitystore.web.exception.IdentityNotFoundException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -80,16 +80,21 @@ public class NotificationService
 	private static final String STATUS_ERROR = "ERROR";
 	private static final String STATUS_FAILED = "FAILED";
 	private static final String STATUS_SUCCESS = "SUCCESS";
-	private static final String TYPE_GUICHET = "GUICHET";	
+	
+	private static final String TYPE_NOTIFICATION_GUICHET = "GUICHET";	
+	private static final String TYPE_NOTIFICATION_AGENT = "AGENT";	
 
-    // Messages
-    private static final String WARNING_DEMAND_ID_MANDATORY = "Notification Demand_id field is mandatory";
-    private static final String WARNING_DEMAND_TYPE_ID_MANDATORY = "Notification Demand_type_id field is mandatory";
-    private static final String WARNING_CUSTOMER_ID_MANDATORY = "Notification connection_id field is mandatory";
-    private static final String MESSAGE_MISSING_MANDATORY_FIELD = "Missing value";
-    private static final String MESSAGE_MISSING_DEMAND_ID = "Demand Id and Demand type Id are mandatory";
-    private static final String MESSAGE_MISSING_USER_ID = "User connection id or customer id is mandatory";
-    private static final String MESSAGE_INCORRECT_DEMAND_ID = "Demand Type Id not found";
+	// Messages
+	private static final String WARNING_DEMAND_ID_MANDATORY = "Notification Demand_id field is mandatory";
+	private static final String WARNING_DEMAND_TYPE_ID_MANDATORY = "Notification Demand_type_id field is mandatory";
+	private static final String WARNING_CUSTOMER_IDS_MANDATORY = "Valid user connection id or customer id is mandatory";
+	private static final String WARNING_CUSTOMER_NOT_FOUND = "User not found in the identityStore";
+	private static final String ERROR_IDENTITYSTORE = "An error occured while retrieving user from identityStore";
+	private static final String MESSAGE_MISSING_MANDATORY_FIELD = "Missing value";
+	private static final String MESSAGE_MISSING_DEMAND_ID = "Demand Id and Demand type Id are mandatory";
+	private static final String MESSAGE_MISSING_USER_ID = "Valid user connection id or customer id is mandatory";
+	private static final String MESSAGE_INCORRECT_USER = "Incorrect User Ids";
+	private static final String WARNING_INCORRECT_DEMAND_TYPE_ID = "Demand Type Id not found";
 
 	// instance variables
 	private static IDemandServiceProvider _demandService;
@@ -137,20 +142,20 @@ public class NotificationService
 			Notification notification = getNotificationFromJson( strJson );
 
 			// control customer
-			processCustomer( notification );
-
-			// store any notification whatever its content
-			store( notification );
+			boolean isCustomerValid = processCustomer( notification, warnings );
 
 			// check Notification
 			checkNotification( notification, warnings );
-			
-			// create Event if a MyDashboard type of notification exists 
-			if ( notification.getMyDashboardNotification( ) != null ) 
+
+			// store  notification only if customer is valid
+			if ( isCustomerValid ) 
 			{
-				addMydashboardNotificationEvent( notification );
+				store( notification );
 			}
 
+			// add event (success, or failure if customer not found for example)
+			addEvents( notification, warnings );
+			
 			// forward notification to registred notifyers (if exists)
 			forward( notification );
 
@@ -204,80 +209,86 @@ public class NotificationService
 			warnings.add( msg );
 		}
 
-		// notification should be associated to a customer id
-		if ( notification.getDemand( ).getCustomer( ) == null || 
-				( StringUtils.isBlank( notification.getDemand( ).getCustomer( ).getConnectionId( ) ) 
-					&&	StringUtils.isBlank( notification.getDemand( ).getCustomer( ).getCustomerId( ) )
-					&&	StringUtils.isBlank( notification.getDemand( ).getCustomer( ).getId( ) )
-				)
-			)
+		// check if demand type id exists
+		if ( !_demandService.getDemandType( notification.getDemand( ).getTypeId( ) ).isPresent( ) )
 		{
-			StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_WARNING, MESSAGE_MISSING_MANDATORY_FIELD, WARNING_CUSTOMER_ID_MANDATORY );
+			StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_WARNING, MESSAGE_MISSING_DEMAND_ID, WARNING_INCORRECT_DEMAND_TYPE_ID );
 			warnings.add( msg );
 		}
-		
 	}
 
 	/**
 	 * Process customer data
 	 * @param notification
+	 * @param warnings 
 	 * @throws IdentityStoreException
 	 */
-	private void processCustomer(Notification notification) throws IdentityStoreException {
-		
-		Customer customerEncrypted = notification.getDemand( ).getCustomer( );
+	private boolean processCustomer(Notification notification, List<StatusMessage> warnings) throws IdentityStoreException {
 
+		Customer customer = CustomerProvider.instance( ).decrypt( notification.getDemand( ) );
+
+		// check customer identity 
 		if ( CustomerProvider.instance( ).hasIdentityService( ) )
 		{
-			Customer customer = CustomerProvider.instance( ).decrypt( customerEncrypted, notification.getDemand( ) );
-			
-			if ( StringUtils.isEmpty( customer.getCustomerId( ) ) && !StringUtils.isEmpty( customer.getId( ) ) )
+			// check customer ids
+			if ( customer == null ||
+					( !CustomerProvider.isCustomerIdValid( customer.getCustomerId( ) ) 
+					  && !CustomerProvider.isCustomerIdValid( customer.getId( ) )  
+					  && !CustomerProvider.isConnectionIdValid( customer.getConnectionId( ) ) )
+				)
+			{
+				StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_WARNING, MESSAGE_INCORRECT_USER, WARNING_CUSTOMER_IDS_MANDATORY);
+				warnings.add( msg );
+				return false;
+			}
+
+			// set customer id if provided by ID customer attribute (if valid)
+			if ( !CustomerProvider.isCustomerIdValid( customer.getCustomerId( ) ) 
+					&& CustomerProvider.isCustomerIdValid( customer.getId( ) ) )
 			{
 				customer.setCustomerId( customer.getId( ) );
 			}
-			
+
+		
 			try
 			{
-				if ( customer != null )
+				// search identity 
+				Customer customerResult = CustomerProvider.instance( ).get( customer.getConnectionId( ), customer.getCustomerId( ) );
+				if ( customerResult != null )
 				{
-					if ( StringUtils.isEmpty( customer.getCustomerId( ) ) && StringUtils.isNotEmpty( customer.getConnectionId() ) )
-					{
-						// search by connection id (GUID)
-						Customer customerTmp = CustomerProvider.instance( ).get( customer.getConnectionId( ), StringUtils.EMPTY );
-						if ( customerTmp != null )
-						{
-							customer.setCustomerId( customerTmp.getCustomerId( ) );
-						}
-						else
-						{
-							// reset customer (a valid customer must have at least a customer_id or a connection_id)
-							customer = null;
-							AppLogService.debug( "Customer not found with connection_id : " + customer.getConnectionId( ) );
-						}
-					}
+					// could be different (in case of consolidated identities for example)
+					customer.setCustomerId( customerResult.getCustomerId( ) );
+				}
+				else
+				{
+					// add a warning : the identity does not exists (incorrect ids, identity deleted...)
+					// A customer must have a valid customer_id of connection_id
+					StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_WARNING, MESSAGE_INCORRECT_USER, WARNING_CUSTOMER_NOT_FOUND );
+					warnings.add( msg );
+					return false;
 				}
 			}
 			catch( IdentityStoreException e )
 			{
 				customer = null;
 				AppLogService.error( "An error occured while accessing IdentityStore", e  );
+				StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_ERROR, MESSAGE_INCORRECT_USER, ERROR_IDENTITYSTORE );
+				warnings.add( msg );
 			}
-
-			if ( customer == null )
-			{
-				customer = new Customer( );
-				customer.setConnectionId( StringUtils.EMPTY );
-				customer.setCustomerId( StringUtils.EMPTY );
-				notification.getDemand().setCustomer( customer );				
-			}
-
-			notification.getDemand( ).setCustomer( customer );
-		}
-		else
-		{
-			notification.getDemand( ).setCustomer( customerEncrypted );
 		}
 		
+		/*
+		// reset customer ???
+		if ( !warnings.isEmpty( ) )
+		{
+			customer = new Customer( );
+			customer.setConnectionId( StringUtils.EMPTY );
+			customer.setCustomerId( StringUtils.EMPTY );				
+		}
+		*/
+
+		notification.getDemand( ).setCustomer( customer );
+		return true;
 	}
 
 	/**
@@ -333,147 +344,112 @@ public class NotificationService
 		_demandService.create( notificationEvent );
 	}
 
-	   /**
-     * Stores a notification and the associated demand
-     * 
-     * @param notification
-     *            the notification to store
-     */
-    private void store( Notification notification )
-    {
-        Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getId( ), 
-        		notification.getDemand( ).getTypeId( ),
-        		notification.getDemand( ).getCustomer( ).getCustomerId( ));
-                
-        if ( demand == null || 
-        		( demand.getCustomer( ) != null && demand.getCustomer( ).getCustomerId( ) != null 
-        		  && !demand.getCustomer( ).getCustomerId( ).equals( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) ) )
-        {
-            demand = new Demand( );
-
-            demand.setId( notification.getDemand( ).getId( ) );
-            demand.setTypeId( notification.getDemand( ).getTypeId( ) );
-            demand.setSubtypeId( notification.getDemand( ).getSubtypeId( ) );
-            demand.setReference( notification.getDemand( ).getReference( ) );
-            demand.setCreationDate( notification.getDate( ) );
-            demand.setMaxSteps( notification.getDemand( ).getMaxSteps( ) );
-            demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
-            demand.setStatusId( -1 );
-
-            Customer customerDemand = new Customer( );
-            customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getId( ) );
-            customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getCustomerId( ) );
-            customerDemand.setConnectionId( notification.getDemand( ).getCustomer( ).getConnectionId( ) );
-            demand.setCustomer( customerDemand );
-            
-            // create demand
-            _demandService.create( demand );
-        }
-        else
-        {
-        	// update demand status
-        	demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
-
-            int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
-            
-            EnumGenericStatus oldStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
-            EnumGenericStatus newStatus = EnumGenericStatus.getByStatusId( nNewStatusId );
-
-            // Demand opened to closed
-            if ( oldStatus != null && newStatus != null 
-            		&& !oldStatus.isFinalStatus( ) && newStatus.isFinalStatus( ) )                  
-            {
-                demand.setClosureDate( notification.getDate( ) );
-            }
-
-            // Demand closed to opened
-            if ( oldStatus != null && newStatus != null 
-            		&& oldStatus.isFinalStatus( ) && !newStatus.isFinalStatus( ) )                  
-            {                
-                demand.setClosureDate( 0 );
-            }
-            
-            _demandService.update( demand );
-        }
-        notification.setDemand( demand );
-        
-        // create notification
-        _demandService.create( notification );
-    }
-
-    
 	/**
-	 * Check notification
-	 * @param notif
-	 * @return The message error
+	 * Stores a notification and the associated demand
+	 * 
+	 * @param notification
+	 *            the notification to store
 	 */
-	private String checkMyDashboardNotification( Notification notif )
-	{        
-		// check if connection id is present
-		if ( notif.getDemand( ) == null 
-				|| notif.getDemand( ).getCustomer( ) == null 
-				|| ( StringUtils.isBlank( notif.getDemand( ).getCustomer( ).getConnectionId( ) )
-						&& StringUtils.isBlank( notif.getDemand( ).getCustomer( ).getCustomerId( ) )
-						&& StringUtils.isBlank( notif.getDemand( ).getCustomer( ).getId( ) ) )
-				)
-		{
-			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_MISSING_USER_ID );
-		}
+	private void store( Notification notification )
+	{
+		Demand demand = _demandService.findByPrimaryKey( notification.getDemand( ).getId( ), 
+				notification.getDemand( ).getTypeId( ),
+				notification.getDemand( ).getCustomer( ).getCustomerId( ));
 
-		// check if Demand remote id and demand type id are present
-		if ( StringUtils.isBlank( notif.getDemand( ).getId( ) ) || StringUtils.isBlank( notif.getDemand( ).getTypeId( ) ) )
+		if ( demand == null || 
+				( demand.getCustomer( ) != null && demand.getCustomer( ).getCustomerId( ) != null 
+				&& !demand.getCustomer( ).getCustomerId( ).equals( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) ) )
 		{
-			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_MISSING_DEMAND_ID );
-		}
+			demand = new Demand( );
 
-		// check id demand_type_id is numeric
-		if ( !StringUtils.isNumeric( notif.getDemand( ).getTypeId( ) ) )
+			demand.setId( notification.getDemand( ).getId( ) );
+			demand.setTypeId( notification.getDemand( ).getTypeId( ) );
+			demand.setSubtypeId( notification.getDemand( ).getSubtypeId( ) );
+			demand.setReference( notification.getDemand( ).getReference( ) );
+			demand.setCreationDate( notification.getDate( ) );
+			demand.setMaxSteps( notification.getDemand( ).getMaxSteps( ) );
+			demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
+			demand.setStatusId( -1 );
+
+			Customer customerDemand = new Customer( );
+			customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getId( ) );
+			customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getCustomerId( ) );
+			customerDemand.setConnectionId( notification.getDemand( ).getCustomer( ).getConnectionId( ) );
+			demand.setCustomer( customerDemand );
+
+			// create demand
+			_demandService.create( demand );
+		}
+		else
 		{
-			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_INCORRECT_DEMAND_ID );
-		}
+			// update demand status
+			demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
 
-		// check if demand type id exists
-		if ( !_demandService.getDemandType( notif.getDemand( ).getTypeId( ) ).isPresent( ) )
-		{
-			return generateErrorMessage( notif, Response.Status.PRECONDITION_FAILED, MESSAGE_INCORRECT_DEMAND_ID );
-		}
+			int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
 
-		return StringUtils.EMPTY;
+			EnumGenericStatus oldStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
+			EnumGenericStatus newStatus = EnumGenericStatus.getByStatusId( nNewStatusId );
+
+			// Demand opened to closed
+			if ( oldStatus != null && newStatus != null 
+					&& !oldStatus.isFinalStatus( ) && newStatus.isFinalStatus( ) )                  
+			{
+				demand.setClosureDate( notification.getDate( ) );
+			}
+
+			// Demand closed to opened
+			if ( oldStatus != null && newStatus != null 
+					&& oldStatus.isFinalStatus( ) && !newStatus.isFinalStatus( ) )                  
+			{                
+				demand.setClosureDate( 0 );
+			}
+
+			_demandService.update( demand );
+		}
+		notification.setDemand( demand );
+
+		// create notification
+		_demandService.create( notification );
 	}
 
 	/**
 	 * Values and store the NotificationEvent object if failure
 	 * @param notification
+	 * @param warnings 
 	 * @param strMessage
 	 */
-	private void addMydashboardNotificationEvent ( Notification notification  )
+	private void addEvents( Notification notification, List<StatusMessage> warnings  )
 	{
+		// no event
+		if ( warnings.isEmpty( ) )
+		{
+			return;
+		}
+		
+		Event event = new Event( );
+		event.setEventDate( notification.getDate( ) );
+		
 		if ( notification.getMyDashboardNotification( ) != null )
 		{
-			Event event = new Event( );
-			event.setType( TYPE_GUICHET );
-			event.setEventDate( notification.getDate( ) );
-			
-			String strMessage = checkMyDashboardNotification( notification ); 
-
-			if( StringUtils.isNotEmpty( strMessage ))
-			{
-				event.setMessage( strMessage );
-				event.setStatus( STATUS_FAILED );
-			}
-			else
-			{
-				event.setStatus( STATUS_SUCCESS );
-			}
-			
-			NotificationEvent notificationEvent = new NotificationEvent( );
-			notificationEvent.setEvent( event );
-			notificationEvent.setMsgId( StringUtils.EMPTY );   
-			notificationEvent.setDemand( notification.getDemand( ) );
-			notificationEvent.setNotificationDate( notification.getDate( ) );
-			
-			store( notificationEvent );
+			event.setType( TYPE_NOTIFICATION_GUICHET );
 		}
+		else
+		{
+			event.setType( TYPE_NOTIFICATION_AGENT );
+		}
+		
+		event.setMessage( generateEventMessage(notification, warnings) ) ;
+		event.setStatus( STATUS_FAILED );
+	
+
+		NotificationEvent notificationEvent = new NotificationEvent( );
+		notificationEvent.setEvent( event );
+		notificationEvent.setMsgId( StringUtils.EMPTY );   
+		notificationEvent.setDemand( notification.getDemand( ) );
+		notificationEvent.setNotificationDate( notification.getDate( ) );
+
+		store( notificationEvent );
+		
 	}
 
 	/**
@@ -550,88 +526,106 @@ public class NotificationService
 	 * @param strErrorMessage
 	 * @return
 	 */
-	private String generateErrorMessage ( Notification notification, Status strResponseStatus,  String strErrorMessage)
+	private String generateEventMessage ( Notification notification, List<StatusMessage> warnings)
 	{
 		StringBuilder message = new StringBuilder();
+		message.append( "WARNINGS\n" );
 		message.append( "\n" );
-		message.append( "Demande id " + notification.getDemand( ).getId( ) + "\n" );
-		message.append( "Notification id " + notification.getId( ) + "\n" );
-		message.append( "Status: " + strResponseStatus.getStatusCode( ) + " " + strResponseStatus.getReasonPhrase( ) + "\n" );
-		message.append( "Error: " + strErrorMessage  + "\n" );
+		message.append( "Demande id : ").append( notification.getDemand( ).getId( )).append("\n" );
+		message.append( "Demande Type id : ").append( notification.getDemand( ).getTypeId( )).append("\n" );
+		message.append( "Notification date : ").append( Instant.ofEpochSecond( notification.getDate( ) ) ).append("\n" );
+		message.append( "\n" );
+		
+		if ( notification.getDemand().getCustomer() != null )
+		{
+			message.append( "Customer id: ").append(notification.getDemand().getCustomer().getCustomerId()).append( "\n" );
+			message.append( "Connection id: ").append(notification.getDemand().getCustomer().getConnectionId()).append( "\n" );
+		}
+		message.append( "-------------------------\n" );
+		
+		for ( StatusMessage s : warnings )
+		{
+			message.append( "Type : ")   .append( s.getType( ) ).append("\n" );
+			message.append( "Status : ") .append( s.getStatus( ) ).append("\n" );
+			message.append( "Message : ").append( s.getStrMessage( ) ).append("\n" );
+			message.append( "Reason : ") .append( s.getReason( ) ).append("\n" );
+			message.append( "-------------------------\n" );
+			
+		}
 
 		return message.toString( );
 	}
 
-    /**
-     * Calculates the generic status id for new notifications.
-     * @param notification
-     * @return
-     */
-    private int getNewDemandStatusIdFromNotification( Notification notification )
-    {                
-        if ( notification.getMyDashboardNotification( ) != null )
-        {
-        	// consider first if the status is sent by the demand
-            if ( notification.getDemand( ) != null 
-                    && EnumGenericStatus.exists( notification.getDemand( ).getStatusId( ) )  )
-            {
-                return notification.getDemand( ).getStatusId( );
-            }
-            
-            // consider the notification status id
-            if ( EnumGenericStatus.exists( notification.getMyDashboardNotification( ).getStatusId( ) ) )
-            {
-                return notification.getMyDashboardNotification( ).getStatusId( );
-            } 
-            
-	        Optional<TemporaryStatus> status = _demandService.getStatusByLabel( notification.getMyDashboardNotification( ).getStatusText( ) );
-	        if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
-	        {
-	            return status.get( ).getGenericStatus( ).getStatusId( );
-	        }
-	        
-	        return -1;
-        }
-        
-        // default
-        return notification.getDemand( ).getStatusId( );
-    }
-    
-    /**
-     * parse json 
-     * @param strJson
-     * @return the notification
-     * @throws JsonMappingException
-     * @throws JsonProcessingException
-     */
-    private Notification getNotificationFromJson( String strJson ) throws JsonMappingException, JsonProcessingException
-    {
-    	AppLogService.debug( "notificationstore / notification - Received strJson : " + strJson );
-    	
-    	// Format from JSON
+	/**
+	 * Calculates the generic status id for new notifications.
+	 * @param notification
+	 * @return
+	 */
+	private int getNewDemandStatusIdFromNotification( Notification notification )
+	{                
+		if ( notification.getMyDashboardNotification( ) != null )
+		{
+			// consider first if the status is sent by the demand
+			if ( notification.getDemand( ) != null 
+					&& EnumGenericStatus.exists( notification.getDemand( ).getStatusId( ) )  )
+			{
+				return notification.getDemand( ).getStatusId( );
+			}
+
+			// consider the notification status id
+			if ( EnumGenericStatus.exists( notification.getMyDashboardNotification( ).getStatusId( ) ) )
+			{
+				return notification.getMyDashboardNotification( ).getStatusId( );
+			} 
+
+			Optional<TemporaryStatus> status = _demandService.getStatusByLabel( notification.getMyDashboardNotification( ).getStatusText( ) );
+			if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
+			{
+				return status.get( ).getGenericStatus( ).getStatusId( );
+			}
+
+			return -1;
+		}
+
+		// default
+		return notification.getDemand( ).getStatusId( );
+	}
+
+	/**
+	 * parse json 
+	 * @param strJson
+	 * @return the notification
+	 * @throws JsonMappingException
+	 * @throws JsonProcessingException
+	 */
+	private Notification getNotificationFromJson( String strJson ) throws JsonMappingException, JsonProcessingException
+	{
+		AppLogService.debug( "notificationstore / notification - Received strJson : " + strJson );
+
+		// Format from JSON
 		ObjectMapper mapper = new ObjectMapper( );
 		mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, true );
 		mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
 
 		Notification notification = mapper.readValue( strJson, Notification.class );
-		
+
 		return notification;    				
-    }
-    
-    
-    /**
-     * call the registred notifyers
-     * 
-     * @param notification
-     * @throws NotificationException 
-     */
-    public void forward( Notification notification ) throws NotificationException
-    {
-        
-        for ( INotifyerServiceProvider notifyer : _notifyers )
-        {
-            notifyer.process( notification );
-        }
-        
-    } 
+	}
+
+
+	/**
+	 * call the registred notifyers
+	 * 
+	 * @param notification
+	 * @throws NotificationException 
+	 */
+	public void forward( Notification notification ) throws NotificationException
+	{
+
+		for ( INotifyerServiceProvider notifyer : _notifyers )
+		{
+			notifyer.process( notification );
+		}
+
+	} 
 }
