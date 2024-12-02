@@ -119,11 +119,10 @@ public final class TemporaryStatusHome
     }
 
     /**
-     * Returns an instance of a status
-     * 
+     * Load the data from the table using a like '%strStatus%'
      * @param strStatus
-     *            The status name
-     * @return an instance of Status
+
+     * @return Only the first status found returned
      */
     public static Optional<TemporaryStatus> findByStatus( String strStatus )
     {
