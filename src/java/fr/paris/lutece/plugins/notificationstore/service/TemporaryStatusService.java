@@ -171,11 +171,11 @@ public class TemporaryStatusService
     }
 
     /**
-     * Returns an instance of a status
+     * Returns an instance of a status (like '%strStatus%')
      * 
      * @param strStatus
      *            The status name
-     * @return an instance of Status
+     * @return Only the first status found returned
      */
     public Optional<TemporaryStatus> findByStatus( String strStatus )
     {
