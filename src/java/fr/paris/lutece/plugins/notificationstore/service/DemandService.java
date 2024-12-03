@@ -164,7 +164,7 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
 
         if ( demand != null )
         {
-            demand.setNotifications( _notificationDao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId ) );
+            demand.setNotifications( _notificationDao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId, new NotificationFilter() ) );
         }
 
         return demand;

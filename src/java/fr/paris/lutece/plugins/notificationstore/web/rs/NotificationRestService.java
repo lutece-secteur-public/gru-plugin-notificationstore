@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web.rs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -48,6 +49,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.NotificationResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.SearchResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.responseStatus.ResponseStatus;
@@ -107,14 +109,20 @@ public class NotificationRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getListNotification( @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
             @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId )
+            @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+            @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         NotificationResult result = new NotificationResult( );
 
         if ( StringUtils.isNotEmpty( strIdDemand ) && StringUtils.isNotEmpty( strIdDemandType ) && StringUtils.isNotEmpty( strCustomerId ) )
         {
+            NotificationFilter filter = new NotificationFilter( );
+            if( StringUtils.isNotEmpty( strNotificationType ) )
+            {
+                filter.getListNotificationType( ).add( EnumNotificationType.valueOf( strNotificationType ) );
+            }
 
-            List<Notification> notifications = NotificationHome.getByDemandIdTypeIdCustomerId( strIdDemand, strIdDemandType, strCustomerId );
+            List<Notification> notifications = NotificationHome.getByDemandIdTypeIdCustomerId( strIdDemand, strIdDemandType, strCustomerId, filter );
 
             result.setNotifications( notifications );
             result.setStatus( ResponseStatusFactory.ok( ) );

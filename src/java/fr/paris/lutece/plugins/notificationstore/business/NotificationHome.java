@@ -137,11 +137,12 @@ public final class NotificationHome
      * @param strDemandId
      * @param strDemandTypeId
      * @param strCustomerId
+     * @param filter
      * @return the notification list
      */
-    public static List<Notification> getByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId )
+    public static List<Notification> getByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId, NotificationFilter filter )
     {
-        return _dao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId );
+        return _dao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId, filter );
     }
 
     /**
