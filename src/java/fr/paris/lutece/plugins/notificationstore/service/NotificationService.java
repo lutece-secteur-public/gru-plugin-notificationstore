@@ -62,8 +62,10 @@ import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.grubusiness.service.notification.INotifyerServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.service.notification.NotificationException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 public class NotificationService 
 {
@@ -147,8 +149,8 @@ public class NotificationService
 			// check Notification
 			checkNotification( notification, warnings );
 
-			// store  notification only if customer is valid
-			if ( isCustomerValid ) 
+			// store  notification only if customer is valid (or if property "store all" is set)
+			if ( isCustomerValid ||  AppPropertiesService.getPropertyBoolean( NotificationStoreConstants.PROPERTY_STORE_ALL_NOTIFICATIONS, false )) 
 			{
 				store( notification );
 			}
