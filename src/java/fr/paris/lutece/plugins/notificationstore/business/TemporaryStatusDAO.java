@@ -58,7 +58,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id_temporary_status FROM notificationstore_temporary_status";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE id_temporary_status IN (  ";
     private static final String SQL_QUERY_SELECT_BY_STATUS_ID = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE status_id = ?";
-    private static final String SQL_QUERY_SELECT_BY_STATUS = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE status like concat('%',?,'%') ";
+    private static final String SQL_QUERY_SELECT_BY_STATUS = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE trim(status) like concat('%',trim(?),'%') ";
 
     /**
      * {@inheritDoc }
