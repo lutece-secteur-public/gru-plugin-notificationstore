@@ -8,9 +8,9 @@ id varchar(100) NOT NULL,               -- old "id" column
 demand_type_id varchar(50) NOT NULL,   -- old "type_id" column
 subtype_id varchar(50) NULL,
 reference varchar(50) NOT NULL,    
-status_id int default 0 NOT NULL ,
+status_id int default -1 NOT NULL ,
 customer_id varchar(100) NULL,
-creation_date timestamp NOT NULL,
+creation_date timestamp NOT NULL DEFAULT current_timestamp(),
 closure_date timestamp NULL,
 max_steps int NULL,
 current_step int NULL,
@@ -117,8 +117,8 @@ CREATE TABLE notificationstore_notification_content (
 id_notification_content int AUTO_INCREMENT,
 notification_id int NOT NULL,
 notification_type varchar(100) default '' NOT NULL,
-id_temporary_status int default "-1",
-status_id int default "-1",
+id_temporary_status int default -1,
+status_id int default -1,
 file_key VARCHAR(255) DEFAULT NULL,
 file_store VARCHAR(255) DEFAULT NULL,
 PRIMARY KEY (id_notification_content)
