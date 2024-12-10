@@ -57,6 +57,7 @@ public final class DemandTypeDAO implements IDemandTypeDAO
     private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_type SET demande_type_id = ?, label = ?, code_category = ? , url = ?, application_code = ? WHERE id = ?";
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id FROM notificationstore_demand_type";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECTALL + " WHERE id IN (  ";
+    private static final String SQL_ORDER_BY = " ORDER BY demande_type_id asc ";
 
     /**
      * {@inheritDoc }
@@ -183,7 +184,7 @@ public final class DemandTypeDAO implements IDemandTypeDAO
     public List<DemandType> selectDemandTypesList( )
     {
         List<DemandType> demandTypeList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL + SQL_ORDER_BY, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.executeQuery( );
 
@@ -205,7 +206,7 @@ public final class DemandTypeDAO implements IDemandTypeDAO
     public List<Integer> selectIdDemandTypesList( )
     {
         List<Integer> demandTypeList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID + SQL_ORDER_BY, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.executeQuery( );
 
