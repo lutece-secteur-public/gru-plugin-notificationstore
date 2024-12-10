@@ -44,13 +44,16 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
-import fr.paris.lutece.plugins.identitystore.v3.web.rs.util.Constants;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
@@ -76,7 +79,7 @@ public class DemandTypeRestService
      */
     @GET
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getDemandTypeList( )
+    public Response getDemandTypeList( @QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE )  String strDirectMode  )
     {
         List<DemandType> listDemandTypes = DemandTypeHome.getDemandTypesList( );
 
@@ -86,11 +89,30 @@ public class DemandTypeRestService
                     .entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) )
                     .build( );
         }
-        return Response.status( Response.Status.OK )
+        
+        if ( strDirectMode == null )
+        {
+        	return Response.status( Response.Status.OK )
                 .entity( JsonUtil.buildJsonResponse( new JsonResponse( listDemandTypes ) ) )
                 .build( );
+        }
+        else
+        {
+        	// direct response mode (old API mode)
+        	ObjectMapper _mapper = new ObjectMapper( );
+            
+            try 
+            {
+            	String strResult = _mapper.writeValueAsString( listDemandTypes );
+            	return Response.ok( strResult ).build( );
+            }
+            catch ( JsonProcessingException e )
+            {
+            	return Response.serverError ( ).build( );
+            }
+        }
     }
-
+    
     /**
      * Create DemandType
      * 
@@ -109,7 +131,6 @@ public class DemandTypeRestService
      * @return the DemandType if created
      */
     @POST
-    @Path( StringUtils.EMPTY )
     @Produces( MediaType.APPLICATION_JSON )
     public Response createDemandType( @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE ) String strIdDemandType,
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_LABEL ) String strLabel,

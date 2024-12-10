@@ -61,6 +61,7 @@ public class NotificationStoreConstants
     public static final String QUERY_PARAM_ID_DEMAND = "idDemand";
     public static final String QUERY_PARAM_LIST_STATUS = "listStatus";
     public static final String QUERY_PARAM_CATEGORY_CODE = "categoryCode";
+    public static final String QUERY_PARAM_DIRECT_MODE = "direct";
     
     //Demand type attributes
     public static final String DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE = "id_demand_type";
