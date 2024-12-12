@@ -376,7 +376,7 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
     @Override
     public Optional<TemporaryStatus> getStatusByLabel( String strStatusLabel )
     {
-        return _statusDao.loadByStatus( strStatusLabel );
+        return TemporaryStatusService.getInstance( ).findByStatus( strStatusLabel );
     }
 
     @Override
