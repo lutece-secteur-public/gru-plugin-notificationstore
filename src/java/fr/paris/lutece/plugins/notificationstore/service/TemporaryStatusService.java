@@ -57,6 +57,7 @@ public class TemporaryStatusService
     
     private static TemporaryStatusService _instance;
     private static IDemandServiceProvider _demandService;
+    private static TemporaryStatusCacheService _cache;
     
     /**
      * Private constructor
@@ -76,6 +77,7 @@ public class TemporaryStatusService
         {
             _instance = new TemporaryStatusService( );
             _demandService = SpringContextService.getBean( BEAN_STORAGE_SERVICE );
+            _cache =  TemporaryStatusCacheService.getInstance( );
         }
         return _instance;
     }
@@ -90,7 +92,10 @@ public class TemporaryStatusService
     public TemporaryStatus create( TemporaryStatus status )
     {
         TemporaryStatusHome.create( status );
-
+        
+        //Remove cache
+        TemporaryStatusCacheService.getInstance( ).removeCache( );
+        
         return status;
     }
 
@@ -124,6 +129,9 @@ public class TemporaryStatusService
             
             //Commit de la transaction
             TransactionManager.commitTransaction( null );
+            
+            //Remove cache
+            TemporaryStatusCacheService.getInstance( ).removeCache( );
         } 
         catch (Exception e) 
         {
@@ -144,6 +152,9 @@ public class TemporaryStatusService
     public void remove( int nKey )
     {
         TemporaryStatusHome.remove( nKey );
+        
+        //Remove cache
+        TemporaryStatusCacheService.getInstance( ).removeCache( );
     }
 
     /**
@@ -179,7 +190,23 @@ public class TemporaryStatusService
      */
     public Optional<TemporaryStatus> findByStatus( String strStatus )
     {
-        return TemporaryStatusHome.findByStatus( strStatus );
+        List<TemporaryStatus> listTemporaryStatus = _cache.getList( );
+        
+        strStatus = strStatus.replaceAll("\\s", "").toLowerCase( );
+        
+        if ( listTemporaryStatus != null && !listTemporaryStatus.isEmpty( ) )
+        {
+            for ( TemporaryStatus temporaryStatus : listTemporaryStatus )
+            {
+                String strStatusExist = temporaryStatus.getStatus( ).replaceAll("\\s", "").toLowerCase( );
+                if( strStatus.contains( strStatusExist ) )
+                {
+                    return Optional.ofNullable( temporaryStatus );
+                }
+                
+            }
+        }
+        return Optional.empty( );
     }
 
     /**
