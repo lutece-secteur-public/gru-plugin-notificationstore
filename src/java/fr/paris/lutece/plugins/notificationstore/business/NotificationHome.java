@@ -200,6 +200,17 @@ public final class NotificationHome
     }
 
     /**
+     * test if a notif exists with the specified demand_type_id
+     * 
+     * @param nDemandTypeId
+     * @return true if exists
+     */
+    public static boolean existsNotificationWithDemandTypeId( int nDemandTypeId )
+    {
+    	return _dao.existsNotificationWithDemandTypeId( nDemandTypeId );
+    }
+    
+    /**
      * Get last notification by demand id and demand type id
      * 
      * @param strDemandId

@@ -55,6 +55,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
+import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import fr.paris.lutece.util.json.ErrorJsonResponse;
@@ -233,7 +234,7 @@ public class DemandTypeRestService
     @DELETE
     @Path( NotificationStoreConstants.PATH_ID )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response deleteDemandType( @PathParam( NotificationStoreConstants.ID ) Integer nId )
+    public Response deleteDemandType( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
         Optional<DemandType> optDemandType = DemandTypeHome.findByPrimaryKey( nId );
         
@@ -244,7 +245,15 @@ public class DemandTypeRestService
                     .build( );
         }
 
-        DemandTypeHome.remove( nId );
+        // test if exists notifications that uses that demand_type
+        if ( NotificationHome.existsNotificationWithDemandTypeId( optDemandType.get( ).getIdDemandType( ) ) )
+        {
+        	return Response.status( Response.Status.FORBIDDEN )
+                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.FORBIDDEN.name( ), NotificationStoreConstants.MESSAGE_ERROR_DEMAND_TYPE_ID_USED ) ) )
+                    .build( );
+        }
+        
+        DemandTypeHome.remove( optDemandType.get( ).getId( ) );
 
         return Response.status( Response.Status.OK )
                 .entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) )

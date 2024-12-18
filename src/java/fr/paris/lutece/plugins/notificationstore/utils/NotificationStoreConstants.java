@@ -95,6 +95,7 @@ public class NotificationStoreConstants
     public static final String MESSAGE_ERROR_NOTIF = "Parameters idDemand, customerId and idDemandType are mandatory ";
     public static final String MESSAGE_ALL_REQUIRED = "All attributes are required";
     public static final String MESSAGE_ERROR_NOT_FOUND_RESOURCE = "Resource not found";
+    public static final String MESSAGE_ERROR_DEMAND_TYPE_ID_USED = "This DemandTypeId is used by existing notifications";
     public static final String MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER = "Empty parameter";
     
     // Constants

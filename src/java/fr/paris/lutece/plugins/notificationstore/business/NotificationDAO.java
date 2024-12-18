@@ -97,7 +97,8 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_AND = " AND ";
     private static final String SQL_QUERY_NOTIFICATION_TYPE = " AND nnc.notification_type in  (%s) ";
     private static final String SQL_QUERY_FILTER_NOTIFICATION_TYPE = " id IN (SELECT notification_id FROM notificationstore_notification_content WHERE notification_type in (  ";
-
+    private static final String SQL_QUERY_EXISTS_DEMAND_TYPE_ID = "SELECT 1 WHERE exists (SELECT * FROM notificationstore_notification WHERE demand_type_id = ? )";
+    
     private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification ( demand_id, demand_type_id, customer_id, date ) VALUES (  ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification WHERE id = ?";
     private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM notificationstore_notification WHERE demand_id = ? AND demand_type_id = ? AND customer_id = ? ";
@@ -660,6 +661,30 @@ public final class NotificationDAO implements INotificationDAO
             }
 
             return notification;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean existsNotificationWithDemandTypeId( int nDemandTypeId )
+    {
+        
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_EXISTS_DEMAND_TYPE_ID, NotificationStorePlugin.getPlugin( ) ) )
+        {
+
+            daoUtil.setString( 1, String.valueOf( nDemandTypeId ) );
+            daoUtil.executeQuery( );
+
+            if ( daoUtil.next( ) )
+            {
+                return true;
+            }
+            else
+            {
+            	return false;
+            }
         }
     }
 }
