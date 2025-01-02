@@ -63,6 +63,7 @@ import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
+import fr.paris.lutece.plugins.notificationstore.web.rs.swagger.SwaggerConstants;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -71,6 +72,12 @@ import fr.paris.lutece.util.html.Paginator;
 import fr.paris.lutece.util.json.ErrorJsonResponse;
 import fr.paris.lutece.util.json.JsonResponse;
 import fr.paris.lutece.util.json.JsonUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 
 /**
  * 
@@ -78,6 +85,7 @@ import fr.paris.lutece.util.json.JsonUtil;
  *
  */
 @Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND )
+@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND )
 public class DemandRestService
 {
 
@@ -94,11 +102,23 @@ public class DemandRestService
     @GET
     @Path( NotificationStoreConstants.PATH_LIST )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getListDemand( @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
+    @ApiOperation( value = "Get demand list for a customer Id", response = DemandResult.class )
+    @ApiResponses( value = {
+    		@ApiResponse( code = 200, message = "Success" ),
+    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 403, message = "Failure" )
+    })
+    public Response getListDemand( 
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_INDEX, value = SwaggerConstants.QUERY_PARAM_INDEX_DESCRIPTION )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIMIT, value = SwaggerConstants.QUERY_PARAM_LIMIT_DESCRIPTION )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );
@@ -131,13 +151,27 @@ public class DemandRestService
     @GET
     @Path( NotificationStoreConstants.PATH_DEMAND_STATUS )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getListOfDemandByStatus( @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIST_STATUS ) String strListStatus,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE ) String strCategoryCode )
+    @ApiOperation( value = "Get demand list for a customer Id by status", response = DemandResult.class )
+    @ApiResponses( value = {
+    		@ApiResponse( code = 200, message = "Success (with or without result)" ),
+    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 403, message = "Failure" )
+    })
+    public Response getListOfDemandByStatus( 
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_INDEX, value = SwaggerConstants.QUERY_PARAM_INDEX_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIMIT, value = SwaggerConstants.QUERY_PARAM_LIMIT_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIST_STATUS, value = SwaggerConstants.QUERY_PARAM_LIST_STATUS_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_LIST_STATUS ) String strListStatus,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE, value = SwaggerConstants.QUERY_PARAM_CATEGORY_CODE_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE ) String strCategoryCode )
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );

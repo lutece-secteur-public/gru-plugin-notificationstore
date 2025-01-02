@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web.rs;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -50,17 +49,24 @@ import org.apache.commons.lang3.StringUtils;
 import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
+import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.NotificationResult;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.SearchResult;
-import fr.paris.lutece.plugins.grubusiness.business.web.rs.responseStatus.ResponseStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.responseStatus.ResponseStatusFactory;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationService;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
+import fr.paris.lutece.plugins.notificationstore.web.rs.swagger.SwaggerConstants;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3  )
+@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3  )
 public class NotificationRestService
 {
 
@@ -107,10 +113,21 @@ public class NotificationRestService
     @GET
     @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_LIST)
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getListNotification( @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
-            @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
+    @ApiOperation( value = "Get the notifications of a demand", response = NotificationResult.class )
+    @ApiResponses( value = {
+    		@ApiResponse( code = 200, message = "Success" ),
+    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 403, message = "Failure" )
+    })
+    public Response getListNotification( 
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION )
+				@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         NotificationResult result = new NotificationResult( );
 
@@ -141,7 +158,7 @@ public class NotificationRestService
     /**
      * Gets list of notification types
      * 
-     * @return list of demand types
+     * @return list of notification types
      */
     @GET
     @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_TYPE_NOTIFICATION )

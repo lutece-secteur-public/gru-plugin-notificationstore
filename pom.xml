@@ -69,7 +69,28 @@
         	<version>[3.1.6-SNAPSHOT,)</version>
             <type>jar</type>
         </dependency>
+        
+        <dependency>
+			<groupId>fr.paris.lutece.plugins</groupId>
+			<artifactId>plugin-swaggerui</artifactId>
+			<version>[1.0.1,)</version>
+			<type>lutece-plugin</type>
+		</dependency>
 
+		<!-- Génération du fichier swagger.json -->
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-jaxrs</artifactId>
+			<version>1.6.11</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.ws.rs</groupId>
+					<artifactId>jsr311-api</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>provided</scope>
+		</dependency>
+		
     </dependencies>
 
     <properties>
@@ -84,4 +105,64 @@
         <url>https://github.com/lutece-secteur-public/gru-plugin-notificationstore.git</url>
         <tag>HEAD</tag>
     </scm>
+    
+    <!-- Profile 'swagger-json' de génération du fichier swagger.json -->
+	<profiles>
+		<profile>
+			<id>swagger-json</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.openapitools.swagger</groupId>
+						<artifactId>swagger-maven-plugin</artifactId>
+						<version>1.0.3</version>
+						<configuration>
+							<resourcePackages>
+								<resourcePackage>fr.paris.lutece.plugins.notificationstore.web.rs.swagger</resourcePackage>
+								<resourcePackage>fr.paris.lutece.plugins.notificationstore.web.rs</resourcePackage>
+							</resourcePackages>
+							<outputDirectory>${project.basedir}/webapp/plugins/notificationstore/api/swagger/v2/</outputDirectory>
+							<outputFilename>swagger</outputFilename>
+							<outputFormats>JSON</outputFormats>
+						</configuration>
+						<dependencies>
+							<dependency>
+					            <groupId>fr.paris.lutece</groupId>
+					            <artifactId>lutece-core</artifactId>
+					            <version>[7.0.0,)</version>
+					            <type>lutece-core</type>
+					             <exclusions>
+							        <exclusion>
+							            <groupId>com.fasterxml.jackson.core</groupId>
+							            <artifactId>jackson-databind</artifactId>
+							        </exclusion>
+							    </exclusions>
+					        </dependency>
+							<dependency>
+								<groupId>fr.paris.lutece.plugins</groupId>
+								<artifactId>library-grubusiness</artifactId>
+								<version>[1.1.19-SNAPSHOT,)</version>
+							</dependency>
+							<dependency>
+								<groupId>com.fasterxml.jackson.core</groupId>
+								<artifactId>jackson-databind</artifactId>
+								<version>2.9.10.8</version>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
 </project>

@@ -54,13 +54,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
+import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandResult;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
+import fr.paris.lutece.plugins.notificationstore.web.rs.swagger.SwaggerConstants;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import fr.paris.lutece.util.json.ErrorJsonResponse;
 import fr.paris.lutece.util.json.JsonResponse;
 import fr.paris.lutece.util.json.JsonUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * 
@@ -68,6 +75,7 @@ import fr.paris.lutece.util.json.JsonUtil;
  *
  */
 @Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND_TYPE )
+@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND_TYPE )
 public class DemandTypeRestService
 {
 
@@ -80,7 +88,15 @@ public class DemandTypeRestService
      */
     @GET
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getDemandTypeList( @QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE )  String strDirectMode  )
+    @ApiOperation( value = "Get demand type list (stable, must be cached)", response = Response.class )
+    @ApiResponses( value = {
+    		@ApiResponse( code = 200, message = "Success" ),
+    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 403, message = "Failure" )
+    })
+    public Response getDemandTypeList( 
+    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE, value = SwaggerConstants.QUERY_PARAM_DIRECT_MODE_DESCRIPTION )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE )  String strDirectMode  )
     {
         List<DemandType> listDemandTypes = DemandTypeHome.getDemandTypesList( );
 
@@ -272,7 +288,16 @@ public class DemandTypeRestService
     @GET
     @Path( NotificationStoreConstants.PATH_ID )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getDemandType( @PathParam( NotificationStoreConstants.ID ) Integer nId )
+    @ApiOperation( value = "Get demand type (stable, must be cached)", response = Response.class )
+    @ApiResponses( value = {
+    		@ApiResponse( code = 200, message = "Success" ),
+    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+    		@ApiResponse( code = 404, message = "Not found"),
+            @ApiResponse( code = 403, message = "Failure" )
+    })
+    public Response getDemandType( 
+    		@ApiParam( name = NotificationStoreConstants.ID, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
+				@PathParam( NotificationStoreConstants.ID ) Integer nId )
     {
         Optional<DemandType> optDemandType = DemandTypeHome.findByPrimaryKey( nId );
         if ( !optDemandType.isPresent( ) )

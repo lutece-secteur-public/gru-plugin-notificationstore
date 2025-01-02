@@ -52,10 +52,16 @@ import org.apache.commons.lang3.StringUtils;
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandCategory;
 import fr.paris.lutece.plugins.notificationstore.business.DemandCategoryHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
+import fr.paris.lutece.plugins.notificationstore.web.rs.swagger.SwaggerConstants;
 import fr.paris.lutece.plugins.rest.service.RestConstants;
 import fr.paris.lutece.util.json.ErrorJsonResponse;
 import fr.paris.lutece.util.json.JsonResponse;
 import fr.paris.lutece.util.json.JsonUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * 
@@ -63,6 +69,7 @@ import fr.paris.lutece.util.json.JsonUtil;
  *
  */
 @Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_CATEGORY )
+@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_CATEGORY )
 public class DemandCategoryRestService
 {
 
@@ -74,6 +81,13 @@ public class DemandCategoryRestService
     @GET
     @Path( NotificationStoreConstants.PATH_LIST )
     @Produces( MediaType.APPLICATION_JSON )
+    @ApiOperation( value = "Get the list of categories", response = Response.class )
+    @ApiResponses( value = {
+    		@ApiResponse( code = 200, message = "Success" ),
+    		@ApiResponse( code = 204, message = "No content" ),
+    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 403, message = "Failure" )
+    })
     public Response getDemandCategoryList( )
     {
         List<DemandCategory> listDemandCategorys = DemandCategoryHome.getDemandCategoriesList( );
@@ -199,14 +213,20 @@ public class DemandCategoryRestService
     
     /**
      * Get DemandCategory
-     * @param nVersion the API version
      * @param id the id
      * @return the DemandCategory
      */
     @GET
     @Path( NotificationStoreConstants.PATH_ID )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response getDemandCategory( @PathParam( NotificationStoreConstants.ID ) Integer id )
+    @ApiOperation( value = "Get a category", response = Response.class )
+    @ApiResponses( value = {
+    		@ApiResponse( code = 200, message = "Success" ),
+    		@ApiResponse( code = 404, message = "Not found" )
+    })
+    public Response getDemandCategory( 
+    		@ApiParam( name = NotificationStoreConstants.ID, value = SwaggerConstants.QUERY_PARAM_ID_CATEGORY_DESCRIPTION )
+				@PathParam( NotificationStoreConstants.ID ) Integer id )
     {
         Optional<DemandCategory> optDemandCategory = DemandCategoryHome.findByPrimaryKey( id );
         if ( !optDemandCategory.isPresent( ) )
