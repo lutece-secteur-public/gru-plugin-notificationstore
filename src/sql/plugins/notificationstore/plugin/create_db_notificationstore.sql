@@ -72,7 +72,7 @@ CREATE TABLE notificationstore_temporary_status (
 id_temporary_status int AUTO_INCREMENT,
 status long varchar NOT NULL,
 status_id int default '-1',
-PRIMARY KEY (id)
+PRIMARY KEY (id_temporary_status)
 );
 
 CREATE INDEX IDX_notificationstore_status_text on  notificationstore_temporary_status (status(200), status_id) ;
