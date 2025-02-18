@@ -40,6 +40,7 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandListener;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
 import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
+import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationEventDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationListener;
@@ -294,6 +295,29 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
         return _notificationEventDao.loadByFilter( notificationFilter );
     }
 
+    /**
+     * Finds events by date and demand_type_id and status
+     * 
+     * @param dStart
+     * @param dEnd
+     * @param strDemandTypeId
+     * @param strStatus
+     * 
+     * @return the demands. An empty list is returned if no event has been found
+     */
+    public List<NotificationEvent> findEventsByDateAndDemandTypeIdAndStatusAndType( long dStart, long dEnd, String strDemandTypeId, String strStatus, List<EnumNotificationType>  lTypes )
+    {
+        NotificationFilter notificationFilter = new NotificationFilter( );
+
+        notificationFilter.setStartDate( dStart );
+        notificationFilter.setEndDate( dEnd );
+        notificationFilter.setDemandTypeId( strDemandTypeId );
+        notificationFilter.setEventStatus( strStatus );
+        notificationFilter.setListNotificationType( lTypes );
+
+        return _notificationEventDao.loadByFilter( notificationFilter );
+    }
+    
     /**
      * get demand Type list
      * 

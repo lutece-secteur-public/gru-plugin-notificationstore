@@ -44,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
+import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Event;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationEventDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
@@ -72,6 +73,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
     private static final String SQL_QUERY_FILTER_BY_STARTDATE = " AND event_date >= ? ";
     private static final String SQL_QUERY_FILTER_BY_ENDDATE = " AND event_date <= ? ";
     private static final String SQL_QUERY_FILTER_BY_STATUS = " AND status = ? ";
+    private static final String SQL_QUERY_FILTER_BY_TYPE = " AND type in ( ";
     private static final String SQL_QUERY_FILTER_ORDER_BY = " ORDER BY event_date DESC ";
 
     /**
@@ -368,6 +370,16 @@ public final class NotificationEventDAO implements INotificationEventDAO
         {
             sbSql.append( SQL_QUERY_FILTER_BY_STATUS );
         }
+        
+        if ( filter.containsNotificationTypeFilter( ) )
+        {
+            sbSql.append( SQL_QUERY_FILTER_BY_TYPE );
+            for ( int i=0 ; i < filter.getListNotificationType( ).size( ) - 1 ; i++ )
+            {
+            	sbSql.append( "?, ");
+            }
+            sbSql.append( "?)");
+        }
 
         sbSql.append( SQL_QUERY_FILTER_ORDER_BY );
     }
@@ -407,7 +419,14 @@ public final class NotificationEventDAO implements INotificationEventDAO
         }
         if ( !StringUtils.isEmpty( filter.getEventStatus( ) ) )
         {
-            daoUtil.setString( i, filter.getEventStatus( ) );
+            daoUtil.setString( i++, filter.getEventStatus( ) );
+        }
+        if ( filter.getListNotificationType( ) != null && !filter.getListNotificationType().isEmpty( ) )
+        {
+        	for ( EnumNotificationType type : filter.getListNotificationType( ) )
+        	{
+        		daoUtil.setString( i++, type.name( ) );
+        	}
         }
     }
 
