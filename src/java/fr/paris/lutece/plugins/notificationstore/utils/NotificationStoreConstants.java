@@ -87,7 +87,7 @@ public class NotificationStoreConstants
     /** The Constant LIMIT_DEMAND_API_REST. */
     public static final String LIMIT_DEMAND_API_REST = "notificationstore.api.rest.limit.demand";
     public static final String PROPERTY_COMPRESS_NOTIFICATION = "notificationstore.notification.compress";
-    public static final String PROPERTY_STORE_ALL_NOTIFICATIONS = "notificationstore.notification.storeAll";
+    public static final String PROPERTY_CONSIDER_GUID_AS_CUSTOMER_ID = "notificationstore.notification.considerGuidAsCuid";
 
     // MESSAGE
     public static final String MESSAGE_ERROR_DEMAND = "Parameter customerId is mandatory";

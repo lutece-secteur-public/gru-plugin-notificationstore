@@ -150,7 +150,7 @@ public class NotificationService
 			checkNotification( notification, warnings );
 
 			// store  notification only if customer is valid (or if property "store all" is set)
-			if ( isCustomerValid ||  AppPropertiesService.getPropertyBoolean( NotificationStoreConstants.PROPERTY_STORE_ALL_NOTIFICATIONS, false )) 
+			if ( isCustomerValid ) 
 			{
 				store( notification );
 			}
@@ -229,6 +229,13 @@ public class NotificationService
 
 		Customer customer = CustomerProvider.instance( ).decrypt( notification.getDemand( ) );
 
+		// use connection id as customer id
+		if ( AppPropertiesService.getPropertyBoolean( NotificationStoreConstants.PROPERTY_CONSIDER_GUID_AS_CUSTOMER_ID, false )
+				&& !StringUtils.isEmpty( customer.getConnectionId( ) ) )
+		{
+			customer.setCustomerId( customer.getConnectionId( ) );
+		}
+		
 		// check customer identity 
 		if ( CustomerProvider.instance( ).hasIdentityService( ) )
 		{
@@ -290,7 +297,9 @@ public class NotificationService
 		*/
 
 		notification.getDemand( ).setCustomer( customer );
-		return true;
+		
+		// return true if customer_id exists
+		return !StringUtils.isEmpty( customer.getCustomerId( ) );
 	}
 
 	/**
