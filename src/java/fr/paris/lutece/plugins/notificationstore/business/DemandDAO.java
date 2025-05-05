@@ -37,6 +37,7 @@ import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
@@ -83,6 +84,7 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO notificationstore_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE uid = ? AND demand_type_id = ?";
+    private static final String SQL_QUERY_DEMAND_UPDATE_LINK = "UPDATE notificationstore_demand SET customer_id = ? WHERE customer_id = ?";
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE id = ? AND demand_type_id = ? AND customer_id = ? ";
     private static final String SQL_QUERY_DEMAND_DELETE_BY_UID = "DELETE FROM notificationstore_demand WHERE uid = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_CUSTOMER_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
@@ -342,6 +344,24 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.executeUpdate( );
     
             return demand;
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void createLink( NotificationLink notificationLink )
+    {
+        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE_LINK, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            int nIndex = 1;
+
+            // update
+            daoUtil.setString( nIndex++, notificationLink.getNewCustomerId() );
+            daoUtil.setString( nIndex, notificationLink.getOldCustomerId() );
+
+            daoUtil.executeUpdate( );
         }
     }
 

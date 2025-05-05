@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -109,6 +110,7 @@ public final class NotificationDAO implements INotificationDAO
 
     private static final String SQL_QUERY_SELECT_LAST_NOTIFICATION = "SELECT * FROM notificationstore_notification " + " WHERE demand_id = ?"
             + " AND demand_type_id = ?" + " ORDER BY date desc, id desc " + " LIMIT 1";
+    private static final String SQL_QUERY_UPDATE_NOTIFICATIONS_TO_LINK = "UPDATE notificationstore_notification SET customer_id = ? WHERE customer_id = ?";
 
     private static final String PROPERTY_DECOMPRESS_NOTIFICATION = "grustoragedb.notification.decompress";
 
@@ -356,6 +358,24 @@ public final class NotificationDAO implements INotificationDAO
         }
 
         return notification;
+    }
+
+    /**
+     *  {@inheritDoc}
+     */
+    @Override
+    public void createLink( NotificationLink notificationLink )
+    {
+        try ( DAOUtil daoUtil = new DAOUtil(SQL_QUERY_UPDATE_NOTIFICATIONS_TO_LINK, NotificationStorePlugin.getPlugin( ) ) )
+        {
+
+            int nIndex = 1;
+
+            daoUtil.setString( nIndex++, notificationLink.getNewCustomerId() );
+            daoUtil.setString( nIndex, notificationLink.getOldCustomerId() );
+
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**

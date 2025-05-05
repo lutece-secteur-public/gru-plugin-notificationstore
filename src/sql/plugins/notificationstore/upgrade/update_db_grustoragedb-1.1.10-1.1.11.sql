@@ -1,0 +1,1 @@
+ALTER TABLE notificationstore_notification DROP FOREIGN KEY fk_notificationstore_notification_demand_id;

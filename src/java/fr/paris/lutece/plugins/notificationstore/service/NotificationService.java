@@ -42,6 +42,9 @@ import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
+import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
+import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -301,6 +304,46 @@ public class NotificationService
 		// return true if customer_id exists
 		return !StringUtils.isEmpty( customer.getCustomerId( ) );
 	}
+
+
+	/**
+	 * Link a notification to another
+	 *
+	 * @param strJson
+	 * @return the response
+	 */
+	public Response linkNotifications ( String strJson )
+	{
+		try
+		{
+			// Format from JSON
+			ObjectMapper mapper = new ObjectMapper( );
+			mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, true );
+			mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
+
+			NotificationLink link = mapper.readValue( strJson, NotificationLink.class );
+			AppLogService.debug( "notificationstore / NotificationLink - Received strJson : " + strJson );
+			DemandHome.createLink( link );
+			NotificationHome.createNotificationLink( link );
+		}
+		catch( JsonParseException ex )
+		{
+			return fail( ex, Response.Status.BAD_REQUEST );
+		}
+		catch( JsonMappingException | NullPointerException ex )
+		{
+			return fail( ex, Response.Status.BAD_REQUEST );
+		}
+		catch( IOException ex )
+		{
+			return fail( ex, Response.Status.INTERNAL_SERVER_ERROR );
+		}
+		catch( Exception ex )
+		{
+			return fail( ex, Response.Status.INTERNAL_SERVER_ERROR  );
+		}
+		return success();
+    }
 
 	/**
 	 * store a notification event
@@ -638,5 +681,5 @@ public class NotificationService
 			notifyer.process( notification );
 		}
 
-	} 
+	}
 }
