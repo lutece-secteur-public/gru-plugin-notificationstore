@@ -568,7 +568,7 @@ public final class DemandDAO implements IDemandDAO
             strSql += SQL_FILTER_BY_DEMAND_TYPE_GD_ID;
         }
 
-        strSql += SQL_QUERY_DATE_ORDER;
+        //strSql += SQL_QUERY_DATE_ORDER;
 
         try ( DAOUtil daoUtil = new DAOUtil( strSql, NotificationStorePlugin.getPlugin( ) ) )
         {
