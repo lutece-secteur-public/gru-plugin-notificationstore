@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.portal.service.file.IFileStoreServiceProvider;
 import fr.paris.lutece.portal.service.plugin.Plugin;
@@ -223,8 +222,14 @@ public final class NotificationHome
         return _dao.loadLastNotifByDemandIdAndDemandTypeId( strDemandId, strDemandTypeId );
     }
 
-    public static void createNotificationLink ( NotificationLink notificationLink )
+    /**
+     * Reassign notifications
+     * 
+     * @param strOldCustomerId
+     * @param strNewCustomerId
+     */
+    public static void reassignNotifications(String strOldCustomerId, String strNewCustomerId) 
     {
-        _dao.createLink( notificationLink );
+        _dao.reassignNotifications(strOldCustomerId, strNewCustomerId );
     }
 }

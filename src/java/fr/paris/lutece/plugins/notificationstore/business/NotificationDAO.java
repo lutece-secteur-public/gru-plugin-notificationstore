@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -364,15 +363,15 @@ public final class NotificationDAO implements INotificationDAO
      *  {@inheritDoc}
      */
     @Override
-    public void createLink( NotificationLink notificationLink )
+    public void reassignNotifications( String strOldCustomerId, String strNewCustomerId )
     {
         try ( DAOUtil daoUtil = new DAOUtil(SQL_QUERY_UPDATE_NOTIFICATIONS_TO_LINK, NotificationStorePlugin.getPlugin( ) ) )
         {
 
             int nIndex = 1;
 
-            daoUtil.setString( nIndex++, notificationLink.getNewCustomerId() );
-            daoUtil.setString( nIndex, notificationLink.getOldCustomerId() );
+            daoUtil.setString( nIndex++, strNewCustomerId );
+            daoUtil.setString( nIndex, strOldCustomerId );
 
             daoUtil.executeUpdate( );
         }

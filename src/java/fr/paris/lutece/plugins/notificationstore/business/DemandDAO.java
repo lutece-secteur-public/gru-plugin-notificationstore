@@ -37,7 +37,6 @@ import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
@@ -351,15 +350,15 @@ public final class DemandDAO implements IDemandDAO
      * {@inheritDoc }
      */
     @Override
-    public void createLink( NotificationLink notificationLink )
+    public void reassignDemands( String strOldCustomerId, String strNewCustomerId )
     {
         try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE_LINK, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
 
             // update
-            daoUtil.setString( nIndex++, notificationLink.getNewCustomerId() );
-            daoUtil.setString( nIndex, notificationLink.getOldCustomerId() );
+            daoUtil.setString( nIndex++, strNewCustomerId );
+            daoUtil.setString( nIndex, strOldCustomerId );
 
             daoUtil.executeUpdate( );
         }

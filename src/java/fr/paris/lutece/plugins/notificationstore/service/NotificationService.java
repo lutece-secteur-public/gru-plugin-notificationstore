@@ -42,7 +42,7 @@ import java.util.Optional;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
+import fr.paris.lutece.plugins.grubusiness.business.notification.ReassignNotificationsRequest;
 import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import org.apache.commons.lang3.StringUtils;
@@ -105,6 +105,9 @@ public class NotificationService
 	private static IDemandServiceProvider _demandService;
 	private static NotificationService _instance;
 	private static List<INotifyerServiceProvider> _notifyers ;
+	
+	private static ObjectMapper _mapper = new ObjectMapper( );
+
 
 	/**
 	 * private constructor
@@ -124,6 +127,9 @@ public class NotificationService
 			_instance = new NotificationService( );    		
 			_demandService = SpringContextService.getBean( BEAN_STORAGE_SERVICE ); 
 			_notifyers = SpringContextService.getBeansOfType( INotifyerServiceProvider.class ) ;
+			
+			_mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, true );
+			_mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
 		}
 
 		return _instance;
@@ -312,19 +318,24 @@ public class NotificationService
 	 * @param strJson
 	 * @return the response
 	 */
-	public Response linkNotifications ( String strJson )
+	public Response reassignNotifications ( String strJson )
 	{
 		try
 		{
-			// Format from JSON
-			ObjectMapper mapper = new ObjectMapper( );
-			mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, true );
-			mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
-
-			NotificationLink link = mapper.readValue( strJson, NotificationLink.class );
-			AppLogService.debug( "notificationstore / NotificationLink - Received strJson : " + strJson );
-			DemandHome.createLink( link );
-			NotificationHome.createNotificationLink( link );
+		        _mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false );
+		    	ReassignNotificationsRequest request = _mapper.readValue( strJson, ReassignNotificationsRequest.class );
+		    	_mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, true );
+		    	
+			AppLogService.debug( "notificationstore / ReassignNotificationsRequest - Received strJson : " + strJson );
+			
+			if ( !CustomerProvider.isCustomerIdValid( request.getOldCustomerId( ) ) 
+					|| !CustomerProvider.isCustomerIdValid( request.getNewCustomerId( ) ) ) 
+			{
+				return fail( new Exception ("Invalid CUIDs"), Response.Status.BAD_REQUEST );
+			}
+			
+			DemandHome.reassignDemands( request.getOldCustomerId( ), request.getNewCustomerId( ) );
+			NotificationHome.reassignNotifications( request.getOldCustomerId( ), request.getNewCustomerId( ) );
 		}
 		catch( JsonParseException ex )
 		{
@@ -355,12 +366,7 @@ public class NotificationService
 	{
 		try
 		{
-			// Format from JSON
-			ObjectMapper mapper = new ObjectMapper( );
-			mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, true );
-			mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
-
-			NotificationEvent notificationEvent = mapper.readValue( strJson, NotificationEvent.class );
+			NotificationEvent notificationEvent = _mapper.readValue( strJson, NotificationEvent.class );
 			AppLogService.debug( "notificationstore / notificationEvent - Received strJson : " + strJson );
 
 			store( notificationEvent );

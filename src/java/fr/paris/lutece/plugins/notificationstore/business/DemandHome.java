@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationLink;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.plugin.PluginService;
@@ -169,13 +168,14 @@ public final class DemandHome
     }
 
     /**
-     * Updates a demand
-     *
-     * @param notificationLink
+     *  reassign  demands
+     *    
+     * @param strOldCustomerId
+     * @param strNewCustomerId
      */
-    public static void createLink( NotificationLink notificationLink )
+    public static void reassignDemands( String strOldCustomerId, String strNewCustomerId )
     {
-        _dao.createLink( notificationLink );
+        _dao.reassignDemands( strOldCustomerId, strNewCustomerId );
     }
     
     /**

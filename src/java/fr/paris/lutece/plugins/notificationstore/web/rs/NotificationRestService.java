@@ -174,11 +174,11 @@ public class NotificationRestService
      *
      */
     @PUT
-    @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_LINK )
+    @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_REASSIGN )
     @Produces ( MediaType.APPLICATION_JSON )
-    public Response notificationLinks( String strJson )
+    public Response reassignDemandsAndNotifications( String strJson )
     {
-        return NotificationService.instance( ).linkNotifications( strJson );
+        return NotificationService.instance( ).reassignNotifications( strJson );
     }
 
 }
