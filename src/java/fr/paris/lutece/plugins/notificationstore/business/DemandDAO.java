@@ -120,6 +120,7 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_ID = " AND demand_type_id = ? ";
+    private static final String SQL_FILTER_BY_CUSTOMER_ID = " AND customer_id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_GD_ID = " AND gd.demand_type_id = ? ";
     private static final String SQL_FILTER_BY_DEMAND_TYPE_GD_ID_IN = " AND gd.demand_type_id IN ( ";
     private static final String SQL_FILTER_BY_START_DATE = " AND creation_date >= ? ";
@@ -508,6 +509,11 @@ public final class DemandDAO implements IDemandDAO
             sql.append( SQL_FILTER_BY_DEMAND_TYPE_ID );
         }
 
+        if ( filter.containsCustomerId( ) )
+        {
+            sql.append( SQL_FILTER_BY_CUSTOMER_ID );
+        }
+
         if ( filter.containsStartDate( ) )
         {
             sql.append( SQL_FILTER_BY_START_DATE );
@@ -538,6 +544,11 @@ public final class DemandDAO implements IDemandDAO
         if ( filter.containsDemandTypeId( ) )
         {
             daoUtil.setString( i++, filter.getDemandTypeId( ) );
+        }
+        
+        if ( filter.containsCustomerId( ) )
+        {
+            daoUtil.setString( i++, filter.getCustomerId( ) );
         }
 
         if ( filter.containsStartDate( ) )

@@ -68,6 +68,7 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
     private static final String MARK_DEMAND_TYPE_ID_LIST = "demand_type_id_list";
     private static final String MARK_DEMAND_ID = "demand_id";
     private static final String MARK_DEMAND_TYPE_ID = "demand_type_id";
+    private static final String MARK_CUSTOMER_ID = "customer_id";
     private static final String MARK_START_DATE = "start_date";
     private static final String MARK_END_DATE = "end_date";
 
@@ -83,6 +84,7 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
     // Parameters
     private static final String PARAMETER_DEMAND_ID = "demand_id";
     private static final String PARAMETER_DEMAND_TYPE_ID = "demand_type_id";
+    private static final String PARAMETER_CUSTOMER_ID = "customer_id";
     private static final String PARAMETER_START_DATE = "start_date";
     private static final String PARAMETER_END_DATE = "end_date";
 
@@ -121,6 +123,11 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
                 _currentFilter.setDemandTypeId( request.getParameter( PARAMETER_DEMAND_TYPE_ID ) );
             }
 
+            if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_CUSTOMER_ID ) ) )
+            {
+                _currentFilter.setCustomerId ( request.getParameter( PARAMETER_CUSTOMER_ID ) );
+            }
+
             if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_START_DATE ) ) )
             {
                 String strStartDate = request.getParameter( PARAMETER_START_DATE );
@@ -142,7 +149,7 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
             }
 
             if ( _currentFilter.containsDemandId( ) || _currentFilter.containsDemandTypeId( ) || _currentFilter.containsStartDate( )
-                    || _currentFilter.containsEndDate( ) )
+                    || _currentFilter.containsEndDate( ) || _currentFilter.containsCustomerId( ) )
             {
                 // search demands
                 _listDemanId = DemandHome.searchIdsByFilter( _currentFilter );
@@ -159,6 +166,10 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
         if ( !StringUtils.isBlank( _currentFilter.getDemandTypeId( ) ) )
         {
             model.put( MARK_DEMAND_TYPE_ID, _currentFilter.getDemandTypeId( ) );
+        }
+        if ( !StringUtils.isEmpty( _currentFilter.getCustomerId( ) ) )
+        {
+            model.put( MARK_CUSTOMER_ID, _currentFilter.getCustomerId( ) );
         }
         if ( _currentFilter.getStartDate( ) > 0 )
         {

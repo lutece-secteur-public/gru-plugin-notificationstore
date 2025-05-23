@@ -18,19 +18,23 @@
              <@select name="demand_type_id" id="demand_type_id" items=demand_type_id_list![] default_value=demand_type_id!'' />
         </@formGroup>
                 
-		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.start_date.label}' formStyle='inline' >
+		<@formGroup labelFor='customer_id' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.customer_id.label}' formStyle='inline'>
+             <@input type='text' id="customer_id" name="customer_id" value=customer_id!'' />
+        </@formGroup>
+                
+		<@formGroup labelFor='start_date' tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.start_date.label}' formStyle='inline' >
 		    <#if !start_date??><#assign start_date = .now /></#if>
 		    <#assign start_date_value = start_date?string["dd/MM/yyyy"] />
            <@input type='date' id="start_date" name="start_date" language=.lang value=start_date_value />
         </@formGroup>
                 
-		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.end_date.label}' formStyle='inline'>
+		<@formGroup labelFor='end_date'  tabIndex='5' labelKey='#i18n{notificationstore.manage_demand.end_date.label}' formStyle='inline'>
 		    <#if end_date??><#assign end_date_value = end_date?string["dd/MM/yyyy"] /></#if>
 		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date_value!'' />
         </@formGroup >
                 
 		<@formGroup formStyle='inline'>
-              <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
+              <@button type='submit' tabIndex='6' title='#i18n{portal.util.labelSearch}' />
 		</@formGroup>
 		
 	</@tform>
@@ -72,7 +76,7 @@
                                         ${demand.subtypeId!''}
                                 </td>
                                 <td>
-                                        ${demand.customer.id!''}
+                                        ${demand.customer.customerId!''}
                                 </td>
                                 <td>
                                         <@tform type='in-line' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" >

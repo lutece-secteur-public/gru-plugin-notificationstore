@@ -228,8 +228,8 @@ public final class NotificationHome
      * @param strOldCustomerId
      * @param strNewCustomerId
      */
-    public static void reassignNotifications(String strOldCustomerId, String strNewCustomerId) 
+    public static void reassignNotifications( String strOldCustomerId, String strNewCustomerId ) 
     {
-        _dao.reassignNotifications(strOldCustomerId, strNewCustomerId );
+        _dao.reassignNotifications( strOldCustomerId, strNewCustomerId );
     }
 }

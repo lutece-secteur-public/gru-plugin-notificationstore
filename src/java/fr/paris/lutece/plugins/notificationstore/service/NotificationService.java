@@ -60,6 +60,7 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Event;
 import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
+import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grubusiness.business.notification.StatusMessage;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.grubusiness.service.notification.INotifyerServiceProvider;
@@ -88,6 +89,7 @@ public class NotificationService
 	
 	private static final String TYPE_NOTIFICATION_GUICHET = "GUICHET";	
 	private static final String TYPE_NOTIFICATION_AGENT = "AGENT";	
+	private static final String TYPE_MERGE_NOTIFICATIONS = "MERGE";	
 
 	// Messages
 	private static final String WARNING_DEMAND_ID_MANDATORY = "Notification Demand_id field is mandatory";
@@ -334,8 +336,24 @@ public class NotificationService
 				return fail( new Exception ("Invalid CUIDs"), Response.Status.BAD_REQUEST );
 			}
 			
+			NotificationFilter filter = new NotificationFilter( );
+			filter.setCustomerId ( request.getOldCustomerId( ) );
+			List<Notification> listNotifsToReassign = NotificationHome.getByFilter ( filter );
+			
+			if ( listNotifsToReassign.size ( ) == 0 ) 
+			{
+			    return ok( );
+			}
+			
 			DemandHome.reassignDemands( request.getOldCustomerId( ), request.getNewCustomerId( ) );
 			NotificationHome.reassignNotifications( request.getOldCustomerId( ), request.getNewCustomerId( ) );
+			
+			// generate events (for history)
+			for ( Notification notif : listNotifsToReassign )
+			{
+			    notif.getDemand ( ).getCustomer ( ).setCustomerId ( request.getNewCustomerId ( ) );
+			    addMergeEvent( notif, request );
+			}
 		}
 		catch( JsonParseException ex )
 		{
@@ -509,7 +527,32 @@ public class NotificationService
 		notificationEvent.setNotificationDate( notification.getDate( ) );
 
 		store( notificationEvent );
+	}
+	
+	/**
+	 * Values and store the NotificationEvent object if failure
+	 * @param notification
+	 * @param warnings 
+	 * @param strMessage
+	 */
+	private void addMergeEvent( Notification notification, ReassignNotificationsRequest request  )
+	{		
+		Event event = new Event( );
+		event.setEventDate( notification.getDate( ) );
 		
+		event.setType( TYPE_MERGE_NOTIFICATIONS );
+		
+		event.setMessage( "Merged CUID : " + request.getOldCustomerId( ) 
+		+ "\nConsolidated CUID : " + request.getNewCustomerId( ) );
+		event.setStatus( STATUS_WARNING );
+	
+		NotificationEvent notificationEvent = new NotificationEvent( );
+		notificationEvent.setEvent( event );
+		notificationEvent.setMsgId( StringUtils.EMPTY );   
+		notificationEvent.setDemand( notification.getDemand( ) );
+		notificationEvent.setNotificationDate( notification.getDate( ) );
+
+		store( notificationEvent );
 	}
 
 	/**
@@ -553,6 +596,15 @@ public class NotificationService
 		return Response.status( Response.Status.CREATED ).entity( RESPONSE_OK ).build( );
 	}
 
+	/**
+	 * ok case
+	 * 
+	 * @return a successful response
+	 */
+	private Response ok( )
+	{
+		return Response.status( Response.Status.OK ).entity( RESPONSE_OK ).build( );
+	}
 
 	/**
 	 * Build an error response
