@@ -240,9 +240,11 @@ public class NotificationService
 
 		Customer customer = CustomerProvider.instance( ).decrypt( notification.getDemand( ) );
 
-		// use connection id as customer id
+		// use connection id as customer id (if set in properties, and the other ids are empty)
 		if ( AppPropertiesService.getPropertyBoolean( NotificationStoreConstants.PROPERTY_CONSIDER_GUID_AS_CUSTOMER_ID, false )
-				&& !StringUtils.isEmpty( customer.getConnectionId( ) ) )
+			&& StringUtils.isEmpty( customer.getId( ) )
+			&& StringUtils.isEmpty( customer.getCustomerId( ) )
+			&& !StringUtils.isEmpty( customer.getConnectionId( ) ) )
 		{
 			customer.setCustomerId( customer.getConnectionId( ) );
 		}
