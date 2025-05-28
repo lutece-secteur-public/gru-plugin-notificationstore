@@ -421,7 +421,16 @@ public class NotificationService
 	 */
 	private void store( NotificationEvent notificationEvent )
 	{
-		_demandService.create( notificationEvent );
+	    // set customer id if provided by ID customer attribute (if valid)
+	    
+	    if ( notificationEvent.getDemand ( ) != null && notificationEvent.getDemand ( ).getCustomer ( ) != null 
+		    && !CustomerProvider.isCustomerIdValid( notificationEvent.getDemand ( ).getCustomer ( ).getCustomerId( ) ) 
+		    && CustomerProvider.isCustomerIdValid( notificationEvent.getDemand ( ).getCustomer ( ).getId( ) ) )
+	    {
+		notificationEvent.getDemand ( ).getCustomer ( ).setCustomerId( notificationEvent.getDemand ( ).getCustomer ( ).getId( ) );
+	    }
+	 			
+	    _demandService.create( notificationEvent );
 	}
 
 	/**
