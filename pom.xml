@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
  
     <parent>
@@ -29,44 +28,44 @@
         <dependency>
             <groupId>fr.paris.lutece</groupId>
             <artifactId>lutece-core</artifactId>
-            <version>[7.0.0,)</version>
+            <version>[7.0.0,7.9.9)</version>
             <type>lutece-core</type>
         </dependency>
         
           <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>plugin-rest</artifactId>
-            <version>[3.3.0,)</version>
+            <version>[3.3.0,3.9.9)</version>
             <type>lutece-plugin</type>
         </dependency>
         
         <dependency>
             <groupId>fr.paris.lutece.plugins</groupId>
             <artifactId>library-grubusiness</artifactId>
-            <version>[1.1.20-SNAPSHOT,)</version>
+            <version>[1.1.20-SNAPSHOT,1.9.9)</version>
             <type>jar</type>
         </dependency>
         <dependency>
         	<groupId>fr.paris.lutece.plugins</groupId>
         	<artifactId>library-identitystore</artifactId>
-        	<version>[3.1.4-SNAPSHOT,)</version>
+        	<version>[3.1.4-SNAPSHOT,3.9.9)</version>
             <type>jar</type>
         </dependency>
         <dependency>
         	<groupId>fr.paris.lutece.plugins</groupId>
         	<artifactId>library-identitybusiness</artifactId>
-        	<version>[3.1.6-SNAPSHOT,)</version>
+        	<version>[3.1.6-SNAPSHOT,3.9.9)</version>
             <type>jar</type>
         </dependency>
         
         <dependency>
 			<groupId>fr.paris.lutece.plugins</groupId>
 			<artifactId>plugin-swaggerui</artifactId>
-			<version>[1.0.1,)</version>
+			<version>[1.0.1,1.9.9)</version>
 			<type>lutece-plugin</type>
 		</dependency>
 
-		<!-- Génération du fichier swagger.json -->
+		<!-- G&#233;n&#233;ration du fichier swagger.json -->
 		<dependency>
 			<groupId>io.swagger</groupId>
 			<artifactId>swagger-jaxrs</artifactId>
@@ -95,7 +94,7 @@
         <tag>HEAD</tag>
     </scm>
     
-    <!-- Profile 'swagger-json' de génération du fichier swagger.json -->
+    <!-- Profile 'swagger-json' de g&#233;n&#233;ration du fichier swagger.json -->
 	<profiles>
 		<profile>
 			<id>swagger-json</id>
@@ -121,7 +120,7 @@
 							<dependency>
 					            <groupId>fr.paris.lutece</groupId>
 					            <artifactId>lutece-core</artifactId>
-					            <version>[7.0.0,)</version>
+					            <version>[7.0.0,7.9.9)</version>
 					            <type>lutece-core</type>
 					             <exclusions>
 							        <exclusion>
@@ -133,7 +132,7 @@
 							<dependency>
 								<groupId>fr.paris.lutece.plugins</groupId>
 								<artifactId>library-grubusiness</artifactId>
-								<version>[1.1.19-SNAPSHOT,)</version>
+								<version>[1.1.19-SNAPSHOT,1.9.9)</version>
 							</dependency>
 							<dependency>
 								<groupId>com.fasterxml.jackson.core</groupId>
