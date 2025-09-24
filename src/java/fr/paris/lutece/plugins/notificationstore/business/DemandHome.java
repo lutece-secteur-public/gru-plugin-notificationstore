@@ -136,9 +136,9 @@ public final class DemandHome
      *            (Optional can be null)
      * @return The list of demand ids
      */
-    public static List<Integer> getIdsByCustomerIdAndDemandTypeId( String strCustomerId, String strNotificationType, String strIdDemandType )
+    public static List<Integer> getIdsByCustomerIdAndDemandTypeId( String strCustomerId, String strNotificationType, String strIdDemandType, String strDirectionDateOrderBy )
     {
-        return _dao.loadIdsByCustomerIdAndIdDemandType( strCustomerId, strNotificationType, strIdDemandType );
+        return _dao.loadIdsByCustomerIdAndIdDemandType( strCustomerId, strNotificationType, strIdDemandType, strDirectionDateOrderBy );
     }
 
     /**

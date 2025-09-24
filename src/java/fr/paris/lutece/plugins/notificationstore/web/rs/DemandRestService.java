@@ -42,6 +42,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -118,7 +119,9 @@ public class DemandRestService
     		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION )
     			@QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
     		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY, value = SwaggerConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY_DESCRIPTION )
+    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY ) @DefaultValue( "" ) String strDirectionDateOrderBy)
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );
@@ -135,8 +138,15 @@ public class DemandRestService
         			.setMessageKey(SearchResult.ERROR_FIELD_MANDATORY));
             return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
         }
+        if( StringUtils.isNotEmpty( strDirectionDateOrderBy ) && !List.of("ASC", "DESC").contains( strDirectionDateOrderBy ) )
+        {
+            result.setStatus( ResponseStatusFactory.badRequest( )
+                                      .setMessage(NotificationStoreConstants.MESSAGE_ERROR_DIRECTION_DATE_ORDER_BY_WRONG_VALUE )
+                                      .setMessageKey(SearchResult.ERROR_FIELD_WRONG_VALUE));
+            return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+        }
 
-        List<Integer> listIds = DemandHome.getIdsByCustomerIdAndDemandTypeId( strCustomerId, strNotificationType, strIdDemandType );
+        List<Integer> listIds = DemandHome.getIdsByCustomerIdAndDemandTypeId( strCustomerId, strNotificationType, strIdDemandType, strDirectionDateOrderBy );
         return getResponse( result, nIndex, nDefaultItemsPerPage, listIds );
     }
 

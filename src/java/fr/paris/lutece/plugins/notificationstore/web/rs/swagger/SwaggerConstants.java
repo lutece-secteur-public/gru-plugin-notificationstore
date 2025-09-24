@@ -66,6 +66,7 @@ public final class SwaggerConstants
 	public static final String QUERY_PARAM_CATEGORY_CODE_DESCRIPTION = "List of requested category codes";
 	public static final String QUERY_PARAM_DIRECT_MODE_DESCRIPTION = "(Deprecated)";
 	public static final String QUERY_PARAM_ID_CATEGORY_DESCRIPTION = "Category id";
+    public static final String QUERY_PARAM_DIRECTION_DATE_ORDER_BY_DESCRIPTION = "Direction date order by (ASC or DESC)";
 
     /**
      * private constructor

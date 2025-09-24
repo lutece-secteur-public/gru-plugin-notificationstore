@@ -127,7 +127,8 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_FILTER_BY_END_DATE = " AND creation_date <= ? ";
     private static final String SQL_FILTER_NOTIFICATION_TYPE = " AND gc.notification_type = ? ";
     private static final String SQL_QUERY_FILTER_ORDER = " ORDER BY uid ASC";
-    private static final String SQL_QUERY_DATE_ORDER = " ORDER BY modify_date DESC";
+    private static final String SQL_QUERY_DATE_ORDER_DESC = " ORDER BY modify_date DESC";
+    private static final String SQL_QUERY_DATE_ORDER_ASC = " ORDER BY modify_date ASC";
 
     /**
      * {@inheritDoc}
@@ -565,6 +566,11 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public List<Integer> loadIdsByCustomerIdAndIdDemandType( String strCustomerId, String strNotificationType, String strIdDemandType )
     {
+        return this.loadIdsByCustomerIdAndIdDemandType( strCustomerId, strNotificationType, strIdDemandType, null );
+    }
+
+    @Override
+    public List<Integer> loadIdsByCustomerIdAndIdDemandType(final String strCustomerId, final String strNotificationType, final String strIdDemandType, final String strDirectionDateOrderBy ) {
         List<Integer> listIds = new ArrayList<>( );
         String strSql = SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID;
 
@@ -578,7 +584,14 @@ public final class DemandDAO implements IDemandDAO
             strSql += SQL_FILTER_BY_DEMAND_TYPE_GD_ID;
         }
 
-        //strSql += SQL_QUERY_DATE_ORDER;
+        if ( StringUtils.isNotEmpty( strDirectionDateOrderBy ) && List.of("ASC", "DESC").contains( strDirectionDateOrderBy ) )
+        {
+            if ("ASC".equalsIgnoreCase(strDirectionDateOrderBy)) {
+                strSql += SQL_QUERY_DATE_ORDER_ASC;
+            } else {
+                strSql += SQL_QUERY_DATE_ORDER_DESC;
+            }
+        }
 
         try ( DAOUtil daoUtil = new DAOUtil( strSql, NotificationStorePlugin.getPlugin( ) ) )
         {
@@ -631,7 +644,7 @@ public final class DemandDAO implements IDemandDAO
             strQuery += SQL_FILTER_NOTIFICATION_TYPE;
         }
 
-        strQuery += SQL_QUERY_DATE_ORDER;
+        strQuery += SQL_QUERY_DATE_ORDER_DESC;
 
         try ( DAOUtil daoUtil = new DAOUtil( strQuery, NotificationStorePlugin.getPlugin( ) ) )
         {

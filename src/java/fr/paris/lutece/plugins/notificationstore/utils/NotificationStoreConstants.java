@@ -63,6 +63,7 @@ public class NotificationStoreConstants
     public static final String QUERY_PARAM_LIST_STATUS = "listStatus";
     public static final String QUERY_PARAM_CATEGORY_CODE = "categoryCode";
     public static final String QUERY_PARAM_DIRECT_MODE = "direct";
+    public static final String QUERY_PARAM_DIRECTION_DATE_ORDER_BY = "directionDateOrderBy";
     
     //Demand type attributes
     public static final String DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE = "id_demand_type";
@@ -98,6 +99,7 @@ public class NotificationStoreConstants
     public static final String MESSAGE_ERROR_NOT_FOUND_RESOURCE = "Resource not found";
     public static final String MESSAGE_ERROR_DEMAND_TYPE_ID_USED = "This DemandTypeId is used by existing notifications";
     public static final String MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER = "Empty parameter";
+    public static final String MESSAGE_ERROR_DIRECTION_DATE_ORDER_BY_WRONG_VALUE = "Optional parameter directionDateOrderBy only accepts 'ASC' or 'DESC' values";
     
     // Constants
     public static final String CHARECTER_REGEXP_FILTER = "[^\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\p{Sm}\\p{Sc}\\s]";
