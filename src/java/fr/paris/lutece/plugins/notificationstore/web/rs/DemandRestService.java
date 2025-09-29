@@ -36,7 +36,9 @@ package fr.paris.lutece.plugins.notificationstore.web.rs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -289,6 +291,7 @@ public class DemandRestService
     {
         List<DemandDisplay> listDemandDisplay = new ArrayList<>( );
         List<Demand> listDemand = DemandHome.getByIds( listIds );
+        
         for ( Demand demand : listDemand )
         {
             DemandDisplay demandDisplay = new DemandDisplay( );
@@ -297,8 +300,10 @@ public class DemandRestService
 
             listDemandDisplay.add( demandDisplay );
         }
-        Collections.reverse( listDemandDisplay );
-        return listDemandDisplay;
+       
+        // keep original order
+        return listDemandDisplay.stream( ).sorted( Comparator.comparingInt( dem -> listIds.indexOf( dem.getDemand( ).getUID( ) ) ) )
+                .collect( Collectors.toList( ) );
     }
 
     /**
