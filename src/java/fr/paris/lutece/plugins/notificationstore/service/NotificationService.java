@@ -458,7 +458,9 @@ public class NotificationService
 			demand.setCreationDate( notification.getDate( ) );
 			demand.setMaxSteps( notification.getDemand( ).getMaxSteps( ) );
 			demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
-			demand.setStatusId( -1 );
+			demand.setStatusId( getNewDemandStatusIdFromNotification( notification ) );
+			demand.setMetaData( notification.getDemand( ).getMetaData( ) );
+			
 
 			Customer customerDemand = new Customer( );
 			customerDemand.setCustomerId( notification.getDemand( ).getCustomer( ).getId( ) );
@@ -474,6 +476,8 @@ public class NotificationService
 			// update demand status
 			demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
 
+			demand.setModifyDate ( notification.getDate( ) );
+			
 			int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
 
 			EnumGenericStatus oldStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
@@ -685,33 +689,33 @@ public class NotificationService
 	 * @return
 	 */
 	private int getNewDemandStatusIdFromNotification( Notification notification )
-	{                
+	{         
+		// consider first the status sent in the demand
+		if ( notification.getDemand( ) != null && notification.getDemand( ).getStatusId( ) > 0
+				&& EnumGenericStatus.exists( notification.getDemand( ).getStatusId( ) )  )
+		{
+			return notification.getDemand( ).getStatusId( );
+		}
+				
+		// Otherwise, consider  the MyDashBoard notification status id 
 		if ( notification.getMyDashboardNotification( ) != null )
 		{
-			// consider first if the status is sent by the demand
-			if ( notification.getDemand( ) != null 
-					&& EnumGenericStatus.exists( notification.getDemand( ).getStatusId( ) )  )
-			{
-				return notification.getDemand( ).getStatusId( );
-			}
-
-			// consider the notification status id
-			if ( EnumGenericStatus.exists( notification.getMyDashboardNotification( ).getStatusId( ) ) )
+			if ( notification.getMyDashboardNotification( ).getStatusId( ) > 0
+					&& EnumGenericStatus.exists( notification.getMyDashboardNotification( ).getStatusId( ) ) )
 			{
 				return notification.getMyDashboardNotification( ).getStatusId( );
-			} 
-
+			}
+			
+			// Otherwise, try to guess  the status id from the label
 			Optional<TemporaryStatus> status = _demandService.getStatusByLabel( notification.getMyDashboardNotification( ).getStatusText( ) );
 			if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
 			{
 				return status.get( ).getGenericStatus( ).getStatusId( );
 			}
-
-			return -1;
-		}
+		} 
 
 		// default
-		return notification.getDemand( ).getStatusId( );
+		return -1;
 	}
 
 	/**

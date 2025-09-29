@@ -1,5 +1,17 @@
 <#include "managedemand_tabs.html" />
 
+<#macro getStatusLabel id >
+<#switch id>
+  <#case -1 >UNDEFINED<#break>
+  <#case 10>CANCELED<#break>
+  <#case 11>ONGOING<#break>
+  <#case 12>TOPAY<#break>
+  <#case 13>TOCOMPLETE<#break>
+  <#case 14>PAID<#break>
+  <#case 15>CLOSED<#break>
+</#switch>
+</#macro>
+
 <@tabs>
 	<@notificationstore_tabList current_tab="demand" />
 	
@@ -50,7 +62,7 @@
 	            <th>#i18n{notificationstore.manage_demand.columnTypeId}</th>
 	            <th>#i18n{notificationstore.manage_demand.columnStatusId}</th>
 	            <th>#i18n{notificationstore.manage_demand.columnReference}</th>
-	            <th>#i18n{notificationstore.manage_demand.columnsubTypeId}</th>
+	            <th>#i18n{notificationstore.manage_demand.columnMetaData}</th>
 	            <th>#i18n{notificationstore.manage_demand.columnCustomerId}</th>
 	            <th>#i18n{notificationstore.manage_demand.action}</th>
 	        </tr>
@@ -65,15 +77,24 @@
                                 </td>
                                 <td>
                                         ${demand.typeId!''}
+                                        <#if demand.subtypeId??  >
+                                        <br> #i18n{notificationstore.manage_demand.columnsubTypeId} : 
+                                        ${demand.subtypeId!''} </#if>
                                 </td>
                                 <td>
-                                        ${demand.statusId!''}
+                                        ${demand.statusId!''}<br>
+                                        <@getStatusLabel id=demand.statusId />
+                                         
                                 </td>
                                 <td>
                                         ${demand.reference!''}
                                 </td>
                                 <td>
-                                        ${demand.subtypeId!''}
+                                	<#if demand.metaData?? >
+                                		<#list  demand.metaData?keys as key >
+                                        ${key} : ${demand.metaData[key]!}<br>
+                                        </#list>
+                                     </#if>
                                 </td>
                                 <td>
                                         ${demand.customer.customerId!''}

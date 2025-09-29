@@ -38,6 +38,7 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.sql.DAOUtil;
 
 import java.sql.Statement;
@@ -45,10 +46,18 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This class provides Data Access methods for Demand objects stored in SQL database
@@ -68,9 +77,11 @@ public final class DemandDAO implements IDemandDAO
     private static final String COLUMN_MAX_STEPS = "max_steps";
     private static final String COLUMN_CURRENT_STEP = "current_step";
     private static final String COLUMN_MODIFY_DATE = "modify_date";
+    private static final String COLUMN_META_DATA= "meta_data";
+    
     // SQL queries
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " uid, id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date, meta_data";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " uid, " +  SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID;
     private static final String SQL_QUERY_DEMAND_SELECT_BY_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE uid = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
@@ -80,9 +91,10 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM notificationstore_demand";
     private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT uid FROM notificationstore_demand ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where uid in ( %s )";
+    
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO notificationstore_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
-            + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ) ";
-    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ? WHERE uid = ? AND demand_type_id = ?";
+            + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?) ";
+    private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ?, meta_data = ? WHERE uid = ? AND demand_type_id = ? ";
     private static final String SQL_QUERY_DEMAND_UPDATE_LINK = "UPDATE notificationstore_demand SET customer_id = ? WHERE customer_id = ?";
     private static final String SQL_QUERY_DEMAND_DELETE = "DELETE FROM notificationstore_demand WHERE id = ? AND demand_type_id = ? AND customer_id = ? ";
     private static final String SQL_QUERY_DEMAND_DELETE_BY_UID = "DELETE FROM notificationstore_demand WHERE uid = ? ";
@@ -130,6 +142,12 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DATE_ORDER_DESC = " ORDER BY modify_date DESC";
     private static final String SQL_QUERY_DATE_ORDER_ASC = " ORDER BY modify_date ASC";
 
+    private static ObjectMapper _mapper = (new ObjectMapper( ))
+    		.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false )
+    		.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
+    
+    private static TypeReference<HashMap<String,String>> hashMapTypeRef = new TypeReference<HashMap<String,String>>() {};
+    
     /**
      * {@inheritDoc}
      */
@@ -309,7 +327,8 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.setInt( nIndex++, demand.getMaxSteps( ) );
             daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );           
             daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
-
+            daoUtil.setString( nIndex++, hashMapToJson( demand.getMetaData( ) ) );
+            
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
             {
@@ -337,7 +356,8 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
             daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
             daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
-    
+            daoUtil.setString( nIndex++, hashMapToJson( demand.getMetaData( ) ) );
+            
             // where primary_key
             daoUtil.setInt( nIndex++, demand.getUID( ) );
             daoUtil.setString( nIndex++, demand.getTypeId( ) );
@@ -487,11 +507,52 @@ public final class DemandDAO implements IDemandDAO
         demand.setMaxSteps( daoUtil.getInt( COLUMN_MAX_STEPS ) );
         demand.setCurrentStep( daoUtil.getInt( COLUMN_CURRENT_STEP ) );
         demand.setModifyDate( daoUtil.getTimestamp( COLUMN_MODIFY_DATE ) != null ? daoUtil.getTimestamp( COLUMN_MODIFY_DATE ).getTime( ) : 0 );
-
+        demand.setMetaData( jsonToHashMap( daoUtil.getString ( COLUMN_META_DATA ) ) );        
+        
         return demand;
     }
 
     /**
+     * convert json string as hashmap
+     * @param json
+     * @return the hashmap
+     */
+    private Map<String, String> jsonToHashMap(String json) {
+		if ( json == null )
+		{ 
+			return null;
+		}
+		
+		try 
+		{
+			return _mapper.readValue( json , hashMapTypeRef );
+		} 
+		catch (  JsonProcessingException e )
+		{
+			AppLogService.error("A problem occurred to generate a map from Json", e);
+			return null;
+		}		
+	}
+    
+    /**
+     * generate Json String of a hashmap
+     * @param map
+     * @return the json
+     */
+    private String hashMapToJson( Map<String,String> map )
+    {
+    	try 
+    	{
+			return _mapper.writeValueAsString( map );
+		} 
+    	catch ( JsonProcessingException e ) 
+    	{
+			AppLogService.error("A problem occurred to generate Json from map", e);
+			return null;
+		}
+    }
+
+	/**
      * build the sql with selected filters
      * 
      * @param sql

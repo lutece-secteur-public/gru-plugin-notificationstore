@@ -80,6 +80,7 @@ public final class NotificationDAO implements INotificationDAO
     private static final String COLUMN_DEMAND_ID = "demand_id";
     private static final String COLUMN_DEMAND_TYPE_ID = "demand_type_id";
     private static final String COLUMN_CUSTOMER_ID = "customer_id";
+    
     private static final String COLUMN_DATE = "date";
     private static final String COLUMN_CUSTOMER = "customer_id";
     
@@ -513,14 +514,16 @@ public final class NotificationDAO implements INotificationDAO
             	demand.setId( strIdDemand );
             	demand.setTypeId( strDemandTypeId );
             }
-            notification.setDemand( demand );
-            
-            setNotificationContent( notification, notificationFilter );
             
             Customer customer = new Customer ( );
             customer.setCustomerId( strCustomerId );
             customer.setId( strCustomerId );
-            notification.getDemand( ).setCustomer( customer );
+            demand.setCustomer( customer );
+            
+            notification.setDemand( demand );
+            
+            setNotificationContent( notification, notificationFilter );
+            
 
             listNotifications.add( notification );
         }

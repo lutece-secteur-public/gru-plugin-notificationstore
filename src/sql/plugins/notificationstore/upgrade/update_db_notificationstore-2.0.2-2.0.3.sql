@@ -1,0 +1,1 @@
+ALTER TABLE notificationstore_demand ADD COLUMN meta_data long varchar;

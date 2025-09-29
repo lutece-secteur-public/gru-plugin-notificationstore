@@ -15,6 +15,7 @@ closure_date timestamp NULL,
 max_steps int NULL,
 current_step int NULL,
 modify_date timestamp NULL,
+meta_data long varchar,
 PRIMARY KEY ( uid ),
 UNIQUE( demand_type_id,customer_id,id )
 );
