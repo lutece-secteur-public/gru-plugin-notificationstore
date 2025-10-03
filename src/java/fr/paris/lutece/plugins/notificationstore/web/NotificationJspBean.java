@@ -158,12 +158,11 @@ public class NotificationJspBean extends AbstractManageDemandJspBean<Integer, No
                 _listNotificationId = listNotification.stream( ).map( Notification::getId ).collect( Collectors.toList( ) );
 
             }
-            else
-                if ( _currentFilter.containsDemandId( ) || _currentFilter.containsDemandTypeId( ) || _currentFilter.containsStartDate( )
-                        || _currentFilter.containsEndDate( ) )
-                {
-                    _listNotificationId = NotificationHome.findIdsByFilter( _currentFilter );
-                }
+            else if ( _currentFilter.containsDemandId( ) || _currentFilter.containsDemandTypeId( ) || _currentFilter.containsStartDate( )
+                    || _currentFilter.containsEndDate( ) )
+            {
+                _listNotificationId = NotificationHome.findIdsByFilter( _currentFilter );
+            }
         }
 
         Map<String, Object> model = getPaginatedListModel( request, MARK_NOTIFICATION_LIST, _listNotificationId, JSP_MANAGE_NOTIFICATIONS );

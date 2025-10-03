@@ -87,7 +87,7 @@ public class CustomerProvider
     private static List<ICustomerEncryptionService> _listCustomerEncryption;
 
     private IdentityService _identityService;
-    private RequestAuthor _requestAuthor = new RequestAuthor(APPLICATION_CODE, AuthorType.application.name( ));
+    private RequestAuthor _requestAuthor = new RequestAuthor( APPLICATION_CODE, AuthorType.application.name( ) );
 
     /**
      * retrieve singleton
@@ -119,7 +119,7 @@ public class CustomerProvider
     /**
      * set identity service
      * 
-     * @param identityService 
+     * @param identityService
      */
     private void setIdentityService( IdentityService identityService )
     {
@@ -144,38 +144,38 @@ public class CustomerProvider
      * @param strCuid
      *            the customer id
      * @return the customer
-     * @throws IdentityStoreException 
+     * @throws IdentityStoreException
      */
     public Customer get( String strGuid, String strCuid ) throws IdentityStoreException
     {
-    	IdentityDto identityDto = null;
-    	
+        IdentityDto identityDto = null;
+
         if ( isCustomerIdValid( strCuid ) )
         {
-        	IdentitySearchResponse response = _identityService.getIdentityByCustomerId( strCuid, APPLICATION_CODE, _requestAuthor );
-        	if (response.getStatus( ).getHttpCode( ) < 300 && !response.getIdentities( ).isEmpty( ) )
-        	{
-        		identityDto = response.getIdentities( ).get( 0 );
-        	}
+            IdentitySearchResponse response = _identityService.getIdentityByCustomerId( strCuid, APPLICATION_CODE, _requestAuthor );
+            if ( response.getStatus( ).getHttpCode( ) < 300 && !response.getIdentities( ).isEmpty( ) )
+            {
+                identityDto = response.getIdentities( ).get( 0 );
+            }
         }
-        
-        if (identityDto == null && isConnectionIdValid( strGuid ) )
+
+        if ( identityDto == null && isConnectionIdValid( strGuid ) )
         {
-        	IdentitySearchResponse response = _identityService.getIdentityByConnectionId( strGuid, APPLICATION_CODE, _requestAuthor );
-        	if (response.getStatus( ).getHttpCode( ) < 300 && !response.getIdentities( ).isEmpty( ) )
-        	{
-        		identityDto = response.getIdentities( ).get( 0 );
-        	}
+            IdentitySearchResponse response = _identityService.getIdentityByConnectionId( strGuid, APPLICATION_CODE, _requestAuthor );
+            if ( response.getStatus( ).getHttpCode( ) < 300 && !response.getIdentities( ).isEmpty( ) )
+            {
+                identityDto = response.getIdentities( ).get( 0 );
+            }
         }
 
         if ( identityDto != null )
         {
-        	Customer customerEncrypted = convert( identityDto );
+            Customer customerEncrypted = convert( identityDto );
 
             return decrypt( customerEncrypted, APPLICATION_CODE );
         }
-        
-        return null;        
+
+        return null;
     }
 
     /**
@@ -246,12 +246,12 @@ public class CustomerProvider
     private static Customer convert( IdentityDto identityDto )
     {
         Customer customer = new Customer( );
-        Map<String,String> attributeMap = getAttributeMap( identityDto );
+        Map<String, String> attributeMap = getAttributeMap( identityDto );
 
         customer.setId( identityDto.getCustomerId( ) );
         customer.setCustomerId( identityDto.getCustomerId( ) );
         customer.setConnectionId( identityDto.getConnectionId( ) );
-        
+
         customer.setLastname( attributeMap.get( ATTRIBUTE_IDENTITY_NAME_FAMILLY ) );
         customer.setFirstname( attributeMap.get( ATTRIBUTE_IDENTITY_NAME_GIVEN ) );
         customer.setEmail( attributeMap.get( ATTRIBUTE_IDENTITY_HOMEINFO_ONLINE_EMAIL ) );
@@ -272,29 +272,31 @@ public class CustomerProvider
      *            the attribute code
      * @return {@code null} if the attribute does not exist, the attribute value otherwise
      */
-    private static Map<String,String> getAttributeMap( IdentityDto identityDto )
+    private static Map<String, String> getAttributeMap( IdentityDto identityDto )
     {
 
-        return identityDto.getAttributes( ).stream( ).collect(Collectors.toMap(AttributeDto::getKey, AttributeDto::getValue));
+        return identityDto.getAttributes( ).stream( ).collect( Collectors.toMap( AttributeDto::getKey, AttributeDto::getValue ) );
     }
-    
+
     /**
      * check customer ID : must contains 36 chars
+     * 
      * @param strId
      * @return true if valid
      */
-    public static boolean isCustomerIdValid( String strId ) 
+    public static boolean isCustomerIdValid( String strId )
     {
-    	return strId != null && strId.length() == 36 ;
+        return strId != null && strId.length( ) == 36;
     }
-    
+
     /**
-     * check connection ID : must contains at least 36 chars 
+     * check connection ID : must contains at least 36 chars
+     * 
      * @param strId
      * @return true if valid
      */
-    public static boolean isConnectionIdValid( String strId ) 
+    public static boolean isConnectionIdValid( String strId )
     {
-    	return strId != null && strId.length() >= 36 ;
+        return strId != null && strId.length( ) >= 36;
     }
 }

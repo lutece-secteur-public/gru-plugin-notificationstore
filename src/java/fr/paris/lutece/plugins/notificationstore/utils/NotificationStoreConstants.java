@@ -51,7 +51,7 @@ public class NotificationStoreConstants
     public static final String PATH_TYPE_NOTIFICATION = "notificationType";
     public static final String PATH_ID = "/{" + NotificationStoreConstants.ID + "}";
     public static final String PATH_CUSTOMER_ID = "/{" + NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID + "}";
-    
+
     public static final String ID = "id";
 
     public static final String QUERY_PARAM_INDEX = "index";
@@ -64,19 +64,19 @@ public class NotificationStoreConstants
     public static final String QUERY_PARAM_CATEGORY_CODE = "categoryCode";
     public static final String QUERY_PARAM_DIRECT_MODE = "direct";
     public static final String QUERY_PARAM_DIRECTION_DATE_ORDER_BY = "directionDateOrderBy";
-    
-    //Demand type attributes
+
+    // Demand type attributes
     public static final String DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE = "id_demand_type";
     public static final String DEMANDTYPE_ATTRIBUTE_LABEL = "label";
     public static final String DEMANDTYPE_ATTRIBUTE_URL = "url";
     public static final String DEMANDTYPE_ATTRIBUTE_APP_CODE = "app_code";
     public static final String DEMANDTYPE_ATTRIBUTE_CATEGORY = "category";
-    
-    //Demand category attributes
+
+    // Demand category attributes
     public static final String DEMANDCATEGORY_ATTRIBUTE_CODE = "code";
     public static final String DEMANDCATEGORY_ATTRIBUTE_LABEL = "label";
     public static final String DEMANDCATEGORY_ATTRIBUTE_DEFAULT = "isDefault";
-    
+
     // EXIT STATUS
     public static final String STATUS_201 = "{" + "\"status\":" + "\"201\"" + "}";
     public static final String STATUS_404 = "{" + "\"status\":" + "\"404\"" + "}";
@@ -100,12 +100,11 @@ public class NotificationStoreConstants
     public static final String MESSAGE_ERROR_DEMAND_TYPE_ID_USED = "This DemandTypeId is used by existing notifications";
     public static final String MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER = "Empty parameter";
     public static final String MESSAGE_ERROR_DIRECTION_DATE_ORDER_BY_WRONG_VALUE = "Optional parameter directionDateOrderBy only accepts 'ASC' or 'DESC' values";
-    
+
     // Constants
     public static final String CHARECTER_REGEXP_FILTER = "[^\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\p{Sm}\\p{Sc}\\s]";
-    
-    
-    //FileStoreProvider
+
+    // FileStoreProvider
     public static final String FILE_STORE_PROVIDER = "notificationStoreDatabaseFileStoreProvider";
 
 }

@@ -80,7 +80,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-
 /**
  * 
  * Service Rest DemandNotificationRestService
@@ -94,7 +93,7 @@ public class DemandRestService
     @Inject
     @Named( "notificationstore.demandService" )
     private IDemandServiceProvider _demandService;
-    
+
     /**
      * Return list of demand
      * 
@@ -106,27 +105,20 @@ public class DemandRestService
     @Produces( MediaType.APPLICATION_JSON )
     @ApiOperation( value = "Get demand list for a customer Id", response = DemandResult.class )
     @ApiResponses( value = {
-    		@ApiResponse( code = 200, message = "Success" ),
-    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
             @ApiResponse( code = 403, message = "Failure" )
-    })
-    public Response getListDemand( 
-    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
-    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_INDEX, value = SwaggerConstants.QUERY_PARAM_INDEX_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
-    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIMIT, value = SwaggerConstants.QUERY_PARAM_LIMIT_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
-    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
-    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
-            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY, value = SwaggerConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY ) @DefaultValue( "" ) String strDirectionDateOrderBy)
+    } )
+    public Response getListDemand(
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_INDEX, value = SwaggerConstants.QUERY_PARAM_INDEX_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIMIT, value = SwaggerConstants.QUERY_PARAM_LIMIT_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY, value = SwaggerConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECTION_DATE_ORDER_BY ) @DefaultValue( "" ) String strDirectionDateOrderBy )
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );
-        if( StringUtils.isNotEmpty( strLimitResult ) )
+        if ( StringUtils.isNotEmpty( strLimitResult ) )
         {
             nDefaultItemsPerPage = Integer.parseInt( strLimitResult );
         }
@@ -134,16 +126,14 @@ public class DemandRestService
         DemandResult result = new DemandResult( );
         if ( StringUtils.isEmpty( strCustomerId ) )
         {
-        	result.setStatus( ResponseStatusFactory.badRequest( )
-        			.setMessage(NotificationStoreConstants.MESSAGE_ERROR_DEMAND )
-        			.setMessageKey(SearchResult.ERROR_FIELD_MANDATORY));
+            result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_DEMAND )
+                    .setMessageKey( SearchResult.ERROR_FIELD_MANDATORY ) );
             return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
         }
-        if( StringUtils.isNotEmpty( strDirectionDateOrderBy ) && !List.of("ASC", "DESC").contains( strDirectionDateOrderBy ) )
+        if ( StringUtils.isNotEmpty( strDirectionDateOrderBy ) && !List.of( "ASC", "DESC" ).contains( strDirectionDateOrderBy ) )
         {
-            result.setStatus( ResponseStatusFactory.badRequest( )
-                                      .setMessage(NotificationStoreConstants.MESSAGE_ERROR_DIRECTION_DATE_ORDER_BY_WRONG_VALUE )
-                                      .setMessageKey(SearchResult.ERROR_FIELD_WRONG_VALUE));
+            result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_DIRECTION_DATE_ORDER_BY_WRONG_VALUE )
+                    .setMessageKey( SearchResult.ERROR_FIELD_WRONG_VALUE ) );
             return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
         }
 
@@ -164,60 +154,51 @@ public class DemandRestService
     @Produces( MediaType.APPLICATION_JSON )
     @ApiOperation( value = "Get demand list for a customer Id by status", response = DemandResult.class )
     @ApiResponses( value = {
-    		@ApiResponse( code = 200, message = "Success (with or without result)" ),
-    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
-            @ApiResponse( code = 403, message = "Failure" )
-    })
-    public Response getListOfDemandByStatus( 
-    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_INDEX, value = SwaggerConstants.QUERY_PARAM_INDEX_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIMIT, value = SwaggerConstants.QUERY_PARAM_LIMIT_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIST_STATUS, value = SwaggerConstants.QUERY_PARAM_LIST_STATUS_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_LIST_STATUS ) String strListStatus,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE, value = SwaggerConstants.QUERY_PARAM_CATEGORY_CODE_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE ) String strCategoryCode )
+            @ApiResponse( code = 200, message = "Success (with or without result)" ),
+            @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ), @ApiResponse( code = 403, message = "Failure" )
+    } )
+    public Response getListOfDemandByStatus(
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_INDEX, value = SwaggerConstants.QUERY_PARAM_INDEX_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIMIT, value = SwaggerConstants.QUERY_PARAM_LIMIT_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIST_STATUS, value = SwaggerConstants.QUERY_PARAM_LIST_STATUS_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIST_STATUS ) String strListStatus,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE, value = SwaggerConstants.QUERY_PARAM_CATEGORY_CODE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CATEGORY_CODE ) String strCategoryCode )
     {
         int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( NotificationStoreConstants.LIMIT_DEMAND_API_REST, 10 );
-        if( StringUtils.isNotEmpty( strLimitResult ) )
+        if ( StringUtils.isNotEmpty( strLimitResult ) )
         {
             nDefaultItemsPerPage = Integer.parseInt( strLimitResult );
         }
-        
+
         DemandResult result = new DemandResult( );
-        
-        //Retrieving request types related to the category as a parameter.
+
+        // Retrieving request types related to the category as a parameter.
         StringBuilder sbIdsTypeDemand = new StringBuilder( );
-        if(StringUtils.isNotEmpty( strIdDemandType ))
+        if ( StringUtils.isNotEmpty( strIdDemandType ) )
         {
             sbIdsTypeDemand.append( Integer.parseInt( strIdDemandType ) + "," );
         }
-        if( StringUtils.isNotEmpty( strCategoryCode ) )
+        if ( StringUtils.isNotEmpty( strCategoryCode ) )
         {
             DemandTypeHome.getDemandTypesListByCategoryCode( strCategoryCode ).stream( ).forEach( dt -> sbIdsTypeDemand.append( dt.getIdDemandType( ) + "," ) );
         }
-        
-        //If no request type is found for the parameter category
-        if( StringUtils.isNotEmpty( strCategoryCode ) && sbIdsTypeDemand.length( ) < 1  )
+
+        // If no request type is found for the parameter category
+        if ( StringUtils.isNotEmpty( strCategoryCode ) && sbIdsTypeDemand.length( ) < 1 )
         {
-            result.setStatus( ResponseStatusFactory.noResult( ).setMessageKey( "no_result" ) );      
+            result.setStatus( ResponseStatusFactory.noResult( ).setMessageKey( "no_result" ) );
             return Response.status( result.getStatus( ).getHttpCode( ) ).entity( result ).build( );
         }
-               
+
         if ( StringUtils.isEmpty( strCustomerId ) || StringUtils.isEmpty( strListStatus ) )
         {
-        	result.setStatus( ResponseStatusFactory.badRequest( ) );
-        			
-        	result.setStatus( ResponseStatusFactory.badRequest( )
-        			.setMessage( NotificationStoreConstants.MESSAGE_ERROR_STATUS )
-        			.setMessageKey(SearchResult.ERROR_FIELD_MANDATORY));
+            result.setStatus( ResponseStatusFactory.badRequest( ) );
+
+            result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_STATUS )
+                    .setMessageKey( SearchResult.ERROR_FIELD_MANDATORY ) );
 
             return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
         }
@@ -227,27 +208,27 @@ public class DemandRestService
 
         return getResponse( result, nIndex, nDefaultItemsPerPage, listIds );
     }
-    
+
     @DELETE
     @Path( NotificationStoreConstants.PATH_CUSTOMER_ID )
     @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response doDeleteAllDemands ( @PathParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String  strCustomerId )
+    public Response doDeleteAllDemands( @PathParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId )
     {
-        
-        if( StringUtils.isNotEmpty( strCustomerId ) )
+
+        if ( StringUtils.isNotEmpty( strCustomerId ) )
         {
             _demandService.deleteAllDemandByCustomerId( strCustomerId );
-            
-            return Response.status( Response.Status.OK )
-                    .entity( JsonUtil.buildJsonResponse( new JsonResponse( Response.Status.OK ) ) ).build( );            
-        } else
+
+            return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( Response.Status.OK ) ) ).build( );
+        }
+        else
         {
             return Response.status( Response.Status.BAD_REQUEST )
                     .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.getReasonPhrase( ) ) ) ).build( );
 
         }
-                
+
     }
 
     /**
@@ -270,14 +251,14 @@ public class DemandRestService
             result.setIndex( String.valueOf( nIndex ) );
             result.setPaginator( nIndex + "/" + paginator.getPagesCount( ) );
             result.setNumberResult( listIds.size( ) );
-            
+
             result.setStatus( ResponseStatusFactory.ok( ) );
         }
         else
         {
-        	result.setStatus( ResponseStatusFactory.noResult( ).setMessageKey( "no_result" ) );
+            result.setStatus( ResponseStatusFactory.noResult( ).setMessageKey( "no_result" ) );
         }
-        
+
         return Response.status( result.getStatus( ).getHttpCode( ) ).entity( result ).build( );
     }
 
@@ -290,7 +271,7 @@ public class DemandRestService
     {
         List<DemandDisplay> listDemandDisplay = new ArrayList<>( );
         List<Demand> listDemand = DemandHome.getByIds( listIds );
-        
+
         for ( Demand demand : listDemand )
         {
             DemandDisplay demandDisplay = new DemandDisplay( );
@@ -299,7 +280,7 @@ public class DemandRestService
 
             listDemandDisplay.add( demandDisplay );
         }
-       
+
         // keep original order
         return listDemandDisplay.stream( ).sorted( Comparator.comparingInt( dem -> listIds.indexOf( dem.getDemand( ).getUID( ) ) ) )
                 .collect( Collectors.toList( ) );
@@ -320,6 +301,5 @@ public class DemandRestService
         }
         return StringUtils.EMPTY;
     }
-
 
 }

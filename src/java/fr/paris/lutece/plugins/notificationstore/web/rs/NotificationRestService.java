@@ -65,13 +65,13 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3  )
-@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3  )
+@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 )
+@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 )
 public class NotificationRestService
 {
 
     /**
-     * process the notification 
+     * process the notification
      * 
      * @param strJson
      *            The JSON flow
@@ -83,13 +83,11 @@ public class NotificationRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response notification( String strJson )
     {
-    	return NotificationService.instance( ).newNotification( strJson );
+        return NotificationService.instance( ).newNotification( strJson );
     }
-    
 
-    
     /**
-     * store the notification  event
+     * store the notification event
      * 
      * @param strJson
      *            The JSON flow
@@ -101,40 +99,34 @@ public class NotificationRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response notificationEvent( String strJson )
     {
-    	return NotificationService.instance( ).newNotificationEvent( strJson );
+        return NotificationService.instance( ).newNotificationEvent( strJson );
     }
-    
-     
+
     /**
      * Gets list of notification
      * 
      * @param strIdDemand
      */
     @GET
-    @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_LIST)
+    @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_LIST )
     @Produces( MediaType.APPLICATION_JSON )
     @ApiOperation( value = "Get the notifications of a demand", response = NotificationResult.class )
     @ApiResponses( value = {
-    		@ApiResponse( code = 200, message = "Success" ),
-    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
             @ApiResponse( code = 403, message = "Failure" )
-    })
-    public Response getListNotification( 
-                        @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_DESCRIPTION )
-    		 	        @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
-			@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION )
-				@QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
+    } )
+    public Response getListNotification(
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         NotificationResult result = new NotificationResult( );
 
         if ( StringUtils.isNotEmpty( strIdDemand ) && StringUtils.isNotEmpty( strIdDemandType ) && StringUtils.isNotEmpty( strCustomerId ) )
         {
             NotificationFilter filter = new NotificationFilter( );
-            if( StringUtils.isNotEmpty( strNotificationType ) )
+            if ( StringUtils.isNotEmpty( strNotificationType ) )
             {
                 filter.getListNotificationType( ).add( EnumNotificationType.valueOf( strNotificationType ) );
             }
@@ -149,12 +141,13 @@ public class NotificationRestService
         }
         else
         {
-        	result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_NOTIF ).setMessageKey( SearchResult.ERROR_FIELD_MANDATORY) );
-            
+            result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_NOTIF )
+                    .setMessageKey( SearchResult.ERROR_FIELD_MANDATORY ) );
+
             return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
         }
     }
-    
+
     /**
      * Gets list of notification types
      * 
@@ -174,7 +167,7 @@ public class NotificationRestService
      */
     @PUT
     @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_REASSIGN )
-    @Produces ( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
     public Response reassignDemandsAndNotifications( String strJson )
     {
         return NotificationService.instance( ).reassignNotifications( strJson );

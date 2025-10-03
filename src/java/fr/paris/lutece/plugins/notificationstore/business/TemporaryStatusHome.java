@@ -41,7 +41,6 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
 import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
-
 /**
  * This class provides instances management methods (create, find, ...) for Status objects
  */
@@ -49,7 +48,7 @@ public final class TemporaryStatusHome
 {
     // Static variable pointed at the DAO instance
     private static ITemporaryStatusDAO _dao = SpringContextService.getBean( "notificationstore.temporaryStatusDao" );
-    
+
     /**
      * Private constructor - this class need not be instantiated
      */
@@ -122,8 +121,9 @@ public final class TemporaryStatusHome
 
     /**
      * Load the data from the table using a like '%strStatus%'
+     * 
      * @param strStatus
-
+     * 
      * @return Only the first status found returned
      */
     public static Optional<TemporaryStatus> findByStatus( String strStatus )
@@ -163,10 +163,9 @@ public final class TemporaryStatusHome
         return _dao.selectStatusListByIds( listIds );
     }
 
-	public static List<Integer> searchItemsIdList(Map<String, String> mapFilterCriteria, String strColumnToOrder,
-			String strSortMode) 
-	{
-		return _dao.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode );
-	}
+    public static List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder, String strSortMode )
+    {
+        return _dao.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode );
+    }
 
 }

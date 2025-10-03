@@ -126,7 +126,6 @@ public final class DemandHome
         return _dao.loadByDemandIdAndTypeIdAndCustomerId( strDemandId, strDemandTypeId, strCustomerId );
     }
 
-    
     /**
      * Load demand ids ordered by date notification
      * 
@@ -136,7 +135,8 @@ public final class DemandHome
      *            (Optional can be null)
      * @return The list of demand ids
      */
-    public static List<Integer> getIdsByCustomerIdAndDemandTypeId( String strCustomerId, String strNotificationType, String strIdDemandType, String strDirectionDateOrderBy )
+    public static List<Integer> getIdsByCustomerIdAndDemandTypeId( String strCustomerId, String strNotificationType, String strIdDemandType,
+            String strDirectionDateOrderBy )
     {
         return _dao.loadIdsByCustomerIdAndIdDemandType( strCustomerId, strNotificationType, strIdDemandType, strDirectionDateOrderBy );
     }
@@ -168,8 +168,8 @@ public final class DemandHome
     }
 
     /**
-     *  reassign  demands
-     *    
+     * reassign demands
+     * 
      * @param strOldCustomerId
      * @param strNewCustomerId
      */
@@ -177,12 +177,13 @@ public final class DemandHome
     {
         _dao.reassignDemands( strOldCustomerId, strNewCustomerId );
     }
-    
+
     /**
      * Delete a demand by uid
+     * 
      * @param nUid
      */
-    public static void deleteByUid ( int nUid )
+    public static void deleteByUid( int nUid )
     {
         _dao.deleteByUid( nUid );
     }

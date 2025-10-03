@@ -56,21 +56,22 @@ public class TemporaryStatusService
 {
     // Bean names
     private static final String BEAN_STORAGE_SERVICE = "notificationstore.demandService";
-    
+
     private static TemporaryStatusService _instance;
     private static IDemandServiceProvider _demandService;
     private static TemporaryStatusCacheService _cache;
-    
+
     /**
      * Private constructor
      */
-    private TemporaryStatusService()
+    private TemporaryStatusService( )
     {
-        //Do nothing
+        // Do nothing
     }
-    
+
     /**
      * Public constructor
+     * 
      * @return instance
      */
     public static TemporaryStatusService getInstance( )
@@ -79,11 +80,11 @@ public class TemporaryStatusService
         {
             _instance = new TemporaryStatusService( );
             _demandService = SpringContextService.getBean( BEAN_STORAGE_SERVICE );
-            _cache =  TemporaryStatusCacheService.getInstance( );
+            _cache = TemporaryStatusCacheService.getInstance( );
         }
         return _instance;
     }
-    
+
     /**
      * Create an instance of the status class
      * 
@@ -94,10 +95,10 @@ public class TemporaryStatusService
     public TemporaryStatus create( TemporaryStatus status )
     {
         TemporaryStatusHome.create( status );
-        
-        //Remove cache
+
+        // Remove cache
         TemporaryStatusCacheService.getInstance( ).removeCache( );
-        
+
         return status;
     }
 
@@ -109,35 +110,34 @@ public class TemporaryStatusService
      * @return The instance of the status which has been updated
      */
     public TemporaryStatus update( TemporaryStatus status )
-    {     
+    {
         try
         {
-            //Début de la transaction
+            // Début de la transaction
             TransactionManager.beginTransaction( null );
-            
+
             Optional<TemporaryStatus> oldStatus = TemporaryStatusHome.findByPrimaryKey( status.getId( ) );
-            
-            if( oldStatus.isPresent( ) 
-                    && EnumGenericStatus.UNDEFINED.getStatusId( ).equals( oldStatus.get( ).getGenericStatus( ).getStatusId( ) )
+
+            if ( oldStatus.isPresent( ) && EnumGenericStatus.UNDEFINED.getStatusId( ).equals( oldStatus.get( ).getGenericStatus( ).getStatusId( ) )
                     && !EnumGenericStatus.UNDEFINED.getStatusId( ).equals( status.getGenericStatus( ).getStatusId( ) ) )
             {
-                //Update demands status id
+                // Update demands status id
                 _demandService.updateDemandsStatusId( status.getGenericStatus( ).getStatusId( ), status.getId( ) );
-                //Update notifications status
+                // Update notifications status
                 NotificationContentHome.updateStatusId( status.getGenericStatus( ).getStatusId( ), status.getId( ) );
             }
-            
+
             TemporaryStatusHome.update( status );
-            
-            //Commit de la transaction
+
+            // Commit de la transaction
             TransactionManager.commitTransaction( null );
-            
-            //Remove cache
+
+            // Remove cache
             TemporaryStatusCacheService.getInstance( ).removeCache( );
-        } 
-        catch (Exception e) 
+        }
+        catch( Exception e )
         {
-            //Roll back
+            // Roll back
             TransactionManager.rollBack( null );
             AppLogService.error( "Une erreur s'est produite lors de la mise à jour du statut temporaire {}", status.getId( ), e.getMessage( ) );
         }
@@ -154,8 +154,8 @@ public class TemporaryStatusService
     public void remove( int nKey )
     {
         TemporaryStatusHome.remove( nKey );
-        
-        //Remove cache
+
+        // Remove cache
         TemporaryStatusCacheService.getInstance( ).removeCache( );
     }
 
@@ -193,19 +193,19 @@ public class TemporaryStatusService
     public Optional<TemporaryStatus> findByStatus( String strStatus )
     {
         List<TemporaryStatus> listTemporaryStatus = _cache.getList( );
-        
-        strStatus = strStatus.replaceAll("\\s", "").toLowerCase( );
-        
+
+        strStatus = strStatus.replaceAll( "\\s", "" ).toLowerCase( );
+
         if ( listTemporaryStatus != null && !listTemporaryStatus.isEmpty( ) )
         {
             for ( TemporaryStatus temporaryStatus : listTemporaryStatus )
             {
-                String strStatusExist = temporaryStatus.getStatus( ).replaceAll("\\s", "").toLowerCase( );
-                if( strStatus.contains( strStatusExist ) )
+                String strStatusExist = temporaryStatus.getStatus( ).replaceAll( "\\s", "" ).toLowerCase( );
+                if ( strStatus.contains( strStatusExist ) )
                 {
                     return Optional.ofNullable( temporaryStatus );
                 }
-                
+
             }
         }
         return Optional.empty( );
@@ -242,7 +242,7 @@ public class TemporaryStatusService
     {
         return TemporaryStatusHome.getStatusListByIds( listIds );
     }
-    
+
     /**
      * search ids
      * 
@@ -252,9 +252,8 @@ public class TemporaryStatusService
      * @param plugin
      * @return the ids list
      */
-    public List<Integer> searchStatusIdsList(  Map<String,String> mapFilterCriteria, 
-    		String strColumnToOrder, String strSortMode ) 
+    public List<Integer> searchStatusIdsList( Map<String, String> mapFilterCriteria, String strColumnToOrder, String strSortMode )
     {
-    	return TemporaryStatusHome.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode);
+        return TemporaryStatusHome.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode );
     }
 }

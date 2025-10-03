@@ -125,7 +125,7 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
 
             if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_CUSTOMER_ID ) ) )
             {
-                _currentFilter.setCustomerId ( request.getParameter( PARAMETER_CUSTOMER_ID ) );
+                _currentFilter.setCustomerId( request.getParameter( PARAMETER_CUSTOMER_ID ) );
             }
 
             if ( !StringUtils.isEmpty( request.getParameter( PARAMETER_START_DATE ) ) )
@@ -190,7 +190,8 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
         List<Demand> listDemand = DemandHome.getByIds( listIds );
 
         // keep original order
-        return listDemand.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( Integer.parseInt( notif.getId( ) ) ) ) ).collect( Collectors.toList( ) );
+        return listDemand.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( Integer.parseInt( notif.getId( ) ) ) ) )
+                .collect( Collectors.toList( ) );
 
     }
 }

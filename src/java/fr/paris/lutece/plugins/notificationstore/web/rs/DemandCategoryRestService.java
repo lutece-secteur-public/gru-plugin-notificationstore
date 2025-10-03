@@ -68,14 +68,17 @@ import io.swagger.annotations.ApiResponses;
  * CategoryRest
  *
  */
-@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_CATEGORY )
+@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3
+        + NotificationStoreConstants.PATH_CATEGORY )
 @Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_CATEGORY )
 public class DemandCategoryRestService
 {
 
     /**
      * Get DemandCategory List
-     * @param nVersion the API version
+     * 
+     * @param nVersion
+     *            the API version
      * @return the DemandCategory List
      */
     @GET
@@ -83,66 +86,65 @@ public class DemandCategoryRestService
     @Produces( MediaType.APPLICATION_JSON )
     @ApiOperation( value = "Get the list of categories", response = Response.class )
     @ApiResponses( value = {
-    		@ApiResponse( code = 200, message = "Success" ),
-    		@ApiResponse( code = 204, message = "No content" ),
-    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
-            @ApiResponse( code = 403, message = "Failure" )
-    })
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 204, message = "No content" ),
+            @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ), @ApiResponse( code = 403, message = "Failure" )
+    } )
     public Response getDemandCategoryList( )
     {
         List<DemandCategory> listDemandCategorys = DemandCategoryHome.getDemandCategoriesList( );
-        
+
         if ( listDemandCategorys.isEmpty( ) )
         {
-            return Response.status( Response.Status.NO_CONTENT )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) )
-                .build( );
+            return Response.status( Response.Status.NO_CONTENT ).entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) ).build( );
         }
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( listDemandCategorys ) ) )
-                .build( );
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( listDemandCategorys ) ) ).build( );
     }
-    
-    
+
     /**
      * Create DemandCategory
-     * @param nVersion the API version
-     * @param code the code
-     * @param label the label
+     * 
+     * @param nVersion
+     *            the API version
+     * @param code
+     *            the code
+     * @param label
+     *            the label
      * @return the DemandCategory if created
      */
     @POST
     @Produces( MediaType.APPLICATION_JSON )
-    public Response createDemandCategory( @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_CODE ) String code, 
+    public Response createDemandCategory( @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_CODE ) String code,
             @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_LABEL ) String label,
             @FormParam( NotificationStoreConstants.DEMANDCATEGORY_ATTRIBUTE_DEFAULT ) String isDefault )
     {
         if ( StringUtils.isEmpty( code ) || StringUtils.isEmpty( label ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(
+                    new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
-        
+
         DemandCategory demandcategory = new DemandCategory( );
         demandcategory.setCode( code );
         demandcategory.setLabel( label );
         demandcategory.setDefault( Boolean.parseBoolean( isDefault ) );
-        
+
         DemandCategoryHome.create( demandcategory );
-        
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( demandcategory ) ) )
-                .build( );
+
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandcategory ) ) ).build( );
     }
-    
-    
+
     /**
      * Modify DemandCategory
-     * @param nVersion the API version
-     * @param id the id
-     * @param code the code
-     * @param label the label
+     * 
+     * @param nVersion
+     *            the API version
+     * @param id
+     *            the id
+     * @param code
+     *            the code
+     * @param label
+     *            the label
      * @return the DemandCategory if modified
      */
     @PUT
@@ -155,17 +157,18 @@ public class DemandCategoryRestService
     {
         if ( StringUtils.isEmpty( code ) || StringUtils.isEmpty( label ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(
+                    new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
-        
+
         Optional<DemandCategory> optDemandCategory = DemandCategoryHome.findByPrimaryKey( id );
-        
+
         if ( !optDemandCategory.isPresent( ) )
         {
             return Response.status( Response.Status.NOT_FOUND )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
+                    .entity( JsonUtil.buildJsonResponse(
+                            new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
         else
@@ -176,18 +179,18 @@ public class DemandCategoryRestService
             demandcategory.setDefault( Boolean.parseBoolean( isDefault ) );
 
             DemandCategoryHome.update( demandcategory );
-            
-            return Response.status( Response.Status.OK )
-                    .entity( JsonUtil.buildJsonResponse( new JsonResponse( demandcategory ) ) )
-                    .build( );
+
+            return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandcategory ) ) ).build( );
         }
     }
-    
-    
+
     /**
      * Delete DemandCategory
-     * @param nVersion the API version
-     * @param id the id
+     * 
+     * @param nVersion
+     *            the API version
+     * @param id
+     *            the id
      * @return the DemandCategory List if deleted
      */
     @DELETE
@@ -199,21 +202,21 @@ public class DemandCategoryRestService
         if ( !optDemandCategory.isPresent( ) )
         {
             return Response.status( Response.Status.NOT_FOUND )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
+                    .entity( JsonUtil.buildJsonResponse(
+                            new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
-        
+
         DemandCategoryHome.remove( id );
-        
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) )
-                .build( );
+
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) ).build( );
     }
-    
-    
+
     /**
      * Get DemandCategory
-     * @param id the id
+     * 
+     * @param id
+     *            the id
      * @return the DemandCategory
      */
     @GET
@@ -221,23 +224,20 @@ public class DemandCategoryRestService
     @Produces( MediaType.APPLICATION_JSON )
     @ApiOperation( value = "Get a category", response = Response.class )
     @ApiResponses( value = {
-    		@ApiResponse( code = 200, message = "Success" ),
-    		@ApiResponse( code = 404, message = "Not found" )
-    })
-    public Response getDemandCategory( 
-    		@ApiParam( name = NotificationStoreConstants.ID, value = SwaggerConstants.QUERY_PARAM_ID_CATEGORY_DESCRIPTION )
-				@PathParam( NotificationStoreConstants.ID ) Integer id )
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 404, message = "Not found" )
+    } )
+    public Response getDemandCategory(
+            @ApiParam( name = NotificationStoreConstants.ID, value = SwaggerConstants.QUERY_PARAM_ID_CATEGORY_DESCRIPTION ) @PathParam( NotificationStoreConstants.ID ) Integer id )
     {
         Optional<DemandCategory> optDemandCategory = DemandCategoryHome.findByPrimaryKey( id );
         if ( !optDemandCategory.isPresent( ) )
         {
             return Response.status( Response.Status.NOT_FOUND )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
+                    .entity( JsonUtil.buildJsonResponse(
+                            new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
-        
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( optDemandCategory.get( ) ) ) )
-                .build( );
+
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( optDemandCategory.get( ) ) ) ).build( );
     }
 }

@@ -50,7 +50,7 @@ public final class DemandTypeHome
 {
     // Static variable pointed at the DAO instance
     private static IDemandTypeDAO _dao = SpringContextService.getBean( "notificationstore.demandTypeDao" );
-    
+
     /**
      * Private constructor - this class need not be instantiated
      */
@@ -108,7 +108,7 @@ public final class DemandTypeHome
     {
         return _dao.load( nKey );
     }
-    
+
     /**
      * Returns an instance of a demandType whose identifier is specified in parameter
      * 
@@ -118,7 +118,7 @@ public final class DemandTypeHome
      */
     public static Optional<DemandType> getDemandType( String type_id )
     {
-    	return _dao.selectByTypeId( type_id );
+        return _dao.selectByTypeId( type_id );
     }
 
     /**
@@ -161,13 +161,14 @@ public final class DemandTypeHome
     public static ReferenceList getDemandTypesReferenceList( )
     {
         ReferenceList listDemandType = new ReferenceList( );
-        listDemandType.addItem( "" , " ");
-        
-        getDemandTypesList( ).stream( ).forEach( dt -> listDemandType.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getIdDemandType( ) + ": " + dt.getLabel( ) ) );
+        listDemandType.addItem( "", " " );
+
+        getDemandTypesList( ).stream( )
+                .forEach( dt -> listDemandType.addItem( String.valueOf( dt.getIdDemandType( ) ), dt.getIdDemandType( ) + ": " + dt.getLabel( ) ) );
 
         return listDemandType;
     }
-    
+
     /**
      * Load the data of all the demandType objects by category code and returns them as a list
      * 
@@ -181,9 +182,8 @@ public final class DemandTypeHome
 
     }
 
-	public static List<Integer> searchItemsIdList(Map<String, String> mapFilterCriteria, String strColumnToOrder,
-			String strSortMode) 
-	{
-		return _dao.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode );
-	}
+    public static List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder, String strSortMode )
+    {
+        return _dao.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode );
+    }
 }

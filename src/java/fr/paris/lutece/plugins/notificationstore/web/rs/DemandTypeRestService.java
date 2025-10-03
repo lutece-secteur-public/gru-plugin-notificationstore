@@ -73,8 +73,10 @@ import io.swagger.annotations.ApiResponses;
  * Service Rest DemandTypeRestService
  *
  */
-@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND_TYPE )
-@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND_TYPE )
+@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3
+        + NotificationStoreConstants.PATH_DEMAND_TYPE )
+@Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3
+        + NotificationStoreConstants.PATH_DEMAND_TYPE )
 public class DemandTypeRestService
 {
 
@@ -89,46 +91,40 @@ public class DemandTypeRestService
     @Produces( MediaType.APPLICATION_JSON )
     @ApiOperation( value = "Get demand type list (stable, must be cached)", response = Response.class )
     @ApiResponses( value = {
-    		@ApiResponse( code = 200, message = "Success" ),
-    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
             @ApiResponse( code = 403, message = "Failure" )
-    })
-    public Response getDemandTypeList( 
-    		@ApiParam( name = NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE, value = SwaggerConstants.QUERY_PARAM_DIRECT_MODE_DESCRIPTION )
-    			@QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE )  String strDirectMode  )
+    } )
+    public Response getDemandTypeList(
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE, value = SwaggerConstants.QUERY_PARAM_DIRECT_MODE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_DIRECT_MODE ) String strDirectMode )
     {
         List<DemandType> listDemandTypes = DemandTypeHome.getDemandTypesList( );
 
         if ( listDemandTypes.isEmpty( ) )
         {
-            return Response.status( Response.Status.NO_CONTENT )
-                    .entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) )
-                    .build( );
+            return Response.status( Response.Status.NO_CONTENT ).entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) ).build( );
         }
-        
+
         if ( strDirectMode == null )
         {
-        	return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( listDemandTypes ) ) )
-                .build( );
+            return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( listDemandTypes ) ) ).build( );
         }
         else
         {
-        	// direct response mode (old API mode)
-        	ObjectMapper _mapper = new ObjectMapper( );
-            
-            try 
+            // direct response mode (old API mode)
+            ObjectMapper _mapper = new ObjectMapper( );
+
+            try
             {
-            	String strResult = _mapper.writeValueAsString( listDemandTypes );
-            	return Response.ok( strResult ).build( );
+                String strResult = _mapper.writeValueAsString( listDemandTypes );
+                return Response.ok( strResult ).build( );
             }
-            catch ( JsonProcessingException e )
+            catch( JsonProcessingException e )
             {
-            	return Response.serverError ( ).build( );
+                return Response.serverError( ).build( );
             }
         }
     }
-    
+
     /**
      * Create DemandType
      * 
@@ -154,26 +150,23 @@ public class DemandTypeRestService
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_APP_CODE ) String strAppCode,
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_CATEGORY ) String strCategory )
     {
-        if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) 
-                || StringUtils.isEmpty( strUrl ) || StringUtils.isEmpty( strAppCode ) )
+        if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) || StringUtils.isEmpty( strUrl ) || StringUtils.isEmpty( strAppCode ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(
+                    new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
-        
+
         DemandType demandtype = new DemandType( );
         demandtype.setIdDemandType( Integer.parseInt( strIdDemandType ) );
         demandtype.setLabel( strLabel );
         demandtype.setUrl( strUrl );
         demandtype.setAppCode( strAppCode );
         demandtype.setCategory( strCategory );
-        
+
         DemandTypeHome.create( demandtype );
 
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( demandtype ) ) )
-                .build( );
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandtype ) ) ).build( );
     }
 
     /**
@@ -205,19 +198,19 @@ public class DemandTypeRestService
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_APP_CODE ) String strAppCode,
             @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_CATEGORY ) String strCategory )
     {
-        if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) 
-                || StringUtils.isEmpty( strUrl ) )
+        if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) || StringUtils.isEmpty( strUrl ) )
         {
-            return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
+            return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(
+                    new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
         Optional<DemandType> optDemandType = DemandTypeHome.findByPrimaryKey( nId );
-        
+
         if ( !optDemandType.isPresent( ) )
         {
             return Response.status( Response.Status.NOT_FOUND )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
+                    .entity( JsonUtil.buildJsonResponse(
+                            new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
         else
@@ -228,12 +221,10 @@ public class DemandTypeRestService
             demandtype.setUrl( strUrl );
             demandtype.setAppCode( StringUtils.isEmpty( strAppCode ) ? StringUtils.EMPTY : strAppCode );
             demandtype.setCategory( StringUtils.isEmpty( strCategory ) ? StringUtils.EMPTY : strCategory );
-            
+
             DemandTypeHome.update( demandtype );
 
-            return Response.status( Response.Status.OK )
-                    .entity( JsonUtil.buildJsonResponse( new JsonResponse( demandtype ) ) )
-                    .build( );
+            return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandtype ) ) ).build( );
         }
     }
 
@@ -252,27 +243,27 @@ public class DemandTypeRestService
     public Response deleteDemandType( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
         Optional<DemandType> optDemandType = DemandTypeHome.findByPrimaryKey( nId );
-        
+
         if ( !optDemandType.isPresent( ) )
         {
             return Response.status( Response.Status.NOT_FOUND )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
+                    .entity( JsonUtil.buildJsonResponse(
+                            new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
 
         // test if exists notifications that uses that demand_type
         if ( NotificationHome.existsNotificationWithDemandTypeId( optDemandType.get( ).getIdDemandType( ) ) )
         {
-        	return Response.status( Response.Status.FORBIDDEN )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.FORBIDDEN.name( ), NotificationStoreConstants.MESSAGE_ERROR_DEMAND_TYPE_ID_USED ) ) )
+            return Response.status( Response.Status.FORBIDDEN )
+                    .entity( JsonUtil.buildJsonResponse(
+                            new ErrorJsonResponse( Response.Status.FORBIDDEN.name( ), NotificationStoreConstants.MESSAGE_ERROR_DEMAND_TYPE_ID_USED ) ) )
                     .build( );
         }
-        
+
         DemandTypeHome.remove( optDemandType.get( ).getId( ) );
 
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) )
-                .build( );
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( "{}" ) ) ).build( );
     }
 
     /**
@@ -289,26 +280,22 @@ public class DemandTypeRestService
     @Produces( MediaType.APPLICATION_JSON )
     @ApiOperation( value = "Get demand type (stable, must be cached)", response = Response.class )
     @ApiResponses( value = {
-    		@ApiResponse( code = 200, message = "Success" ),
-    		@ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
-    		@ApiResponse( code = 404, message = "Not found"),
-            @ApiResponse( code = 403, message = "Failure" )
-    })
-    public Response getDemandType( 
-    		@ApiParam( name = NotificationStoreConstants.ID, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION )
-				@PathParam( NotificationStoreConstants.ID ) Integer nId )
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 404, message = "Not found" ), @ApiResponse( code = 403, message = "Failure" )
+    } )
+    public Response getDemandType(
+            @ApiParam( name = NotificationStoreConstants.ID, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @PathParam( NotificationStoreConstants.ID ) Integer nId )
     {
         Optional<DemandType> optDemandType = DemandTypeHome.findByPrimaryKey( nId );
         if ( !optDemandType.isPresent( ) )
         {
             return Response.status( Response.Status.NOT_FOUND )
-                    .entity( JsonUtil.buildJsonResponse( new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
+                    .entity( JsonUtil.buildJsonResponse(
+                            new ErrorJsonResponse( Response.Status.NOT_FOUND.name( ), NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) ) )
                     .build( );
         }
 
-        return Response.status( Response.Status.OK )
-                .entity( JsonUtil.buildJsonResponse( new JsonResponse( optDemandType.get( ) ) ) )
-                .build( );
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( optDemandType.get( ) ) ) ).build( );
     }
 
 }

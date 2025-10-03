@@ -133,7 +133,7 @@ public final class DemandCategoryDAO implements IDemandCategoryDAO
             daoUtil.setString( nIndex++, demandCategory.getLabel( ) );
             daoUtil.setBoolean( nIndex++, demandCategory.isDefault( ) );
             daoUtil.setInt( nIndex++, demandCategory.getId( ) );
-            
+
             daoUtil.executeUpdate( );
         }
     }
@@ -224,7 +224,7 @@ public final class DemandCategoryDAO implements IDemandCategoryDAO
                     demandCategory.setCode( daoUtil.getString( nIndex++ ) );
                     demandCategory.setLabel( daoUtil.getString( nIndex++ ) );
                     demandCategory.setDefault( daoUtil.getBoolean( nIndex ) );
-                    
+
                     demandCategoryList.add( demandCategory );
                 }
 

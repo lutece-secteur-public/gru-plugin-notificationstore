@@ -80,10 +80,10 @@ public final class NotificationDAO implements INotificationDAO
     private static final String COLUMN_DEMAND_ID = "demand_id";
     private static final String COLUMN_DEMAND_TYPE_ID = "demand_type_id";
     private static final String COLUMN_CUSTOMER_ID = "customer_id";
-    
+
     private static final String COLUMN_DATE = "date";
     private static final String COLUMN_CUSTOMER = "customer_id";
-    
+
     private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT id, demand_id, demand_type_id, customer_id, date FROM notificationstore_notification ";
     private static final String SQL_QUERY_FILTER_SELECT_ID_BASE = "SELECT distinct id FROM notificationstore_notification ";
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE ";
@@ -98,7 +98,7 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_NOTIFICATION_TYPE = " AND nnc.notification_type in  (%s) ";
     private static final String SQL_QUERY_FILTER_NOTIFICATION_TYPE = " id IN (SELECT notification_id FROM notificationstore_notification_content WHERE notification_type in (  ";
     private static final String SQL_QUERY_EXISTS_DEMAND_TYPE_ID = "SELECT 1 WHERE exists (SELECT * FROM notificationstore_notification WHERE demand_type_id = ? )";
-    
+
     private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_notification ( demand_id, demand_type_id, customer_id, date ) VALUES (  ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_notification WHERE id = ?";
     private static final String SQL_QUERY_DELETE_BY_DEMAND = "DELETE FROM notificationstore_notification WHERE demand_id = ? AND demand_type_id = ? AND customer_id = ? ";
@@ -133,7 +133,7 @@ public final class NotificationDAO implements INotificationDAO
      * {@inheritDoc}
      */
     @Override
-    public List<Notification> loadByDemand( String strDemandId, String strDemandTypeId, String strCustomerId)
+    public List<Notification> loadByDemand( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
         NotificationFilter filter = new NotificationFilter( );
         filter.setDemandId( strDemandId );
@@ -329,7 +329,7 @@ public final class NotificationDAO implements INotificationDAO
     @Override
     public synchronized Notification insert( Notification notification )
     {
-        
+
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
         {
 
@@ -337,22 +337,21 @@ public final class NotificationDAO implements INotificationDAO
 
             daoUtil.setString( nIndex++, notification.getDemand( ).getId( ) );
             daoUtil.setString( nIndex++, notification.getDemand( ).getTypeId( ) );
-            
-            String strCustomerId = StringUtils.EMPTY;           
-            if( notification.getDemand( ).getCustomer( ) != null 
-                    && StringUtils.isNotEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) )
+
+            String strCustomerId = StringUtils.EMPTY;
+            if ( notification.getDemand( ).getCustomer( ) != null && StringUtils.isNotEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) )
             {
                 strCustomerId = notification.getDemand( ).getCustomer( ).getCustomerId( );
-            }           
+            }
             daoUtil.setString( nIndex++, strCustomerId );
-            
+
             daoUtil.setTimestamp( nIndex++, notification.getDate( ) > 0 ? new Timestamp( notification.getDate( ) ) : null );
 
             daoUtil.executeUpdate( );
-            
+
             if ( daoUtil.nextGeneratedKey( ) )
             {
-            	notification.setId( daoUtil.getGeneratedKeyInt( 1 ) );
+                notification.setId( daoUtil.getGeneratedKeyInt( 1 ) );
             }
         }
 
@@ -360,12 +359,12 @@ public final class NotificationDAO implements INotificationDAO
     }
 
     /**
-     *  {@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
     public void reassignNotifications( String strOldCustomerId, String strNewCustomerId )
     {
-        try ( DAOUtil daoUtil = new DAOUtil(SQL_QUERY_UPDATE_NOTIFICATIONS_TO_LINK, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE_NOTIFICATIONS_TO_LINK, NotificationStorePlugin.getPlugin( ) ) )
         {
 
             int nIndex = 1;
@@ -406,8 +405,6 @@ public final class NotificationDAO implements INotificationDAO
             daoUtil.executeUpdate( );
         }
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -500,29 +497,28 @@ public final class NotificationDAO implements INotificationDAO
         {
             Notification notification = new Notification( );
             notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
-            notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime ( ) : 0 );
+            notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime( ) : 0 );
 
             String strIdDemand = daoUtil.getString( COLUMN_DEMAND_ID );
             String strDemandTypeId = daoUtil.getString( COLUMN_DEMAND_TYPE_ID );
             String strCustomerId = daoUtil.getString( COLUMN_CUSTOMER_ID );
-            
-            Demand demand = DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( strIdDemand, strDemandTypeId, strCustomerId ); 
+
+            Demand demand = DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( strIdDemand, strDemandTypeId, strCustomerId );
             if ( demand == null )
             {
-            	demand = new Demand( );
-            	demand.setId( strIdDemand );
-            	demand.setTypeId( strDemandTypeId );
+                demand = new Demand( );
+                demand.setId( strIdDemand );
+                demand.setTypeId( strDemandTypeId );
             }
-            
-            Customer customer = new Customer ( );
+
+            Customer customer = new Customer( );
             customer.setCustomerId( strCustomerId );
             customer.setId( strCustomerId );
             demand.setCustomer( customer );
-            
+
             notification.setDemand( demand );
-            
+
             setNotificationContent( notification, notificationFilter );
-            
 
             listNotifications.add( notification );
         }
@@ -586,10 +582,10 @@ public final class NotificationDAO implements INotificationDAO
     {
         try
         {
-            File file = FileService.getInstance( ).getFileStoreServiceProvider( notifContent.getFileStore( ) ).getFile( notifContent.getFileKey( ) );            
-            
+            File file = FileService.getInstance( ).getFileStoreServiceProvider( notifContent.getFileStore( ) ).getFile( notifContent.getFileKey( ) );
+
             String strNotification;
-            
+
             if ( AppPropertiesService.getPropertyBoolean( PROPERTY_DECOMPRESS_NOTIFICATION, false ) )
             {
                 strNotification = StringUtil.decompress( file.getPhysicalFile( ).getValue( ) );
@@ -613,21 +609,21 @@ public final class NotificationDAO implements INotificationDAO
     public List<Notification> loadByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId, NotificationFilter filter )
     {
         String strSql = SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE;
-        
-        if( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
+
+        if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
         {
             strSql = strSql + String.format( SQL_QUERY_NOTIFICATION_TYPE,
                     filter.getListNotificationType( ).stream( ).map( v -> "?" ).collect( Collectors.joining( ", " ) ) );
-        } 
-            
+        }
+
         try ( DAOUtil daoUtil = new DAOUtil( strSql, NotificationStorePlugin.getPlugin( ) ) )
         {
-            int nIndex =1;
+            int nIndex = 1;
             daoUtil.setString( nIndex++, strDemandId );
             daoUtil.setString( nIndex++, strDemandTypeId );
             daoUtil.setString( nIndex++, strCustomerId );
-            
-            if( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
+
+            if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
             {
                 for ( EnumNotificationType notifType : filter.getListNotificationType( ) )
                 {
@@ -644,15 +640,15 @@ public final class NotificationDAO implements INotificationDAO
             {
                 Notification notification = new Notification( );
                 notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
-                notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime ( ) : 0 );
+                notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime( ) : 0 );
 
                 notification.setDemand( DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( strDemandId, strDemandTypeId, strCustomerId ) );
                 setNotificationContent( notification, filter );
-                
-                Customer customer = new Customer ();
+
+                Customer customer = new Customer( );
                 customer.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER ) );
                 notification.getDemand( ).setCustomer( customer );
-                
+
                 listNotifications.add( notification );
             }
 
@@ -676,7 +672,7 @@ public final class NotificationDAO implements INotificationDAO
             {
                 notification = new Notification( );
                 notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
-                notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime ( ) : 0 );
+                notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime( ) : 0 );
                 setNotificationContent( notification, new NotificationFilter( ) );
 
             }
@@ -684,14 +680,14 @@ public final class NotificationDAO implements INotificationDAO
             return notification;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean existsNotificationWithDemandTypeId( int nDemandTypeId )
     {
-        
+
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_EXISTS_DEMAND_TYPE_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
 
@@ -704,7 +700,7 @@ public final class NotificationDAO implements INotificationDAO
             }
             else
             {
-            	return false;
+                return false;
             }
         }
     }

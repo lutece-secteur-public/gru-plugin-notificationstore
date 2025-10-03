@@ -150,7 +150,8 @@ public final class DemandCategoryHome
     {
 
         ReferenceList list = new ReferenceList( );
-        list.addItem( StringUtils.EMPTY, StringUtils.EMPTY );;
+        list.addItem( StringUtils.EMPTY, StringUtils.EMPTY );
+        ;
         getDemandCategoriesList( ).stream( ).forEach( c -> list.addItem( c.getCode( ), c.getLabel( ) ) );
 
         return list;

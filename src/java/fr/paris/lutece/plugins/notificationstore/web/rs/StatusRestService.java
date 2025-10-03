@@ -65,7 +65,8 @@ import fr.paris.lutece.util.json.JsonUtil;
  * StatusRest
  *
  */
-@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 + NotificationStoreConstants.PATH_DEMAND_STATUS )
+@Path( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3
+        + NotificationStoreConstants.PATH_DEMAND_STATUS )
 public class StatusRestService
 {
 
@@ -79,7 +80,8 @@ public class StatusRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getListStatus( )
     {
-        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse(  TemporaryStatusService.getInstance( ).getStatusList( ) ) ) ).build( );
+        return Response.status( Response.Status.OK )
+                .entity( JsonUtil.buildJsonResponse( new JsonResponse( TemporaryStatusService.getInstance( ).getStatusList( ) ) ) ).build( );
     }
 
     /**
@@ -94,7 +96,7 @@ public class StatusRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response getStatus( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
-        Optional<TemporaryStatus> status =  TemporaryStatusService.getInstance( ).findByPrimaryKey( nId );
+        Optional<TemporaryStatus> status = TemporaryStatusService.getInstance( ).findByPrimaryKey( nId );
 
         if ( status.isPresent( ) )
         {
@@ -156,7 +158,7 @@ public class StatusRestService
         {
             TemporaryStatus status = NotificationStoreUtils.getMapper( ).readValue( strStatus, TemporaryStatus.class );
 
-            if ( isStatusCompleted( status ) &&  TemporaryStatusService.getInstance( ).findByPrimaryKey( status.getId( ) ).isPresent( ) )
+            if ( isStatusCompleted( status ) && TemporaryStatusService.getInstance( ).findByPrimaryKey( status.getId( ) ).isPresent( ) )
             {
                 TemporaryStatusService.getInstance( ).update( status );
                 return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( status ) ) ).build( );
@@ -185,7 +187,7 @@ public class StatusRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response doDeleteStatus( @PathParam( NotificationStoreConstants.ID ) int nId )
     {
-        if (  TemporaryStatusService.getInstance( ).findByPrimaryKey( nId ).isPresent( ) )
+        if ( TemporaryStatusService.getInstance( ).findByPrimaryKey( nId ).isPresent( ) )
         {
             TemporaryStatusService.getInstance( ).remove( nId );
             return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( Response.Status.OK ) ) ).build( );

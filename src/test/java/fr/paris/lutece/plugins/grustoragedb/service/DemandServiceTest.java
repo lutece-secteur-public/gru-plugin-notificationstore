@@ -104,7 +104,7 @@ public class DemandServiceTest extends TestCase
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.UPDATE, demand1 ) );
         assertFalse( _demandListener.listenAndConsume( MockActionListenerEnum.DELETE, demand1 ) );
         assertEquals( serviceTest.findByCustomerId( customer1.getCustomerId( ) ).size( ), 1 );
-        assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( )  ) );
+        assertNotNull( serviceTest.findByPrimaryKey( demand1.getId( ), demand1.getTypeId( ), customer1.getCustomerId( ) ) );
         assertNull( serviceTest.findByPrimaryKey( demand2.getId( ), demand2.getTypeId( ), customer1.getCustomerId( ) ) );
         assertEquals( serviceTest.findByReference( demand1.getReference( ) ).size( ), 1 );
         assertEquals( serviceTest.findByReference( demand2.getReference( ) ).size( ), 0 );

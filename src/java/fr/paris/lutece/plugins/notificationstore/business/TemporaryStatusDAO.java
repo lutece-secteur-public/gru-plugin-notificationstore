@@ -49,7 +49,7 @@ import fr.paris.lutece.util.sql.DAOUtil;
 /**
  * This class provides Data Access methods for Status objects
  */
-public final class TemporaryStatusDAO  extends AbstractFilterDao<TemporaryStatus> implements ITemporaryStatusDAO
+public final class TemporaryStatusDAO extends AbstractFilterDao<TemporaryStatus> implements ITemporaryStatusDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE id_temporary_status = ?";
@@ -63,7 +63,7 @@ public final class TemporaryStatusDAO  extends AbstractFilterDao<TemporaryStatus
     private static final String SQL_QUERY_SELECT_BY_STATUS = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE trim(status) like concat('%',trim(?),'%') ";
 
     private static final Plugin _plugin = NotificationStorePlugin.getPlugin( );
-    
+
     /**
      * {@inheritDoc }
      */
@@ -74,7 +74,7 @@ public final class TemporaryStatusDAO  extends AbstractFilterDao<TemporaryStatus
         {
             int nIndex = 1;
             daoUtil.setString( nIndex++, status.getStatus( ) );
-            daoUtil.setInt( nIndex++, status.getGenericStatus( ) != null ? status.getGenericStatus( ).getStatusId( ) : -1  );
+            daoUtil.setInt( nIndex++, status.getGenericStatus( ) != null ? status.getGenericStatus( ).getStatusId( ) : -1 );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
@@ -269,11 +269,10 @@ public final class TemporaryStatusDAO  extends AbstractFilterDao<TemporaryStatus
 
         return status;
     }
-    
+
     @Override
-    public List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder,
-	    String strSortMode )
+    public List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder, String strSortMode )
     {
-	return searchItemsIdList( SQL_QUERY_SELECTALL_ID, mapFilterCriteria, strColumnToOrder, strSortMode) ;
+        return searchItemsIdList( SQL_QUERY_SELECTALL_ID, mapFilterCriteria, strColumnToOrder, strSortMode );
     }
 }

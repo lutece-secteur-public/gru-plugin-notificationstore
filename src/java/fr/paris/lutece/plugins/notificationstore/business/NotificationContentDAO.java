@@ -243,7 +243,7 @@ public final class NotificationContentDAO implements INotificationContentDAO
         {
             daoUtil.setInt( 1, nNewStatusId );
             daoUtil.setInt( 2, nTemporaryStatusId );
-            
+
             daoUtil.executeUpdate( );
         }
     }

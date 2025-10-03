@@ -67,7 +67,7 @@ import java.util.Optional;
  * This class manages demands
  *
  */
-public class DemandService  extends AbstractCacheableService implements IDemandServiceProvider 
+public class DemandService extends AbstractCacheableService implements IDemandServiceProvider
 {
 
     private IDemandDAO _demandDao;
@@ -76,39 +76,41 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
     private ITemporaryStatusDAO _statusDao;
 
     private static final String SERVICE_NAME = "DemandRefCacheService";
-	private static final String DEMAND_TYPE_CACHE_PREFIX = "DEMAND_TYPE_";
-	private static final String DEMAND_TYPE_LIST_CACHE_KEY = "DEMAND_TYPE_LIST";
-    
-	/**
-	 * Constructor
-	 * 
-	 */
-    public DemandService() {
-		super();
-		
-		initCache();
-	}
-    
-	/**
-	 * Constructor
-	 * 
-	 * @param _demandDao
-	 * @param _notificationDao
-	 * @param _notificationEventDao
-	 * @param _statusDao
-	 */
-    public DemandService(IDemandDAO _demandDao, INotificationDAO _notificationDao,
-			INotificationEventDAO _notificationEventDao, ITemporaryStatusDAO _statusDao) {
-		super();
-		this._demandDao = _demandDao;
-		this._notificationDao = _notificationDao;
-		this._notificationEventDao = _notificationEventDao;
-		this._statusDao = _statusDao;
-		
-		initCache();
-	}
+    private static final String DEMAND_TYPE_CACHE_PREFIX = "DEMAND_TYPE_";
+    private static final String DEMAND_TYPE_LIST_CACHE_KEY = "DEMAND_TYPE_LIST";
 
-	/**
+    /**
+     * Constructor
+     * 
+     */
+    public DemandService( )
+    {
+        super( );
+
+        initCache( );
+    }
+
+    /**
+     * Constructor
+     * 
+     * @param _demandDao
+     * @param _notificationDao
+     * @param _notificationEventDao
+     * @param _statusDao
+     */
+    public DemandService( IDemandDAO _demandDao, INotificationDAO _notificationDao, INotificationEventDAO _notificationEventDao,
+            ITemporaryStatusDAO _statusDao )
+    {
+        super( );
+        this._demandDao = _demandDao;
+        this._notificationDao = _notificationDao;
+        this._notificationEventDao = _notificationEventDao;
+        this._statusDao = _statusDao;
+
+        initCache( );
+    }
+
+    /**
      * Finds demands for the specified customer id
      * 
      * @param strCustomerId
@@ -165,7 +167,8 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
 
         if ( demand != null )
         {
-            demand.setNotifications( _notificationDao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId, new NotificationFilter() ) );
+            demand.setNotifications(
+                    _notificationDao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId, new NotificationFilter( ) ) );
         }
 
         return demand;
@@ -237,9 +240,9 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
         }
         return demandDao;
     }
-    
+
     /**
-     * Update status demand 
+     * Update status demand
      * 
      * @param nNewStatusId
      *            the new status id
@@ -305,7 +308,8 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
      * 
      * @return the demands. An empty list is returned if no event has been found
      */
-    public List<NotificationEvent> findEventsByDateAndDemandTypeIdAndStatusAndType( long dStart, long dEnd, String strDemandTypeId, String strStatus, List<EnumNotificationType>  lTypes )
+    public List<NotificationEvent> findEventsByDateAndDemandTypeIdAndStatusAndType( long dStart, long dEnd, String strDemandTypeId, String strStatus,
+            List<EnumNotificationType> lTypes )
     {
         NotificationFilter notificationFilter = new NotificationFilter( );
 
@@ -317,7 +321,7 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
 
         return _notificationEventDao.loadByFilter( notificationFilter );
     }
-    
+
     /**
      * get demand Type list
      * 
@@ -325,16 +329,16 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
      */
     public List<DemandType> getDemandTypesList( )
     {
-    	List<DemandType> demandTypeList = (List<DemandType>) getFromCache( DEMAND_TYPE_LIST_CACHE_KEY );
-    	if ( demandTypeList == null )
-    	{
-    		demandTypeList = DemandTypeHome.getDemandTypesList( );
-    		if ( demandTypeList != null )
-    		{
-    			putInCache(DEMAND_TYPE_LIST_CACHE_KEY, demandTypeList);
-    		}
-    	}
-    	
+        List<DemandType> demandTypeList = (List<DemandType>) getFromCache( DEMAND_TYPE_LIST_CACHE_KEY );
+        if ( demandTypeList == null )
+        {
+            demandTypeList = DemandTypeHome.getDemandTypesList( );
+            if ( demandTypeList != null )
+            {
+                putInCache( DEMAND_TYPE_LIST_CACHE_KEY, demandTypeList );
+            }
+        }
+
         return demandTypeList;
     }
 
@@ -345,21 +349,21 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
      */
     public Optional<DemandType> getDemandType( String type_id )
     {
-    	DemandType dt = (DemandType) getFromCache( DEMAND_TYPE_CACHE_PREFIX + type_id );
-    	
-    	if ( dt != null )
-    	{
-    		return Optional.of( dt );
-    	}
-    	else
-    	{
-    		Optional<DemandType> odt = DemandTypeHome.getDemandType( type_id );
-    		if ( odt.isPresent( ) ) 
-    		{
-    			putInCache( DEMAND_TYPE_CACHE_PREFIX + type_id, odt.get( ) );
-    		}
-    		return odt;
-    	}
+        DemandType dt = (DemandType) getFromCache( DEMAND_TYPE_CACHE_PREFIX + type_id );
+
+        if ( dt != null )
+        {
+            return Optional.of( dt );
+        }
+        else
+        {
+            Optional<DemandType> odt = DemandTypeHome.getDemandType( type_id );
+            if ( odt.isPresent( ) )
+            {
+                putInCache( DEMAND_TYPE_CACHE_PREFIX + type_id, odt.get( ) );
+            }
+            return odt;
+        }
     }
 
     /**
@@ -408,55 +412,56 @@ public class DemandService  extends AbstractCacheableService implements IDemandS
     {
         try
         {
-            //Début de la transaction
+            // Début de la transaction
             TransactionManager.beginTransaction( null );
-            
+
             // Notifications
             List<Notification> listNotification = NotificationHome.findByDemand( null, null, strCustomerId );
-            for( Notification notification : listNotification )
-            {                 
+            for ( Notification notification : listNotification )
+            {
                 List<NotificationContent> listNotificationContent = NotificationContentHome.getNotificationContentsByIdNotification( notification.getId( ) );
-                
-                for( NotificationContent notifContent : listNotificationContent )
+
+                for ( NotificationContent notifContent : listNotificationContent )
                 {
-                    //Remove File
+                    // Remove File
                     FileService.getInstance( ).getFileStoreServiceProvider( notifContent.getFileStore( ) ).delete( notifContent.getFileKey( ) );
 
-                    //Remove notification content
+                    // Remove notification content
                     NotificationContentHome.remove( notifContent.getId( ) );
                 }
-                //Remove notification
+                // Remove notification
                 NotificationHome.remove( notification.getId( ) );
             }
-            
+
             // Demands
             Collection<Demand> demands = DemandHome.getDemandIdCustomer( strCustomerId );
-            for( Demand demand :  demands )
+            for ( Demand demand : demands )
             {
-                //Remove demand
+                // Remove demand
                 DemandHome.deleteByUid( demand.getUID( ) );
             }
-            
+
             // Events
             NotificationEventHome.deleteByCustomerId( strCustomerId );
-            
-            //Commit de la transaction
+
+            // Commit de la transaction
             TransactionManager.commitTransaction( null );
         }
-        catch (Exception e)
+        catch( Exception e )
         {
-            //Roll back
+            // Roll back
             TransactionManager.rollBack( null );
-            
-            AppLogService.error( "Une erreur s'est produite lors de la suppression des demandes et des données liées de l'usager {}", strCustomerId , e.getMessage( ) );
+
+            AppLogService.error( "Une erreur s'est produite lors de la suppression des demandes et des données liées de l'usager {}", strCustomerId,
+                    e.getMessage( ) );
         }
-        
+
     }
 
-	@Override
-	public String getName( ) 
-	{
-		return SERVICE_NAME;
-	}
+    @Override
+    public String getName( )
+    {
+        return SERVICE_NAME;
+    }
 
 }

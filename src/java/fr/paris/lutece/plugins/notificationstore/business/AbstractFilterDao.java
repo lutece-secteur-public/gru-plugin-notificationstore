@@ -33,7 +33,6 @@ package fr.paris.lutece.plugins.notificationstore.business;
  * License 1.0
  */
 
-
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -48,257 +47,285 @@ import org.apache.commons.lang3.StringUtils;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+public abstract class AbstractFilterDao<T>
+{
 
-public abstract class AbstractFilterDao<T> {
+    // Maps containing names and types of each databases column associated to a business class attribute
+    protected HashMap<String, String> _mapSql;
 
-	//Maps containing names and types of each databases column associated to a business class attribute 
-	protected HashMap<String,String> _mapSql;
+    // Prefix
+    private final static String PREFIX_GET = "get";
+    private final static String PREFIX_IS = "is";
 
-	//Prefix 
-	private final static String PREFIX_GET = "get";
-	private final static String PREFIX_IS = "is";
+    // Constants SQL
+    private final static String SQL_WHERE = " WHERE 1 ";
+    private final static String SQL_ORDER_BY = " ORDER BY ";
+    private final static String SQL_EQUAL = " = ? ";
+    private final static String SQL_LIKE = " LIKE ? ";
+    private final static String SQL_AND = " AND ";
 
-	//Constants SQL
-	private final static String SQL_WHERE =" WHERE 1 ";
-	private final static String SQL_ORDER_BY =" ORDER BY ";
-	private final static String SQL_EQUAL =" = ? ";
-	private final static String SQL_LIKE =" LIKE ? ";
-	private final static String SQL_AND = " AND ";
+    // types only allowed for research
+    protected final static String TYPE_DATE = "Date";
+    protected final static String TYPE_STRING = "String";
+    protected final static String TYPE_BOOLEAN = "boolean";
+    protected final static String TYPE_INT = "int";
 
-	//types only allowed for research
-	protected final static String TYPE_DATE = "Date";
-	protected final static String TYPE_STRING = "String";
-	protected final static String TYPE_BOOLEAN = "boolean";
-	protected final static String TYPE_INT = "int";
+    // List of constraints
+    private final static List<String> _listPrefixToRemove = Arrays.asList( PREFIX_GET, PREFIX_IS );
+    protected final static List<String> _listTypeAllowedForSearch = Arrays.asList( TYPE_DATE, TYPE_STRING, TYPE_BOOLEAN, TYPE_INT );
 
-	//List of constraints
-	private final static List<String> _listPrefixToRemove = Arrays.asList(PREFIX_GET,PREFIX_IS);
-	protected final static List<String> _listTypeAllowedForSearch = Arrays.asList(TYPE_DATE,TYPE_STRING,TYPE_BOOLEAN,TYPE_INT);
+    private final Class<T> _clazz;
+    protected Plugin _plugin;
 
-	private final Class<T> _clazz;
-	protected Plugin _plugin;
+    @SuppressWarnings( "unchecked" )
+    protected AbstractFilterDao( )
+    {
+        Type superClass = getClass( ).getGenericSuperclass( );
+        if ( superClass instanceof ParameterizedType )
+        {
+            Type actualType = ( (ParameterizedType) superClass ).getActualTypeArguments( ) [0];
+            this._clazz = (Class<T>) actualType;
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Pas de type générique trouvé !" );
+        }
 
-	@SuppressWarnings("unchecked")
-	protected AbstractFilterDao() {
-		Type superClass = getClass().getGenericSuperclass();
-		if (superClass instanceof ParameterizedType) {
-			Type actualType = ((ParameterizedType) superClass).getActualTypeArguments()[0];
-			this._clazz = (Class<T>) actualType;
-		} else {
-			throw new IllegalArgumentException("Pas de type générique trouvé !");
-		}
+        initMapSql( _clazz ); // Maps with name and type of each databases column associated to the business class attributes
+    }
 
-		initMapSql( _clazz ); //Maps with name and type of each databases column associated to the business class attributes
-	}
+    /**
+     * Preparation of filterStatement
+     * 
+     * @param mapFilterCriteria
+     *            contains searchbar names/values inputs
+     * @param strColumnToOrder
+     *            contains the column name to use for orderBy statement in case of sorting request (must be null)
+     * @param strSortMode
+     *            contains the sortMode in case of sorting request : ASC or DESC (must be null)
+     * @return a string with the WHERE part and the ORDER BY part of the sql statement
+     */
 
-	/**
-	 *  Preparation of filterStatement
-	 * @param mapFilterCriteria contains searchbar names/values inputs 
-	 * @param strColumnToOrder contains the column name to use for orderBy statement in case of sorting request (must be null)
-	 * @param strSortMode contains the sortMode in case of sorting request : ASC or DESC (must be null)
-	 * @return a string with the WHERE part and the ORDER BY part of the sql statement
-	 */
+    protected String prepareSelectStatement( String SQL_QUERY_SELECTALL_ID, Map<String, String> mapFilterCriteria, String strColumnToOrder, String strSortMode )
+    {
 
-	protected String prepareSelectStatement(String SQL_QUERY_SELECTALL_ID,Map <String,String> mapFilterCriteria, String strColumnToOrder, String strSortMode) {
+        StringBuilder builder = new StringBuilder( );
 
+        builder.append( SQL_QUERY_SELECTALL_ID );
+        builder.append( addWhereClauses( mapFilterCriteria ) );
+        builder.append( addOrderByClause( strColumnToOrder, strSortMode ) );
 
-		StringBuilder builder = new StringBuilder();
+        return builder.toString( );
 
-		builder.append(SQL_QUERY_SELECTALL_ID);
-		builder.append(addWhereClauses(mapFilterCriteria));
-		builder.append(addOrderByClause(strColumnToOrder,strSortMode));
+    }
 
+    /**
+     * add Where clause to the filterStatement
+     * 
+     * @param mapFilterCriteria
+     *            contains name and value of each where clause
+     * @return the where part of the filterStatement
+     */
 
-		return  builder.toString();	
+    protected String addWhereClauses( Map<String, String> mapFilterCriteria )
+    {
 
-	}
+        StringBuilder WhereClauses = new StringBuilder( );
 
-	/**
-	 *  add Where clause to the filterStatement
-	 *  @param mapFilterCriteria contains name and value of each where clause
-	 *  @return the where part of the filterStatement
-	 */
+        if ( !mapFilterIsEmpty( mapFilterCriteria ) )
+        {
 
-	protected String addWhereClauses(Map<String, String> mapFilterCriteria) {
+            WhereClauses.append( SQL_WHERE );
 
-		StringBuilder WhereClauses = new StringBuilder();
+            for ( Map.Entry<String, String> filter : mapFilterCriteria.entrySet( ) )
+            {
 
-		if(!mapFilterIsEmpty(mapFilterCriteria)) {
+                // Check if a value was passed for the search
+                if ( StringUtils.isNotBlank( filter.getValue( ) ) )
+                {
 
-			WhereClauses.append(SQL_WHERE);
+                    // Check if the criteria name match with a BDD column name and if the type of this column is allowed for a search
+                    if ( _mapSql.containsKey( filter.getKey( ) ) && _listTypeAllowedForSearch.contains( _mapSql.get( filter.getKey( ) ) ) )
+                    {
 
-			for(Map.Entry<String, String> filter : mapFilterCriteria.entrySet()) {
+                        WhereClauses.append( SQL_AND );
+                        WhereClauses.append( filter.getKey( ) );
+                        WhereClauses.append( addWhereClauseOperator( filter.getKey( ) ) );
+                    }
+                }
+            }
 
-				//Check if a value was passed for the search 
-				if(StringUtils.isNotBlank(filter.getValue())) {
+        }
 
-					//Check if the criteria name match with a BDD column name and if the type of this column is allowed for a search
-					if(_mapSql.containsKey(filter.getKey()) && _listTypeAllowedForSearch.contains(_mapSql.get(filter.getKey()))) {
+        return WhereClauses.toString( );
+    };
 
-						WhereClauses.append(SQL_AND);
-						WhereClauses.append(filter.getKey());
-						WhereClauses.append(addWhereClauseOperator(filter.getKey()));
-					}
-				}
-			}
+    /**
+     * add OrderBy columns to the filterStatement
+     * 
+     * @param strColumnToOrder
+     *            contains the column name to use for orderBy statement in case of sorting request (must be null)
+     * @param strSortMode
+     *            contains the sortMode in case of sorting request : ASC or DESC (must be null)
+     * @return the orderBy part of the filterStatement
+     */
+    protected String addOrderByClause( String strColumnToOrder, String strSortMode )
+    {
+        if ( StringUtils.isNotBlank( strColumnToOrder ) && _mapSql.containsKey( strColumnToOrder ) )
+        {
 
-		}
+            StringBuilder orderByClauses = new StringBuilder( );
 
-		return WhereClauses.toString();
-	}; 
+            orderByClauses.append( SQL_ORDER_BY );
+            orderByClauses.append( strColumnToOrder );
+            orderByClauses.append( strSortMode );
 
-	/**
-	 *  add OrderBy columns to the filterStatement
-	 *  
-	 * @param strColumnToOrder contains the column name to use for orderBy statement in case of sorting request (must be null)
-	 * @param strSortMode contains the sortMode in case of sorting request : ASC or DESC (must be null)
-	 * @return the orderBy part of the filterStatement
-	 */
-	protected String addOrderByClause(String strColumnToOrder,String strSortMode)
-	{
-		if (StringUtils.isNotBlank(strColumnToOrder) && _mapSql.containsKey(strColumnToOrder)) {
+            return orderByClauses.toString( );
+        }
 
-			StringBuilder orderByClauses = new StringBuilder();
+        return "";
+    }
 
-			orderByClauses.append(SQL_ORDER_BY);
-			orderByClauses.append(strColumnToOrder);
-			orderByClauses.append(strSortMode);				
+    /**
+     * Check if _mapFilter is empty
+     * 
+     * @return boolean
+     */
+    private boolean mapFilterIsEmpty( Map<String, String> mapFilterCriteria )
+    {
 
-			return  orderByClauses.toString(); 
-		}
+        for ( Map.Entry<String, String> entry : mapFilterCriteria.entrySet( ) )
+        {
+            if ( StringUtils.isNotBlank( entry.getValue( ) ) )
+            {
+                return false;
+            }
+        }
 
-		return "";
-	} 
+        return true;
+    }
 
-	/**
-	 * Check if _mapFilter is empty
-	 * @return boolean
-	 */    
-	private boolean mapFilterIsEmpty(Map<String,String> mapFilterCriteria) 
-	{
+    /**
+     * add where clause operator to the filterStatement
+     * 
+     * @param strWhereClauseColumn
+     *            contains one of the column names to use for where clause part
+     * @return operator to use for the clause passed in argument
+     */
 
-		for (Map.Entry<String, String> entry : mapFilterCriteria.entrySet()) {
-			if(StringUtils.isNotBlank(entry.getValue())) {
-				return false;
-			}
-		}
+    private String addWhereClauseOperator( String strWhereClauseColumn )
+    {
 
-		return true;
-	}
+        if ( _mapSql.containsKey( strWhereClauseColumn ) )
+        {
 
-	/**
-	 *  add where clause operator to the filterStatement
-	 * @param strWhereClauseColumn contains one of the column names to use for where clause part
-	 * @return operator to use for the clause passed in argument
-	 */
+            switch( _mapSql.get( strWhereClauseColumn ) )
+            {
+                case TYPE_DATE:
+                    return SQL_EQUAL;
+                case TYPE_STRING:
+                    return SQL_LIKE;
+                case TYPE_BOOLEAN:
+                    return SQL_EQUAL;
+                case TYPE_INT:
+                    return SQL_EQUAL;
+                default:
+                    return SQL_LIKE; // Other types will be managed as strings
+            }
+        }
 
-	private String addWhereClauseOperator(String strWhereClauseColumn) {
+        return SQL_LIKE; // Other types will be managed as strings
+    }
 
-		if(_mapSql.containsKey(strWhereClauseColumn)) {
+    /**
+     * Return name of column in sql database format from getter name of business class exemples : getImageUrl -> image_url , getCost -> cost
+     * 
+     * @return the name of column in sql database
+     */
+    private String getFormatedColumnName( String strAttributeName, String strPrefixToCut )
+    {
 
-			switch(_mapSql.get(strWhereClauseColumn)) {
-			case TYPE_DATE :
-				return SQL_EQUAL;
-			case TYPE_STRING :
-				return SQL_LIKE;  			
-			case TYPE_BOOLEAN :
-				return SQL_EQUAL;
-			case TYPE_INT :
-				return SQL_EQUAL;
-			default :
-				return SQL_LIKE; //Other types will be managed as strings
-			}
-		}
+        // Remove prefix (get or is) and lowercase the first character
+        String strRemovePrefix = StringUtils.uncapitalize( strAttributeName.substring( strPrefixToCut.length( ) ) ).toString( );
 
-		return SQL_LIKE; //Other types will be managed as strings
-	}
+        StringBuilder builder = new StringBuilder( );
 
-	/**
-	 * Return name of column in sql database format from getter name of business class exemples : getImageUrl -> image_url , getCost -> cost
-	 * @return the name of column in sql database   
-	 */
-	private String getFormatedColumnName(String strAttributeName, String strPrefixToCut){
+        // Change uppercase character to lowercase and add an underscore in front of it. exemple : dateStart -> date_start
+        for ( char c : strRemovePrefix.toCharArray( ) )
+        {
 
-		//Remove prefix (get or is) and lowercase the first character
-		String strRemovePrefix = StringUtils.uncapitalize(strAttributeName.substring(strPrefixToCut.length())).toString();
+            if ( Character.isUpperCase( c ) )
+            {
+                builder.append( '_' );
+                builder.append( Character.toLowerCase( c ) );
+            }
+            else
+            {
+                builder.append( c );
+            }
+        }
 
-		StringBuilder builder = new StringBuilder();
+        return builder.toString( );
+    }
 
-		//Change uppercase character to lowercase and add an underscore in front of it. exemple : dateStart -> date_start 
-		for(char c: strRemovePrefix.toCharArray()) {
+    /**
+     * Initialization of mapSql. mapSql Containing names and types of each databases column associated to a business class attribute.
+     */
+    protected void initMapSql( Class<?> businessClass )
+    {
 
-			if( Character.isUpperCase(c)) 
-			{
-				builder.append('_');
-				builder.append(Character.toLowerCase(c));
-			}
-			else 
-			{
-				builder.append(c);
-			}
-		}
+        _mapSql = new HashMap<>( );
 
-		return builder.toString();
-	}
+        for ( Method method : businessClass.getDeclaredMethods( ) )
+        {
 
+            for ( String prefix : _listPrefixToRemove )
+            {
+                // Use only getter and is function of business class to infer database name of each attributes
+                if ( method.getName( ).startsWith( prefix ) )
+                {
+                    _mapSql.put( getFormatedColumnName( method.getName( ), prefix ), method.getReturnType( ).getSimpleName( ) );
+                }
+            }
+        }
+    }
 
-	/**
-	 * Initialization of mapSql. 
-	 * mapSql Containing names and types of each databases column associated to a business class attribute.
-	 */
-	protected void initMapSql(Class<?> businessClass) {
+    /**
+     * searchItemsIdList
+     * 
+     * @param mapFilterCriteria
+     * @param strColumnToOrder
+     * @param strSortMode
+     * @param plugin
+     * @return
+     */
+    public List<Integer> searchItemsIdList( String strSqlSelectAllIds, Map<String, String> mapFilterCriteria, String strColumnToOrder, String strSortMode )
+    {
 
-		_mapSql = new HashMap<>();
+        List<Integer> itemList = new ArrayList<>( );
 
-		for (Method method : businessClass.getDeclaredMethods()) {
+        String strSelectStatement = prepareSelectStatement( strSqlSelectAllIds, mapFilterCriteria, strColumnToOrder, strSortMode );
 
-			for(String prefix : _listPrefixToRemove) {
-				//Use only getter and is function of business class to infer database name of each attributes
-				if(method.getName().startsWith(prefix)){
-					_mapSql.put(getFormatedColumnName(method.getName(),prefix),method.getReturnType().getSimpleName()); 
-				}
-			}
-		}
-	}
+        try ( DAOUtil daoUtil = new DAOUtil( strSelectStatement, _plugin ) )
+        {
+            int nIndex = 1;
+            for ( Map.Entry<String, String> filter : mapFilterCriteria.entrySet( ) )
+            {
+                if ( StringUtils.isNotBlank( filter.getValue( ) ) && _mapSql.containsKey( filter.getKey( ) ) )
+                {
+                    daoUtil.setString( nIndex++, filter.getValue( ) );
+                }
+            }
 
-	/**
-	 * searchItemsIdList
-	 * 
-	 * @param mapFilterCriteria
-	 * @param strColumnToOrder
-	 * @param strSortMode
-	 * @param plugin
-	 * @return
-	 */
-	public List<Integer> searchItemsIdList( String strSqlSelectAllIds, Map<String,String> mapFilterCriteria, 
-			String strColumnToOrder, String strSortMode )
-	{
+            daoUtil.executeQuery( );
 
-		List<Integer> itemList = new ArrayList<>( );
+            while ( daoUtil.next( ) )
+            {
+                itemList.add( daoUtil.getInt( 1 ) );
+            }
 
-		String strSelectStatement =  prepareSelectStatement(
-			strSqlSelectAllIds, mapFilterCriteria, strColumnToOrder, strSortMode);  
-
-		try( DAOUtil daoUtil = new DAOUtil( strSelectStatement, _plugin ) )
-		{
-			int nIndex = 1;
-			for (Map.Entry<String, String> filter : mapFilterCriteria.entrySet()) 
-			{
-				if (StringUtils.isNotBlank(filter.getValue())  && _mapSql.containsKey(filter.getKey())) 
-				{
-					daoUtil.setString( nIndex++ , filter.getValue() );
-				}
-			}
-
-			daoUtil.executeQuery(  );
-
-			while ( daoUtil.next(  ) )
-			{
-				itemList.add( daoUtil.getInt( 1 ) );
-			}
-
-			return itemList;
-		}
-	}
+            return itemList;
+        }
+    }
 
 }

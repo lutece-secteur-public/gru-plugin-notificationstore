@@ -85,7 +85,8 @@ public final class NotificationEventDAO implements INotificationEventDAO
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
-            daoUtil.setTimestamp( nIndex++, notificationEvent.getEvent( ).getEventDate( ) > 0 ? new Timestamp ( notificationEvent.getEvent( ).getEventDate( ) ) : null );
+            daoUtil.setTimestamp( nIndex++,
+                    notificationEvent.getEvent( ).getEventDate( ) > 0 ? new Timestamp( notificationEvent.getEvent( ).getEventDate( ) ) : null );
             daoUtil.setString( nIndex++, notificationEvent.getEvent( ).getType( ) );
             daoUtil.setString( nIndex++, notificationEvent.getEvent( ).getStatus( ) );
             daoUtil.setInt( nIndex++, notificationEvent.getEvent( ).getRedelivry( ) );
@@ -93,14 +94,14 @@ public final class NotificationEventDAO implements INotificationEventDAO
             daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getId( ) ) );
             daoUtil.setString( nIndex++, String.valueOf( notificationEvent.getDemand( ).getTypeId( ) ) );
             String strCustomerId = StringUtils.EMPTY;
-            
-            if( notificationEvent.getDemand( ).getCustomer( ) != null 
+
+            if ( notificationEvent.getDemand( ).getCustomer( ) != null
                     && StringUtils.isNotEmpty( notificationEvent.getDemand( ).getCustomer( ).getCustomerId( ) ) )
             {
                 strCustomerId = notificationEvent.getDemand( ).getCustomer( ).getCustomerId( );
             }
             daoUtil.setString( nIndex++, strCustomerId );
-            daoUtil.setTimestamp( nIndex++, notificationEvent.getNotificationDate( ) > 0 ? new Timestamp ( notificationEvent.getNotificationDate( ) ) : null );
+            daoUtil.setTimestamp( nIndex++, notificationEvent.getNotificationDate( ) > 0 ? new Timestamp( notificationEvent.getNotificationDate( ) ) : null );
             daoUtil.setString( nIndex++, notificationEvent.getMsgId( ) );
 
             daoUtil.executeUpdate( );
@@ -167,7 +168,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
             daoUtil.free( );
         }
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -305,8 +306,8 @@ public final class NotificationEventDAO implements INotificationEventDAO
         notificationEvent.setId( daoUtil.getInt( nIndex++ ) );
 
         Event event = new Event( );
-        Timestamp eventDate =  daoUtil.getTimestamp( nIndex++ ) ;
-        event.setEventDate( eventDate != null ? eventDate.getTime( ) : 0  );
+        Timestamp eventDate = daoUtil.getTimestamp( nIndex++ );
+        event.setEventDate( eventDate != null ? eventDate.getTime( ) : 0 );
         event.setType( daoUtil.getString( nIndex++ ) );
         event.setStatus( daoUtil.getString( nIndex++ ) );
         event.setRedelivry( daoUtil.getInt( nIndex++ ) );
@@ -318,16 +319,16 @@ public final class NotificationEventDAO implements INotificationEventDAO
         Demand demand = new Demand( );
         demand.setId( daoUtil.getString( nIndex++ ) );
         demand.setTypeId( daoUtil.getString( nIndex++ ) );
-        
+
         Customer customer = new Customer( );
-        customer.setCustomerId(  daoUtil.getString( nIndex++ ) );
+        customer.setCustomerId( daoUtil.getString( nIndex++ ) );
         customer.setId( customer.getCustomerId( ) );
-        
+
         demand.setCustomer( customer );
-        
+
         notificationEvent.setDemand( demand );
 
-        notificationEvent.setNotificationDate(  daoUtil.getTimestamp( nIndex ) != null ? daoUtil.getTimestamp( nIndex ).getTime( ) : 0  );
+        notificationEvent.setNotificationDate( daoUtil.getTimestamp( nIndex ) != null ? daoUtil.getTimestamp( nIndex ).getTime( ) : 0 );
 
         return notificationEvent;
     }
@@ -370,15 +371,15 @@ public final class NotificationEventDAO implements INotificationEventDAO
         {
             sbSql.append( SQL_QUERY_FILTER_BY_STATUS );
         }
-        
+
         if ( filter.containsNotificationTypeFilter( ) )
         {
             sbSql.append( SQL_QUERY_FILTER_BY_TYPE );
-            for ( int i=0 ; i < filter.getListNotificationType( ).size( ) - 1 ; i++ )
+            for ( int i = 0; i < filter.getListNotificationType( ).size( ) - 1; i++ )
             {
-            	sbSql.append( "?, ");
+                sbSql.append( "?, " );
             }
-            sbSql.append( "?)");
+            sbSql.append( "?)" );
         }
 
         sbSql.append( SQL_QUERY_FILTER_ORDER_BY );
@@ -411,7 +412,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
         }
         if ( filter.containsStartDate( ) )
         {
-            daoUtil.setTimestamp( i++, new Timestamp ( filter.getStartDate( ) ) );
+            daoUtil.setTimestamp( i++, new Timestamp( filter.getStartDate( ) ) );
         }
         if ( filter.containsEndDate( ) )
         {
@@ -421,12 +422,12 @@ public final class NotificationEventDAO implements INotificationEventDAO
         {
             daoUtil.setString( i++, filter.getEventStatus( ) );
         }
-        if ( filter.getListNotificationType( ) != null && !filter.getListNotificationType().isEmpty( ) )
+        if ( filter.getListNotificationType( ) != null && !filter.getListNotificationType( ).isEmpty( ) )
         {
-        	for ( EnumNotificationType type : filter.getListNotificationType( ) )
-        	{
-        		daoUtil.setString( i++, type.name( ) );
-        	}
+            for ( EnumNotificationType type : filter.getListNotificationType( ) )
+            {
+                daoUtil.setString( i++, type.name( ) );
+            }
         }
     }
 
@@ -437,7 +438,7 @@ public final class NotificationEventDAO implements INotificationEventDAO
     {
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE_BY_DATE, NotificationStorePlugin.getPlugin( ) ) )
         {
-            daoUtil.setTimestamp( 1, new Timestamp(  lDate ) );
+            daoUtil.setTimestamp( 1, new Timestamp( lDate ) );
             daoUtil.executeUpdate( );
             daoUtil.free( );
         }

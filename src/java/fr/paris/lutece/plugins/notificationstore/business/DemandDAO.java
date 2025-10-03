@@ -77,21 +77,19 @@ public final class DemandDAO implements IDemandDAO
     private static final String COLUMN_MAX_STEPS = "max_steps";
     private static final String COLUMN_CURRENT_STEP = "current_step";
     private static final String COLUMN_MODIFY_DATE = "modify_date";
-    private static final String COLUMN_META_DATA= "meta_data";
-    
+    private static final String COLUMN_META_DATA = "meta_data";
+
     // SQL queries
     private static final String SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID = " id, demand_type_id, subtype_id, reference, status_id, customer_id, creation_date, closure_date, max_steps, current_step, modify_date, meta_data";
-    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " uid, " +  SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID;
-    private static final String SQL_QUERY_DEMAND_SELECT_BY_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM notificationstore_demand WHERE uid = ? ";
-    private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
-            + " FROM notificationstore_demand WHERE id = ? ";
+    private static final String SQL_QUERY_DEMAND_ALL_FIELDS = " uid, " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID;
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM notificationstore_demand WHERE uid = ? ";
+    private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM notificationstore_demand WHERE id = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID_AND_TYPE_ID = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE id = ? AND  demand_type_id = ? AND customer_id  = ? ";
     private static final String SQL_QUERY_DEMAND_SELECT_ALL = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS + " FROM notificationstore_demand";
     private static final String SQL_QUERY_DEMAND_SELECT_DEMAND_IDS = "SELECT uid FROM notificationstore_demand ";
     private static final String SQL_QUERY_DEMAND_SELECT_BY_IDS = SQL_QUERY_DEMAND_SELECT_ALL + " where uid in ( %s )";
-    
+
     private static final String SQL_QUERY_DEMAND_INSERT = "INSERT INTO notificationstore_demand ( " + SQL_QUERY_DEMAND_ALL_FIELDS_WITH_NO_DEMAND_ID
             + " ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? , ?) ";
     private static final String SQL_QUERY_DEMAND_UPDATE = "UPDATE notificationstore_demand SET status_id = ?, customer_id = ?, closure_date = ?, current_step = ?, subtype_id = ?, modify_date = ?, meta_data = ? WHERE uid = ? AND demand_type_id = ? ";
@@ -103,30 +101,20 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_SELECT_BY_REFERENCE = "SELECT " + SQL_QUERY_DEMAND_ALL_FIELDS
             + " FROM notificationstore_demand WHERE reference = ?";
 
-    private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.uid) "
-            + " FROM notificationstore_demand gd "
+    private static final String SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID = "SELECT distinct(gd.uid) " + " FROM notificationstore_demand gd "
             + " INNER JOIN notificationstore_notification gn ON ( gd.id = gn.demand_id and gd.demand_type_id = gn.demand_type_id and gd.customer_id = gn.customer_id ) "
-            + " INNER JOIN notificationstore_notification_content gc ON ( gn.id = gc.notification_id ) "
-            + " WHERE gd.customer_id = ? ";
+            + " INNER JOIN notificationstore_notification_content gc ON ( gn.id = gc.notification_id ) " + " WHERE gd.customer_id = ? ";
 
-    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct gd.uid "
-            + " FROM notificationstore_demand gd "
+    private static final String SQL_QUERY_IDS_BY_STATUS = "SELECT distinct gd.uid " + " FROM notificationstore_demand gd "
             + " JOIN notificationstore_notification gn ON ( gd.id = gn.demand_id and gd.demand_type_id=gn.demand_type_id and gd.customer_id=gn.customer_id) "
-            + " JOIN notificationstore_notification_content gc ON gn.id = gc.notification_id "
-            + " WHERE gd.customer_id = ? " + " AND gd.status_id IN ( ";
-    
+            + " JOIN notificationstore_notification_content gc ON gn.id = gc.notification_id " + " WHERE gd.customer_id = ? " + " AND gd.status_id IN ( ";
+
     private static final String SQL_QUERY_DEMAND_UPDATE_STATUS_ID = "UPDATE notificationstore_demand d"
             + " INNER JOIN notificationstore_notification n2 ON (d.id = n2.demand_id AND d.demand_type_id = n2.demand_type_id AND d.customer_id = n2.customer_id ) "
             + " INNER JOIN notificationstore_notification_content c2 ON (n2.id = c2.notification_id  AND c2.notification_type ='MYDASHBOARD' AND c2.id_temporary_status = ? ) "
-            + " SET d.status_id = ?"
-            + " WHERE n2.id IN ("
-            + "    SELECT MAX(n.id) "
-            + "    FROM notificationstore_notification n "
-            + "    INNER JOIN notificationstore_notification_content c ON (n.id = c.notification_id "
-            + "    AND c.notification_type ='MYDASHBOARD') "
-            + "    WHERE d.id = n.demand_id "
-            + "    AND d.demand_type_id = n.demand_type_id "
-            + "    AND d.customer_id = n.customer_id "
+            + " SET d.status_id = ?" + " WHERE n2.id IN (" + "    SELECT MAX(n.id) " + "    FROM notificationstore_notification n "
+            + "    INNER JOIN notificationstore_notification_content c ON (n.id = c.notification_id " + "    AND c.notification_type ='MYDASHBOARD') "
+            + "    WHERE d.id = n.demand_id " + "    AND d.demand_type_id = n.demand_type_id " + "    AND d.customer_id = n.customer_id "
             + "    GROUP BY n.demand_id, n.demand_type_id, n.customer_id)";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
@@ -142,30 +130,31 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DATE_ORDER_DESC = " ORDER BY modify_date DESC";
     private static final String SQL_QUERY_DATE_ORDER_ASC = " ORDER BY modify_date ASC";
 
-    private static ObjectMapper _mapper = (new ObjectMapper( ))
-    		.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false )
-    		.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
-    
-    private static TypeReference<HashMap<String,String>> hashMapTypeRef = new TypeReference<HashMap<String,String>>() {};
-    
+    private static ObjectMapper _mapper = ( new ObjectMapper( ) ).configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false )
+            .configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
+
+    private static TypeReference<HashMap<String, String>> hashMapTypeRef = new TypeReference<HashMap<String, String>>( )
+    {
+    };
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Demand load( int nId )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_ID, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setInt( 1, nId );
             daoUtil.executeQuery( );
-    
+
             Demand demand = null;
-    
+
             if ( daoUtil.next( ) )
             {
                 demand = dao2Demand( daoUtil );
             }
-        
+
             return demand;
         }
     }
@@ -251,7 +240,7 @@ public final class DemandDAO implements IDemandDAO
 
         return collectionDemands;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -322,13 +311,13 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.setString( nIndex++, demand.getReference( ) );
             daoUtil.setInt( nIndex++, demand.getStatusId( ) );
             daoUtil.setString( nIndex++, demand.getCustomer( ).getCustomerId( ) );
-            daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) > 0 ? new Timestamp( demand.getCreationDate( ) )  : null );
-            daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp(demand.getClosureDate( ) ) : null );
+            daoUtil.setTimestamp( nIndex++, demand.getCreationDate( ) > 0 ? new Timestamp( demand.getCreationDate( ) ) : null );
+            daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp( demand.getClosureDate( ) ) : null );
             daoUtil.setInt( nIndex++, demand.getMaxSteps( ) );
-            daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );           
+            daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
             daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
             daoUtil.setString( nIndex++, hashMapToJson( demand.getMetaData( ) ) );
-            
+
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
             {
@@ -345,25 +334,25 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public Demand store( Demand demand )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
-    
+
             // update
             daoUtil.setInt( nIndex++, demand.getStatusId( ) );
             daoUtil.setString( nIndex++, demand.getCustomer( ).getCustomerId( ) );
-            daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp(demand.getClosureDate( ) ) : null );
+            daoUtil.setTimestamp( nIndex++, demand.getClosureDate( ) > 0 ? new Timestamp( demand.getClosureDate( ) ) : null );
             daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
             daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
             daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
             daoUtil.setString( nIndex++, hashMapToJson( demand.getMetaData( ) ) );
-            
+
             // where primary_key
             daoUtil.setInt( nIndex++, demand.getUID( ) );
             daoUtil.setString( nIndex++, demand.getTypeId( ) );
-    
+
             daoUtil.executeUpdate( );
-    
+
             return demand;
         }
     }
@@ -374,7 +363,7 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public void reassignDemands( String strOldCustomerId, String strNewCustomerId )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE_LINK, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_UPDATE_LINK, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
 
@@ -392,26 +381,26 @@ public final class DemandDAO implements IDemandDAO
     @Override
     public void delete( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setString( 1, strDemandId );
             daoUtil.setString( 2, strDemandTypeId );
             daoUtil.setString( 2, strCustomerId );
-            
+
             daoUtil.executeUpdate( );
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void deleteByUid( int nUid )
     {
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE_BY_UID, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_DELETE_BY_UID, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setInt( 1, nUid );
-    
+
             daoUtil.executeUpdate( );
         }
     }
@@ -427,12 +416,12 @@ public final class DemandDAO implements IDemandDAO
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_ALL, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.executeQuery( );
-    
+
             while ( daoUtil.next( ) )
             {
                 collectionIds.add( String.valueOf( dao2Demand( daoUtil ).getId( ) ) );
             }
-        
+
             return collectionIds;
         }
     }
@@ -445,11 +434,11 @@ public final class DemandDAO implements IDemandDAO
     {
         Demand demand = null;
 
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setString( 1, strDemandId );
             daoUtil.executeQuery( );
-    
+
             while ( daoUtil.next( ) )
             {
                 demand = dao2Demand( daoUtil );
@@ -458,19 +447,19 @@ public final class DemandDAO implements IDemandDAO
             return demand;
         }
     }
-    
+
     @Override
     public Demand loadByDemandIdAndTypeIdAndCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
         Demand demand = null;
 
-        try( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID_AND_TYPE_ID, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DEMAND_SELECT_BY_DEMAND_ID_AND_TYPE_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
             daoUtil.setString( 1, strDemandId );
             daoUtil.setString( 2, strDemandTypeId );
             daoUtil.setString( 3, strCustomerId );
             daoUtil.executeQuery( );
-    
+
             while ( daoUtil.next( ) )
             {
                 demand = dao2Demand( daoUtil );
@@ -507,52 +496,55 @@ public final class DemandDAO implements IDemandDAO
         demand.setMaxSteps( daoUtil.getInt( COLUMN_MAX_STEPS ) );
         demand.setCurrentStep( daoUtil.getInt( COLUMN_CURRENT_STEP ) );
         demand.setModifyDate( daoUtil.getTimestamp( COLUMN_MODIFY_DATE ) != null ? daoUtil.getTimestamp( COLUMN_MODIFY_DATE ).getTime( ) : 0 );
-        demand.setMetaData( jsonToHashMap( daoUtil.getString ( COLUMN_META_DATA ) ) );        
-        
+        demand.setMetaData( jsonToHashMap( daoUtil.getString( COLUMN_META_DATA ) ) );
+
         return demand;
     }
 
     /**
      * convert json string as hashmap
+     * 
      * @param json
      * @return the hashmap
      */
-    private Map<String, String> jsonToHashMap(String json) {
-		if ( json == null )
-		{ 
-			return null;
-		}
-		
-		try 
-		{
-			return _mapper.readValue( json , hashMapTypeRef );
-		} 
-		catch (  JsonProcessingException e )
-		{
-			AppLogService.error("A problem occurred to generate a map from Json", e);
-			return null;
-		}		
-	}
-    
+    private Map<String, String> jsonToHashMap( String json )
+    {
+        if ( json == null )
+        {
+            return null;
+        }
+
+        try
+        {
+            return _mapper.readValue( json, hashMapTypeRef );
+        }
+        catch( JsonProcessingException e )
+        {
+            AppLogService.error( "A problem occurred to generate a map from Json", e );
+            return null;
+        }
+    }
+
     /**
      * generate Json String of a hashmap
+     * 
      * @param map
      * @return the json
      */
-    private String hashMapToJson( Map<String,String> map )
+    private String hashMapToJson( Map<String, String> map )
     {
-    	try 
-    	{
-			return _mapper.writeValueAsString( map );
-		} 
-    	catch ( JsonProcessingException e ) 
-    	{
-			AppLogService.error("A problem occurred to generate Json from map", e);
-			return null;
-		}
+        try
+        {
+            return _mapper.writeValueAsString( map );
+        }
+        catch( JsonProcessingException e )
+        {
+            AppLogService.error( "A problem occurred to generate Json from map", e );
+            return null;
+        }
     }
 
-	/**
+    /**
      * build the sql with selected filters
      * 
      * @param sql
@@ -607,7 +599,7 @@ public final class DemandDAO implements IDemandDAO
         {
             daoUtil.setString( i++, filter.getDemandTypeId( ) );
         }
-        
+
         if ( filter.containsCustomerId( ) )
         {
             daoUtil.setString( i++, filter.getCustomerId( ) );
@@ -631,7 +623,9 @@ public final class DemandDAO implements IDemandDAO
     }
 
     @Override
-    public List<Integer> loadIdsByCustomerIdAndIdDemandType(final String strCustomerId, final String strNotificationType, final String strIdDemandType, final String strDirectionDateOrderBy ) {
+    public List<Integer> loadIdsByCustomerIdAndIdDemandType( final String strCustomerId, final String strNotificationType, final String strIdDemandType,
+            final String strDirectionDateOrderBy )
+    {
         List<Integer> listIds = new ArrayList<>( );
         String strSql = SQL_QUERY_IDS_BY_CUSTOMER_ID_AND_DEMANDTYPE_ID;
 
@@ -645,11 +639,14 @@ public final class DemandDAO implements IDemandDAO
             strSql += SQL_FILTER_BY_DEMAND_TYPE_GD_ID;
         }
 
-        if ( StringUtils.isNotEmpty( strDirectionDateOrderBy ) && List.of("ASC", "DESC").contains( strDirectionDateOrderBy ) )
+        if ( StringUtils.isNotEmpty( strDirectionDateOrderBy ) && List.of( "ASC", "DESC" ).contains( strDirectionDateOrderBy ) )
         {
-            if ("ASC".equalsIgnoreCase(strDirectionDateOrderBy)) {
+            if ( "ASC".equalsIgnoreCase( strDirectionDateOrderBy ) )
+            {
                 strSql += SQL_QUERY_DATE_ORDER_ASC;
-            } else {
+            }
+            else
+            {
                 strSql += SQL_QUERY_DATE_ORDER_DESC;
             }
         }
@@ -690,11 +687,11 @@ public final class DemandDAO implements IDemandDAO
         {
             strQuery += listStatus.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " ) ";
         }
-        
-        List<Integer> listIdsDemandType = new ArrayList<>();
+
+        List<Integer> listIdsDemandType = new ArrayList<>( );
         if ( StringUtils.isNotEmpty( strIdDemandType ) )
         {
-            listIdsDemandType = Arrays.stream(strIdDemandType.split(",")).map(Integer::parseInt).collect(Collectors.toList());           
+            listIdsDemandType = Arrays.stream( strIdDemandType.split( "," ) ).map( Integer::parseInt ).collect( Collectors.toList( ) );
             strQuery += SQL_FILTER_BY_DEMAND_TYPE_GD_ID_IN;
             strQuery += listIdsDemandType.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " ) ";
 
@@ -711,7 +708,7 @@ public final class DemandDAO implements IDemandDAO
         {
             int nIndexIn = 1;
             daoUtil.setString( nIndexIn++, strCustomerId );
-            
+
             for ( String strStatus : listStatus )
             {
                 daoUtil.setString( nIndexIn, strStatus );
@@ -725,7 +722,7 @@ public final class DemandDAO implements IDemandDAO
             if ( StringUtils.isNotEmpty( strNotificationType ) )
             {
                 daoUtil.setString( nIndexIn++, strNotificationType );
-            }           
+            }
 
             daoUtil.executeQuery( );
 
@@ -745,8 +742,8 @@ public final class DemandDAO implements IDemandDAO
         {
             daoUtil.setInt( 1, nTemporaryStatusId );
             daoUtil.setInt( 2, nNewStatusId );
-            
+
             daoUtil.executeUpdate( );
-        }       
+        }
     }
 }

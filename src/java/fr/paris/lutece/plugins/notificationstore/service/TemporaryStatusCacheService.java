@@ -46,8 +46,8 @@ import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
  */
 public class TemporaryStatusCacheService extends AbstractCacheableService
 {
-    private static final String                SERVICE_NAME         = "temporaryStatusCacheService";
-    private static final String                KEY_TEMPORARY_STATUS = "[temporaryStatus]";
+    private static final String SERVICE_NAME = "temporaryStatusCacheService";
+    private static final String KEY_TEMPORARY_STATUS = "[temporaryStatus]";
 
     private static TemporaryStatusCacheService _singleton;
 
@@ -86,7 +86,7 @@ public class TemporaryStatusCacheService extends AbstractCacheableService
      */
     public List<TemporaryStatus> getList( )
     {
-        List<TemporaryStatus> listTemporaryStatus = ( List<TemporaryStatus> ) getFromCache( KEY_TEMPORARY_STATUS );
+        List<TemporaryStatus> listTemporaryStatus = (List<TemporaryStatus>) getFromCache( KEY_TEMPORARY_STATUS );
 
         if ( listTemporaryStatus == null || listTemporaryStatus.isEmpty( ) )
         {

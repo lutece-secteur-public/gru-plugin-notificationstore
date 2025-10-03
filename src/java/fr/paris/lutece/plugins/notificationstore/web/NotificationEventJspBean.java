@@ -166,12 +166,11 @@ public class NotificationEventJspBean extends AbstractManageDemandJspBean<Intege
                     }
                 }
             }
-            else
-                if ( _currentFilter.containsDemandId( ) || _currentFilter.containsDemandTypeId( ) || _currentFilter.containsStartDate( )
-                        || _currentFilter.containsEndDate( ) )
-                {
-                    _listNotificationEventId = NotificationEventHome.findIdsByFilter( _currentFilter );
-                }
+            else if ( _currentFilter.containsDemandId( ) || _currentFilter.containsDemandTypeId( ) || _currentFilter.containsStartDate( )
+                    || _currentFilter.containsEndDate( ) )
+            {
+                _listNotificationEventId = NotificationEventHome.findIdsByFilter( _currentFilter );
+            }
         }
 
         Map<String, Object> model = getPaginatedListModel( request, MARK_EVENT_LIST, _listNotificationEventId, JSP_MANAGE_EVENTS );

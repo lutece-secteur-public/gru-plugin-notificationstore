@@ -128,7 +128,7 @@ public class DemandDAOTest extends LuteceTestCase
 
         _demandDao.store( demand );
 
-        demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId() );
+        demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId( ) );
         assertNull( demandStored );
 
         demand.setId( DEMAND_ID_1 );
@@ -136,7 +136,7 @@ public class DemandDAOTest extends LuteceTestCase
         demand.setSubtypeId( DEMAND_SUBTYPE_ID_1 );
         _demandDao.store( demand );
 
-        demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId() );
+        demandStored = _demandDao.loadByDemandIdAndTypeIdAndCustomerId( demand.getId( ), demand.getTypeId( ), demand.getCustomer( ).getCustomerId( ) );
         assertEquals( demandStored.getId( ), demand.getId( ) );
         assertEquals( demandStored.getTypeId( ), demand.getTypeId( ) );
         assertEquals( demandStored.getSubtypeId( ), demand.getSubtypeId( ) );

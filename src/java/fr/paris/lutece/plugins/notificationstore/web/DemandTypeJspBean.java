@@ -141,21 +141,18 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
         List<DemandType> listDemandType = DemandTypeHome.getDemandTypesListByIds( listIds );
 
         // keep original order
-        return listDemandType.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
-                .collect( Collectors.toList( ) );
+        return listDemandType.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).collect( Collectors.toList( ) );
     }
 
     /**
      * getItemIdsList
      */
     @Override
-    protected List<Integer> getItemIdsList(HashMap<String, String> _mapFilterCriteria,
-			String strOrderByColumn, String strSortMode) 
+    protected List<Integer> getItemIdsList( HashMap<String, String> _mapFilterCriteria, String strOrderByColumn, String strSortMode )
     {
-    	return DemandTypeHome.searchItemsIdList( _mapFilterCriteria,
-    			strOrderByColumn, strSortMode); 
+        return DemandTypeHome.searchItemsIdList( _mapFilterCriteria, strOrderByColumn, strSortMode );
     }
-    
+
     /**
      * Returns the form to create a demandtype
      *

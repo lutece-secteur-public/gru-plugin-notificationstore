@@ -115,7 +115,8 @@ public class NotificationContent
     }
 
     /**
-     * @param strIdTemporaryStatus the _strIdTemporaryStatus to set
+     * @param strIdTemporaryStatus
+     *            the _strIdTemporaryStatus to set
      */
     public void setIdTemporaryStatus( Integer strIdTemporaryStatus )
     {
@@ -148,7 +149,8 @@ public class NotificationContent
     }
 
     /**
-     * @param strFileKey the _strFileKey to set
+     * @param strFileKey
+     *            the _strFileKey to set
      */
     public void setFileKey( String strFileKey )
     {
@@ -164,11 +166,12 @@ public class NotificationContent
     }
 
     /**
-     * @param strFileStore the _strFileStore to set
+     * @param strFileStore
+     *            the _strFileStore to set
      */
     public void setFileStore( String strFileStore )
     {
         this._strFileStore = strFileStore;
     }
-    
+
 }

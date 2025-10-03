@@ -140,7 +140,7 @@ public final class NotificationContentHome
 
         return notificationContent;
     }
-    
+
     /**
      * Update the record in the table
      * 
@@ -154,7 +154,7 @@ public final class NotificationContentHome
     {
         _dao.updateStatusId( nNewStatusId, nTemporaryStatusId, NotificationStorePlugin.getPlugin( ) );
     }
-    
+
     /**
      * Remove the notificationContent whose identifier is specified in parameter
      * 
@@ -257,7 +257,7 @@ public final class NotificationContentHome
                 NotificationContent notificationContent = initNotificationContent( notification, EnumNotificationType.MYDASHBOARD,
                         mapperr.writeValueAsString( notification.getMyDashboardNotification( ) ) );
                 listNotificationContent.add( notificationContent );
-                //Update demand status only for mydashboard notification
+                // Update demand status only for mydashboard notification
                 demand.setStatusId( notificationContent.getStatusId( ) );
             }
 
@@ -266,7 +266,7 @@ public final class NotificationContentHome
                 listNotificationContent.add( initNotificationContent( notification, EnumNotificationType.CUSTOMER_EMAIL,
                         mapperr.writeValueAsString( notification.getEmailNotification( ) ) ) );
             }
-            //Update modify date of demand
+            // Update modify date of demand
             demand.setModifyDate( new Date( ).getTime( ) );
             DemandHome.update( demand );
 
@@ -297,37 +297,38 @@ public final class NotificationContentHome
         NotificationContent notificationContent = new NotificationContent( );
         notificationContent.setIdNotification( notification.getId( ) );
         notificationContent.setNotificationType( notificationType.name( ) );
-        notificationContent.setFileKey( saveContentInFileStore(notification, notificationType, strNotificationContent ) );
+        notificationContent.setFileKey( saveContentInFileStore( notification, notificationType, strNotificationContent ) );
         notificationContent.setFileStore( NotificationStoreConstants.FILE_STORE_PROVIDER );
 
-        //Calculate status
+        // Calculate status
         Integer nStatusId = getStatusGenericId( notification, EnumNotificationType.MYDASHBOARD );
         notificationContent.setStatusId( nStatusId );
         notificationContent.setIdTemporaryStatus( -1 );
-        
-        //If no generic status found.
-        if( nStatusId == -1 )
+
+        // If no generic status found.
+        if ( nStatusId == -1 )
         {
             notificationContent.setIdTemporaryStatus( getTemporaryStatusId( notification, EnumNotificationType.MYDASHBOARD ) );
         }
-        
+
         return notificationContent;
     }
-    
+
     /**
      * Save notification content in file store
+     * 
      * @param notification
      * @param notificationType
      * @param strNotificationContent
      * @return file id
      * @throws IOException
      */
-    private static String saveContentInFileStore( Notification notification, EnumNotificationType notificationType,
-            String strNotificationContent) throws IOException
+    private static String saveContentInFileStore( Notification notification, EnumNotificationType notificationType, String strNotificationContent )
+            throws IOException
     {
         strNotificationContent = strNotificationContent.replaceAll( NotificationStoreConstants.CHARECTER_REGEXP_FILTER, "" );
-        
-        //Convert notification content to bytes
+
+        // Convert notification content to bytes
         byte [ ] bytes;
 
         if ( AppPropertiesService.getPropertyBoolean( NotificationStoreConstants.PROPERTY_COMPRESS_NOTIFICATION, false ) )
@@ -338,26 +339,28 @@ public final class NotificationContentHome
         {
             bytes = strNotificationContent.getBytes( StandardCharsets.UTF_8 );
         }
-        
-        //Create file
+
+        // Create file
         File file = new File( );
-        file.setTitle( notification.getDemand( ).getId( ) + "_" + notificationType.name( ) + "_" + notification.getDemand( ).getCustomer( ).getConnectionId( ) );
+        file.setTitle(
+                notification.getDemand( ).getId( ) + "_" + notificationType.name( ) + "_" + notification.getDemand( ).getCustomer( ).getConnectionId( ) );
         file.setSize( bytes.length );
-        file.setMimeType( MediaType.APPLICATION_JSON  );
-        
+        file.setMimeType( MediaType.APPLICATION_JSON );
+
         PhysicalFile physiqueFile = new PhysicalFile( );
         physiqueFile.setValue( bytes );
-        
+
         file.setPhysicalFile( physiqueFile );
-        
+
         try
         {
-            //Save file
+            // Save file
             return FileService.getInstance( ).getFileStoreServiceProvider( NotificationStoreConstants.FILE_STORE_PROVIDER ).storeFile( file );
-            
-        } catch ( FileServiceException e )
+
+        }
+        catch( FileServiceException e )
         {
-            AppLogService.error( "An error occurred while saving the notification content, demand_id {}", notification.getDemand( ).getId( )  , e.getMessage( ) );
+            AppLogService.error( "An error occurred while saving the notification content, demand_id {}", notification.getDemand( ).getId( ), e.getMessage( ) );
         }
         return StringUtils.EMPTY;
     }
@@ -377,7 +380,8 @@ public final class NotificationContentHome
             }
             else
             {
-                Optional<TemporaryStatus> status =  TemporaryStatusService.getInstance( ).findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
+                Optional<TemporaryStatus> status = TemporaryStatusService.getInstance( )
+                        .findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
                 if ( status.isPresent( ) && status.get( ).getGenericStatus( ) != null )
                 {
                     return status.get( ).getGenericStatus( ).getStatusId( );
@@ -388,31 +392,33 @@ public final class NotificationContentHome
 
         return -1;
     }
-    
+
     /**
      * Returns the id of the temporary status if it exists, otherwise we create it
+     * 
      * @param notification
      * @param statusType
      * @return temporary status id
      */
-    private static Integer getTemporaryStatusId ( Notification notification, EnumNotificationType statusType )
+    private static Integer getTemporaryStatusId( Notification notification, EnumNotificationType statusType )
     {
         if ( EnumNotificationType.MYDASHBOARD.equals( statusType ) && notification.getMyDashboardNotification( ) != null )
         {
-            Optional<TemporaryStatus> status =  TemporaryStatusService.getInstance( ).findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
-            
+            Optional<TemporaryStatus> status = TemporaryStatusService.getInstance( )
+                    .findByStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
+
             if ( status.isPresent( ) )
             {
                 return status.get( ).getId( );
-            } 
+            }
             else
             {
-                //Create temporary status if not exist
+                // Create temporary status if not exist
                 TemporaryStatus newStatus = new TemporaryStatus( );
                 newStatus.setStatus( notification.getMyDashboardNotification( ).getStatusText( ) );
-                
-                newStatus =  TemporaryStatusService.getInstance( ).create( newStatus );
-                
+
+                newStatus = TemporaryStatusService.getInstance( ).create( newStatus );
+
                 return newStatus.getId( );
             }
         }

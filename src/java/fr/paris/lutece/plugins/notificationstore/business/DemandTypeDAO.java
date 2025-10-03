@@ -61,22 +61,21 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
     private static final String SQL_ORDER_BY = " ORDER BY demande_type_id asc ";
 
     private static final String SQL_QUERY_SELECTALL_ID = "SELECT id FROM notificationstore_demand_type";
-    
-    
-    public DemandTypeDAO()
+
+    public DemandTypeDAO( )
     {
-	super ( );
-	
-	// override MapSql (DB column names are not corresponding to Class attributes)
-	_mapSql = new HashMap<>();
-	
-	_mapSql.put("demande_type_id","int");
-	_mapSql.put("meta_data","Map");
-	_mapSql.put("id","int");
-	_mapSql.put("label","String");
-	_mapSql.put("code_category","String");
-	_mapSql.put("url","String");
-	_mapSql.put("application_code","String");
+        super( );
+
+        // override MapSql (DB column names are not corresponding to Class attributes)
+        _mapSql = new HashMap<>( );
+
+        _mapSql.put( "demande_type_id", "int" );
+        _mapSql.put( "meta_data", "Map" );
+        _mapSql.put( "id", "int" );
+        _mapSql.put( "label", "String" );
+        _mapSql.put( "code_category", "String" );
+        _mapSql.put( "url", "String" );
+        _mapSql.put( "application_code", "String" );
     }
 
     /**
@@ -132,7 +131,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
             return Optional.ofNullable( demandType );
         }
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -305,9 +304,8 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
     }
 
     @Override
-    public List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder,
-	    String strSortMode )
+    public List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder, String strSortMode )
     {
-	return searchItemsIdList( SQL_QUERY_SELECTALL_ID, mapFilterCriteria, strColumnToOrder, strSortMode) ;
+        return searchItemsIdList( SQL_QUERY_SELECTALL_ID, mapFilterCriteria, strColumnToOrder, strSortMode );
     }
 }

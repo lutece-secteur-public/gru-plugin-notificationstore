@@ -48,20 +48,20 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
-public abstract class AbstractJspBean <S, T> extends MVCAdminJspBean
+public abstract class AbstractJspBean<S, T> extends MVCAdminJspBean
 {
-    
+
     private static final long serialVersionUID = 1L;
-    
-	// Properties
+
+    // Properties
     protected static final String PROPERTY_DEFAULT_LIST_ITEM_PER_PAGE = "search.listItems.itemsPerPage";
     private static final int PROPERTY_DEFAULT_ITEM_PER_PAGE = 50;
-    
+
     // Parameters
     private static final String PARAMETER_PAGE_INDEX = "page_index";
     protected static final String PARAMETER_SEARCH_ORDER_BY = "orderBy";
-    private static final String  PARAMETER_MAP_FILTER_CRITERIA = "mapFilterCriteria";  
-    
+    private static final String PARAMETER_MAP_FILTER_CRITERIA = "mapFilterCriteria";
+
     // Markers
     private static final String MARK_PAGINATOR = "paginator";
     private static final String MARK_NB_ITEMS_PER_PAGE = "nb_items_per_page";
@@ -71,164 +71,177 @@ public abstract class AbstractJspBean <S, T> extends MVCAdminJspBean
     private static final String FILTER_ATTRIBUTES_PREFIX = "filter_";
     private static final String SORT_ATTRIBUTES_ASC = " ASC ";
     private static final String SORT_ATTRIBUTES_DESC = " DESC ";
-    
+
     // Variables
     private String _strCurrentPageIndex;
     private int _nItemsPerPage;
-    private String _strSortMode="";
+    private String _strSortMode = "";
 
     // Session variable to store working values
     private List<S> _listItemIds;
-    private HashMap<String,String> _mapFilterCriteria = new HashMap<>();
-    protected Map<String, Object> _model ;
-    
+    private HashMap<String, String> _mapFilterCriteria = new HashMap<>( );
+    protected Map<String, Object> _model;
+
     /**
      * Return a model that contains the list and paginator infos
-     * @param request The HTTP request
-     * @param strBookmark The bookmark
-     * @param list The list of item
-     * @param strManageJsp The JSP
+     * 
+     * @param request
+     *            The HTTP request
+     * @param strBookmark
+     *            The bookmark
+     * @param list
+     *            The list of item
+     * @param strManageJsp
+     *            The JSP
      * @return The model
      */
-    protected <T> Map<String, Object> getPaginatedListModel( HttpServletRequest request, String strBookmark, List<S> list,
-        String strManageJsp )
+    protected <T> Map<String, Object> getPaginatedListModel( HttpServletRequest request, String strBookmark, List<S> list, String strManageJsp )
     {
         int nDefaultItemsPerPage = getPluginDefaultNumberOfItemPerPage( );
         _strCurrentPageIndex = AbstractPaginator.getPageIndex( request, AbstractPaginator.PARAMETER_PAGE_INDEX, _strCurrentPageIndex );
         _nItemsPerPage = AbstractPaginator.getItemsPerPage( request, AbstractPaginator.PARAMETER_ITEMS_PER_PAGE, _nItemsPerPage, nDefaultItemsPerPage );
 
         UrlItem url = new UrlItem( strManageJsp );
-        String strUrl = url.getUrl(  );
+        String strUrl = url.getUrl( );
 
         // PAGINATOR
-        LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale(  ) );
+        LocalizedPaginator<S> paginator = new LocalizedPaginator<>( list, _nItemsPerPage, strUrl, PARAMETER_PAGE_INDEX, _strCurrentPageIndex, getLocale( ) );
 
-        _model = getModel(  );
+        _model = getModel( );
 
         _model.put( MARK_NB_ITEMS_PER_PAGE, String.valueOf( _nItemsPerPage ) );
         _model.put( MARK_PAGINATOR, paginator );
-        _model.put( strBookmark, getItemsFromIds ( paginator.getPageItems( ) ) );
+        _model.put( strBookmark, getItemsFromIds( paginator.getPageItems( ) ) );
 
         return _model;
     }
-    
+
     /**
      * Get Items from Ids list
+     * 
      * @param <T>
      *
-     * @param <S> the generic type of the Ids
-     * @param <T> the generic type of the items
+     * @param <S>
+     *            the generic type of the Ids
+     * @param <T>
+     *            the generic type of the items
      * @param <S>
      * @param listIds
      * @return the populated list of items corresponding to the id List
      */
-     abstract  List<T> getItemsFromIds ( List<S> listIds ) ;
-     
-     int getPluginDefaultNumberOfItemPerPage( ) { return PROPERTY_DEFAULT_ITEM_PER_PAGE; } ;
-     
-      /**
-      * set _strCurrentPageIndex to null
-      */
-     protected void resetCurrentPageIndexOfPaginator() {
-    	 _strCurrentPageIndex=null;
-     }
-     
-     /**
-      * the name of the filter criteria sent in the request must start with "filter_"
-      * @param request 
-      * @return mapFilterCriteria : contains all names/values filter criteria
-      */
-     protected Map<String,String> getFilterCriteriaFromRequest( HttpServletRequest request ) 
-     {	
-    	   	
-     	Enumeration<String> enumeration = request.getParameterNames( );
-     	Map<String, String> mapFilterCriteria = new HashMap<>( );
-         
-     	while ( enumeration.hasMoreElements( ) )
-		{
-			String strParameterName = (String) enumeration.nextElement();
-			
-			//All parameters from search bar start with the same prefix "filter_" 
-			if ( strParameterName.startsWith( FILTER_ATTRIBUTES_PREFIX ) && !StringUtils.isBlank( request.getParameter( strParameterName ) ) )
-			{
-				mapFilterCriteria.put( strParameterName.substring(FILTER_ATTRIBUTES_PREFIX.length()), request.getParameter( strParameterName ) );
-			}
-		}
-        return mapFilterCriteria;            	
-     }  
-     
-     /**
-      *  add persistent values of the search inputs in model
-      *  @param model : map containing name parameters of http request with values associated.
-      *  @param mapFilterCriteria : contains search bar names/values inputs 
-      */
-     protected void addSearchParameters( Map<String, Object>  model, Map<String,String> mapFilterCriteria) {
-     	
-    	 //Persistent values of search inputs
-    	 model.put(PARAMETER_MAP_FILTER_CRITERIA, mapFilterCriteria); 
- 	}
+    abstract List<T> getItemsFromIds( List<S> listIds );
 
-     /**
-      *  get _strSortMode
-      *  At each sort request, the sort mode switches (ASC to DESC and vice versa)
-      */
-     protected String getSortMode( ) 
-     {
-    	 _strSortMode = (_strSortMode==SORT_ATTRIBUTES_ASC)?SORT_ATTRIBUTES_DESC:SORT_ATTRIBUTES_ASC;
-    	 return _strSortMode;    	 
-     }
-     
-     /**
-      * Get search params, search Items, and fill model with paginated items
-      * 
-      * @param request
-      * @param strItemManagementJsp
-      */
-     public void fillModelWithSearchParamsAndResult( HttpServletRequest request, String strItemManagementJsp )
-     {
-	     // new search only if in pagination mode
-	     if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX) == null )
-	     {
-	     	// if sorting request : new search with the existing filter criteria, ordered 
-	     	// example of order by parameter : orderby=name
-	     	if ( StringUtils.isNotBlank( (String)request.getParameter(PARAMETER_SEARCH_ORDER_BY) ) )
-	     	{	     		
-	     		_listItemIds = getItemIdsList( _mapFilterCriteria,  
-	     				(String)request.getParameter(PARAMETER_SEARCH_ORDER_BY), getSortMode() );
-	     	}
-	       	else
-	       	{
-	       		// reload the filter criteria and search
-	       		_mapFilterCriteria = (HashMap<String, String>) getFilterCriteriaFromRequest( request );
-	       		_listItemIds = getItemIdsList( _mapFilterCriteria, null ,null);
-	       	}
-	     	
-	     	//set CurrentPageIndex of Paginator to null in aim of displays the first page of results
-	     	resetCurrentPageIndexOfPaginator();
-	     }
-	    	
-	    Map<String, Object> _model = getPaginatedListModel( request, MARK_ITEMS_LIST, _listItemIds, strItemManagementJsp );
-	          
-	     addSearchParameters(_model,_mapFilterCriteria); //allow the persistence of search values in inputs search bar inputs
-     }
-     
-     /**
-      * reset the _listIdStatuss list
-      */
-     public void resetListId( )
-     {
-     	_listItemIds = new ArrayList<>( );
-     }
+    int getPluginDefaultNumberOfItemPerPage( )
+    {
+        return PROPERTY_DEFAULT_ITEM_PER_PAGE;
+    };
 
-     /**
-      * get item Ids list
-      * 
-      * @param _mapFilterCriteria
-      * @param strOrderByColumn
-      * @param strSortMode
-      * @return the id list
-      */
-	protected abstract List<S> getItemIdsList(HashMap<String, String> _mapFilterCriteria,
-			String strOrderByColumn, String strSortMode);
-	
+    /**
+     * set _strCurrentPageIndex to null
+     */
+    protected void resetCurrentPageIndexOfPaginator( )
+    {
+        _strCurrentPageIndex = null;
+    }
+
+    /**
+     * the name of the filter criteria sent in the request must start with "filter_"
+     * 
+     * @param request
+     * @return mapFilterCriteria : contains all names/values filter criteria
+     */
+    protected Map<String, String> getFilterCriteriaFromRequest( HttpServletRequest request )
+    {
+
+        Enumeration<String> enumeration = request.getParameterNames( );
+        Map<String, String> mapFilterCriteria = new HashMap<>( );
+
+        while ( enumeration.hasMoreElements( ) )
+        {
+            String strParameterName = (String) enumeration.nextElement( );
+
+            // All parameters from search bar start with the same prefix "filter_"
+            if ( strParameterName.startsWith( FILTER_ATTRIBUTES_PREFIX ) && !StringUtils.isBlank( request.getParameter( strParameterName ) ) )
+            {
+                mapFilterCriteria.put( strParameterName.substring( FILTER_ATTRIBUTES_PREFIX.length( ) ), request.getParameter( strParameterName ) );
+            }
+        }
+        return mapFilterCriteria;
+    }
+
+    /**
+     * add persistent values of the search inputs in model
+     * 
+     * @param model
+     *            : map containing name parameters of http request with values associated.
+     * @param mapFilterCriteria
+     *            : contains search bar names/values inputs
+     */
+    protected void addSearchParameters( Map<String, Object> model, Map<String, String> mapFilterCriteria )
+    {
+
+        // Persistent values of search inputs
+        model.put( PARAMETER_MAP_FILTER_CRITERIA, mapFilterCriteria );
+    }
+
+    /**
+     * get _strSortMode At each sort request, the sort mode switches (ASC to DESC and vice versa)
+     */
+    protected String getSortMode( )
+    {
+        _strSortMode = ( _strSortMode == SORT_ATTRIBUTES_ASC ) ? SORT_ATTRIBUTES_DESC : SORT_ATTRIBUTES_ASC;
+        return _strSortMode;
+    }
+
+    /**
+     * Get search params, search Items, and fill model with paginated items
+     * 
+     * @param request
+     * @param strItemManagementJsp
+     */
+    public void fillModelWithSearchParamsAndResult( HttpServletRequest request, String strItemManagementJsp )
+    {
+        // new search only if in pagination mode
+        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null )
+        {
+            // if sorting request : new search with the existing filter criteria, ordered
+            // example of order by parameter : orderby=name
+            if ( StringUtils.isNotBlank( (String) request.getParameter( PARAMETER_SEARCH_ORDER_BY ) ) )
+            {
+                _listItemIds = getItemIdsList( _mapFilterCriteria, (String) request.getParameter( PARAMETER_SEARCH_ORDER_BY ), getSortMode( ) );
+            }
+            else
+            {
+                // reload the filter criteria and search
+                _mapFilterCriteria = (HashMap<String, String>) getFilterCriteriaFromRequest( request );
+                _listItemIds = getItemIdsList( _mapFilterCriteria, null, null );
+            }
+
+            // set CurrentPageIndex of Paginator to null in aim of displays the first page of results
+            resetCurrentPageIndexOfPaginator( );
+        }
+
+        Map<String, Object> _model = getPaginatedListModel( request, MARK_ITEMS_LIST, _listItemIds, strItemManagementJsp );
+
+        addSearchParameters( _model, _mapFilterCriteria ); // allow the persistence of search values in inputs search bar inputs
+    }
+
+    /**
+     * reset the _listIdStatuss list
+     */
+    public void resetListId( )
+    {
+        _listItemIds = new ArrayList<>( );
+    }
+
+    /**
+     * get item Ids list
+     * 
+     * @param _mapFilterCriteria
+     * @param strOrderByColumn
+     * @param strSortMode
+     * @return the id list
+     */
+    protected abstract List<S> getItemIdsList( HashMap<String, String> _mapFilterCriteria, String strOrderByColumn, String strSortMode );
+
 }

@@ -128,7 +128,7 @@ public class StatusJspBean extends AbstractJspBean<Integer, TemporaryStatus>
     public String getManageStatus( HttpServletRequest request )
     {
         _status = null;
-        
+
         fillModelWithSearchParamsAndResult( request, JSP_MANAGE_STATUS );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_STATUS, TEMPLATE_MANAGE_STATUS, _model );
@@ -148,8 +148,6 @@ public class StatusJspBean extends AbstractJspBean<Integer, TemporaryStatus>
         // keep original order
         return listStatus.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).collect( Collectors.toList( ) );
     }
-
-
 
     /**
      * Returns the form to create a status
@@ -183,7 +181,7 @@ public class StatusJspBean extends AbstractJspBean<Integer, TemporaryStatus>
     public String doCreateStatus( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _status, request, getLocale( ) );
-        
+
         populateGenericStatus( request );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_STATUS ) )
@@ -256,7 +254,7 @@ public class StatusJspBean extends AbstractJspBean<Integer, TemporaryStatus>
 
         if ( _status == null || ( _status.getId( ) != nId ) )
         {
-            Optional<TemporaryStatus> optStatus =  TemporaryStatusService.getInstance( ).findByPrimaryKey( nId );
+            Optional<TemporaryStatus> optStatus = TemporaryStatusService.getInstance( ).findByPrimaryKey( nId );
             _status = optStatus.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
         }
 
@@ -280,7 +278,7 @@ public class StatusJspBean extends AbstractJspBean<Integer, TemporaryStatus>
     public String doModifyStatus( HttpServletRequest request ) throws AccessDeniedException
     {
         populate( _status, request, getLocale( ) );
-        
+
         populateGenericStatus( request );
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_STATUS ) )
@@ -300,31 +298,29 @@ public class StatusJspBean extends AbstractJspBean<Integer, TemporaryStatus>
 
         return redirectView( request, VIEW_MANAGE_STATUS );
     }
-    
+
     /**
      * Populate generic status
+     * 
      * @param request
      */
     private void populateGenericStatus( HttpServletRequest request )
     {
         String strGenericStatus = request.getParameter( PARAMETER_GENERIC_STATUS );
-        
-        if( StringUtils.isNotEmpty( strGenericStatus ) )
+
+        if ( StringUtils.isNotEmpty( strGenericStatus ) )
         {
             _status.setGenericStatus( EnumGenericStatus.valueOf( strGenericStatus ) );
         }
     }
-    
+
     /**
      * getItemIdsList
      */
     @Override
-    protected List<Integer> getItemIdsList(HashMap<String, String> _mapFilterCriteria,
-			String strOrderByColumn, String strSortMode) 
+    protected List<Integer> getItemIdsList( HashMap<String, String> _mapFilterCriteria, String strOrderByColumn, String strSortMode )
     {
-    	return TemporaryStatusService.getInstance( ).searchStatusIdsList( _mapFilterCriteria,
-    			strOrderByColumn, strSortMode); 
+        return TemporaryStatusService.getInstance( ).searchStatusIdsList( _mapFilterCriteria, strOrderByColumn, strSortMode );
     }
 
 }
-

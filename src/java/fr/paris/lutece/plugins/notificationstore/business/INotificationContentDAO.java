@@ -76,7 +76,7 @@ public interface INotificationContentDAO
      */
 
     void updateStatusId( int nNewStatusId, int nTemporaryStatusId, Plugin plugin );
-    
+
     /**
      * Delete a record from the table
      * 

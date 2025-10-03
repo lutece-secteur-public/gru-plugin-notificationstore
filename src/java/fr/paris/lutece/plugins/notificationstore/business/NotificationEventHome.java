@@ -137,7 +137,7 @@ public final class NotificationEventHome
 
         return _dao.deleteBeforeDate( purgeBeforeDate );
     }
-    
+
     /**
      * Delete by customer id
      * 

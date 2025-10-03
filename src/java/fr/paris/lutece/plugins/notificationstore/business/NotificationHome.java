@@ -66,7 +66,7 @@ public final class NotificationHome
      */
     public static List<Notification> findByDemand( String strDemandId, String strDemandTypeId, String strCustomerId )
     {
-        return _dao.loadByDemand( strDemandId, strDemandTypeId, strCustomerId);
+        return _dao.loadByDemand( strDemandId, strDemandTypeId, strCustomerId );
     }
 
     /**
@@ -135,7 +135,8 @@ public final class NotificationHome
      * @param filter
      * @return the notification list
      */
-    public static List<Notification> getByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId, NotificationFilter filter )
+    public static List<Notification> getByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId,
+            NotificationFilter filter )
     {
         return _dao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId, filter );
     }
@@ -202,9 +203,9 @@ public final class NotificationHome
      */
     public static boolean existsNotificationWithDemandTypeId( int nDemandTypeId )
     {
-    	return _dao.existsNotificationWithDemandTypeId( nDemandTypeId );
+        return _dao.existsNotificationWithDemandTypeId( nDemandTypeId );
     }
-    
+
     /**
      * Get last notification by demand id and demand type id
      * 
@@ -223,7 +224,7 @@ public final class NotificationHome
      * @param strOldCustomerId
      * @param strNewCustomerId
      */
-    public static void reassignNotifications( String strOldCustomerId, String strNewCustomerId ) 
+    public static void reassignNotifications( String strOldCustomerId, String strNewCustomerId )
     {
         _dao.reassignNotifications( strOldCustomerId, strNewCustomerId );
     }
