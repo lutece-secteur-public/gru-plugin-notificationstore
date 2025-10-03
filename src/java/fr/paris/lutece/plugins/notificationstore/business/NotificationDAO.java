@@ -84,7 +84,6 @@ public final class NotificationDAO implements INotificationDAO
     private static final String COLUMN_DATE = "date";
     private static final String COLUMN_CUSTOMER = "customer_id";
     
-    private static final String SQL_QUERY_NEW_PK = "SELECT max( id ) FROM notificationstore_notification";
     private static final String SQL_QUERY_FILTER_SELECT_BASE = "SELECT id, demand_id, demand_type_id, customer_id, date FROM notificationstore_notification ";
     private static final String SQL_QUERY_FILTER_SELECT_ID_BASE = "SELECT distinct id FROM notificationstore_notification ";
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE ";

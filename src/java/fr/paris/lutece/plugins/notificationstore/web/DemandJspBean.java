@@ -190,7 +190,7 @@ public class DemandJspBean extends AbstractManageDemandJspBean<Integer, Demand>
         List<Demand> listDemand = DemandHome.getByIds( listIds );
 
         // keep original order
-        return listDemand.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).collect( Collectors.toList( ) );
+        return listDemand.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( Integer.parseInt( notif.getId( ) ) ) ) ).collect( Collectors.toList( ) );
 
     }
 }

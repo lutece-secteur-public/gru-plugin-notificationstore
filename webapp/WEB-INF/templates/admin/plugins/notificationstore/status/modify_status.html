@@ -1,10 +1,10 @@
-<#include "manage_tabs.html" />
-<@tabs2 tab="status" />
+<#include "manage_status_tabs.html" />
+<@tabs>
+<@tabs2 current_tab="status" />
 
-
-<@box>
-	<@boxHeader title='#i18n{notificationstore.modify_status.title}' />
-	<@boxBody>
+<@tabContent>
+		<@tabPanel id='status' active=true>
+		
     <@tform class="form-horizontal" method="post" name="modify_status" action="jsp/admin/plugins/notificationstore/ManageStatus.jsp" >
 			<@messages errors=errors />
 			<@input type="hidden" id="id" name="id" value="${status.id}"/>
@@ -18,5 +18,7 @@
 			</@formGroup>
         <@actionButtons button1Name="action_modifyStatus" button2Name="view_manageStatus"/>
     </@tform>
-	</@boxBody>
-</@box>
+
+		</@tabPanel>
+	</@tabContent>
+</@tabs>

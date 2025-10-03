@@ -1,0 +1,10 @@
+<#macro tabs2 current_tab >
+<@tabList>
+	<@tabLink active=( current_tab == "status" ) 
+				title="#i18n{notificationstore.manage_status.pageTitle}"
+				href="jsp/admin/plugins/notificationstore/ManageStatus.jsp" 
+				tabIcon="flag"   />
+				
+
+	</@tabList>
+</#macro>

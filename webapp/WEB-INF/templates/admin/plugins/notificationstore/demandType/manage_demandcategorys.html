@@ -1,13 +1,15 @@
 <#include "managedemandtype_tabs.html" />
-<@tabs2 tab="demandcategory" />
+<@tabs>
+<@tabs2 current_tab="demandcategory" />
 
-<@box>
-	<@boxHeader title='#i18n{notificationstore.manage_demandcategory.title}' boxTools=true>
+<@tabContent>
+		<@tabPanel id='demandcategory' active=true>
+		
+
 		<@tform class='form-inline pull-right' name='manage_demandcategory' action='jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp'>
 			<@button type='submit' name='view_createDemandCategory' buttonIcon='plus' title='#i18n{notificationstore.manage_demandcategorys.buttonAdd}' />
 		</@tform>
-	</@boxHeader>
-	<@boxBody>    
+ 
     <@messages infos=infos />
     <@paginationAdmin paginator=paginator combo=1 />
     <div class="clearfix"></div>
@@ -37,6 +39,7 @@
     </@table>
 
     <@paginationAdmin paginator=paginator />
-
-  </@boxBody>
-</@box>
+        
+		</@tabPanel>
+	</@tabContent>
+</@tabs>

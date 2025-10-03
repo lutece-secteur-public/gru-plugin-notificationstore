@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.notificationstore.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
@@ -41,6 +42,7 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationContentHome;
 import fr.paris.lutece.plugins.notificationstore.business.TemporaryStatusHome;
+import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.sql.TransactionManager;
@@ -239,5 +241,20 @@ public class TemporaryStatusService
     public List<TemporaryStatus> getStatusListByIds( List<Integer> listIds )
     {
         return TemporaryStatusHome.getStatusListByIds( listIds );
+    }
+    
+    /**
+     * search ids
+     * 
+     * @param mapFilterCriteria
+     * @param strColumnToOrder
+     * @param strSortMode
+     * @param plugin
+     * @return the ids list
+     */
+    public List<Integer> searchStatusIdsList(  Map<String,String> mapFilterCriteria, 
+    		String strColumnToOrder, String strSortMode ) 
+    {
+    	return TemporaryStatusHome.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode);
     }
 }

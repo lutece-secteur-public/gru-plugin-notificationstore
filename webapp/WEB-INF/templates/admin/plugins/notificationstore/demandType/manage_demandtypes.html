@@ -1,26 +1,76 @@
 <#include "managedemandtype_tabs.html" />
-<@tabs2 tab="demandtype" />
+<@tabs>
+<@tabs2 current_tab="demandtype" />
 
-<@box>
-	<@boxHeader title='#i18n{notificationstore.manage_demandtype.title}' boxTools=true>
+<@tabContent>
+		<@tabPanel id='demandtype' active=true>
+	
+	
+    <@messages infos=infos />
+    <@messages errors=errors />
+    
+    	
 		<@tform class='form-inline pull-right' name='manage_demandtype' action='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp'>
 			<@button type='submit' name='view_createDemandType' buttonIcon='plus' title='#i18n{notificationstore.manage_demandtypes.buttonAdd}' />
 		</@tform>
-	</@boxHeader>
-	<@boxBody>    
-    <@messages infos=infos />
+      
+	
     <@paginationAdmin paginator=paginator combo=1 />
+    
+    <#list mapFilterCriteria?keys as key> 
+    	<#if mapFilterCriteria[key]!="">
+	    	<span class="badge bg-primary px-2" > 
+	 			${key} <a href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?clean_filter=1<#list mapFilterCriteria?keys as x><#if "${x}"!="${key}">&filter_${x}=${mapFilterCriteria["${x}"]} </#if></#list>' class='icon-block'><i class='fas fa-times-circle' style="color:white" ></i></a>
+			</span>
+		</#if> 
+	</#list>
+
+	
+
     <div class="clearfix"></div>
+    
+      <@tform id='demandType_search_form'    name='demandType_search_form'  method='get' action='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp' >
+		
+				
+    
     <@table>
         <tr>
-            <th>#i18n{notificationstore.manage_demandtypes.columnIdDemandType}</th>
-            <th>#i18n{notificationstore.manage_demandtypes.columnCode}</th>
+            <th>#i18n{notificationstore.manage_demandtypes.columnIdDemandType} 
+            	<a href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?orderBy=demande_type_id'><i class='fas fa-sort'></i></a></th>
+            <th>#i18n{notificationstore.manage_demandtypes.columnCode} 
+            	<a href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?orderBy=application_code'><i class='fas fa-sort'></i></a></th>
             <th>#i18n{notificationstore.manage_demandtypes.columnLabel}</th>
-            <th>#i18n{notificationstore.manage_demandtypes.columnCodeCategory}</th>
+            <th>#i18n{notificationstore.manage_demandtypes.columnCodeCategory}  
+            	<a href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?orderBy=code_category'><i class='fas fa-sort'></i></a></th>
             <th>#i18n{portal.util.labelActions}</th>
         </tr>
+        
+        <tr>
+        	<td>
+        	 <@formGroup labelFor='filter_demande_type_id'  formStyle='inline' >
+				    		<@input type='text' id='filter_demande_type_id' name='filter_demande_type_id'  maxlength=50  
+				    		placeHolder='#i18n{notificationstore.manage_demandtypes.columnIdDemandType}' 
+				    		value=mapFilterCriteria["demande_type_id"]!'' tabIndex='1' />
+				    </@formGroup>
+        	</td>
+	        <td>
+        	<@formGroup labelFor='filter_application_code'  formStyle='inline' >
+				    		<@input type='text' id='filter_application_code' name='filter_application_code'  maxlength=50  
+				    		placeHolder='#i18n{notificationstore.manage_demandtypes.columnCode}' 
+				    		value=mapFilterCriteria["application_code"]!'' tabIndex='2' />
+				    </@formGroup>
+		</td>
+		<td>&nbsp;</td>
+		<td><@formGroup labelFor='filter_code_category'  formStyle='inline' >
+				    		<@input type='text' id='filter_code_category' name='filter_code_category'  maxlength=50  
+				    		placeHolder='#i18n{notificationstore.manage_demandtypes.columnCode}' 
+				    		value=mapFilterCriteria["code_category"]!'' tabIndex='3' />
+				    </@formGroup></td>
+		<td><@button type='submit' title='Search' buttonIcon='search'/>	</td>
+	</tr>
+	
         <@tableHeadBodySeparator />
-        <#list demandtype_list as demandtype >
+        <#list items_list as demandtype >
         <tr>
             <td>
 				${demandtype.idDemandType}
@@ -43,8 +93,10 @@
         </tr>
         </#list>
     </@table>
-
+ </@tform>
     <@paginationAdmin paginator=paginator />
-
-  </@boxBody>
-</@box>
+    
+    
+		</@tabPanel>
+	</@tabContent>
+</@tabs>

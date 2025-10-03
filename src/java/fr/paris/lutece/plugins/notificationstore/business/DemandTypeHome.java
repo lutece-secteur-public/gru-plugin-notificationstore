@@ -33,17 +33,15 @@
  */
 package fr.paris.lutece.plugins.notificationstore.business;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
-import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandTypeDAO;
-import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
-import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.util.ReferenceList;
-
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
+import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandTypeDAO;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.util.ReferenceList;
 
 /**
  * This class provides instances management methods (create, find, ...) for DemandType objects
@@ -52,7 +50,6 @@ public final class DemandTypeHome
 {
     // Static variable pointed at the DAO instance
     private static IDemandTypeDAO _dao = SpringContextService.getBean( "notificationstore.demandTypeDao" );
-    private static Plugin _plugin = NotificationStorePlugin.getPlugin( );
     
     /**
      * Private constructor - this class need not be instantiated
@@ -184,4 +181,9 @@ public final class DemandTypeHome
 
     }
 
+	public static List<Integer> searchItemsIdList(Map<String, String> mapFilterCriteria, String strColumnToOrder,
+			String strSortMode) 
+	{
+		return _dao.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode );
+	}
 }

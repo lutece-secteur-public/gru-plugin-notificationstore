@@ -1,13 +1,15 @@
-<#macro tabs2 tab >
+<#macro tabs2 current_tab >
 <@tabs>
 	<@tabList>
-			<li <#if tab="demandtype">class="active"</#if>>
-				<@aButton href="jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp">#i18n{notificationstore.manage_demandtypes.pageTitle}</@aButton>
-			</li>
-			<li <#if tab="demandcategory">class="active"</#if>>
-				<@aButton href="jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp">#i18n{notificationstore.manage_demandcategorys.pageTitle}</@aButton>
-			</li>
+			<@tabLink active=( current_tab == "demandtype" ) 
+				title="#i18n{notificationstore.manage_demandtypes.pageTitle}"
+				href="jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp" 
+				tabIcon="question"   />
+				
+			<@tabLink active=( current_tab == "demandcategory" ) 
+				title="#i18n{notificationstore.manage_demandcategorys.pageTitle}"
+				href="jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp" 
+				tabIcon="flag"   />
 	</@tabList>
 </@tabs>
-
 </#macro>

@@ -36,18 +36,20 @@ package fr.paris.lutece.plugins.notificationstore.business;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
+import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
 /**
  * This class provides Data Access methods for Status objects
  */
-public final class TemporaryStatusDAO implements ITemporaryStatusDAO
+public final class TemporaryStatusDAO  extends AbstractFilterDao<TemporaryStatus> implements ITemporaryStatusDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECT = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE id_temporary_status = ?";
@@ -60,13 +62,15 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     private static final String SQL_QUERY_SELECT_BY_STATUS_ID = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE status_id = ?";
     private static final String SQL_QUERY_SELECT_BY_STATUS = "SELECT id_temporary_status, status, status_id FROM notificationstore_temporary_status WHERE trim(status) like concat('%',trim(?),'%') ";
 
+    private static final Plugin _plugin = NotificationStorePlugin.getPlugin( );
+    
     /**
      * {@inheritDoc }
      */
     @Override
     public void insert( TemporaryStatus status )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, _plugin ) )
         {
             int nIndex = 1;
             daoUtil.setString( nIndex++, status.getStatus( ) );
@@ -87,7 +91,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     @Override
     public Optional<TemporaryStatus> load( int nKey )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, _plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeQuery( );
@@ -108,7 +112,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     @Override
     public void delete( int nKey )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_DELETE, _plugin ) )
         {
             daoUtil.setInt( 1, nKey );
             daoUtil.executeUpdate( );
@@ -121,7 +125,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     @Override
     public void store( TemporaryStatus status )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_UPDATE, _plugin ) )
         {
             int nIndex = 1;
 
@@ -140,7 +144,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     public List<TemporaryStatus> selectStatusList( )
     {
         List<TemporaryStatus> statusList = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL, _plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -160,7 +164,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     public List<Integer> selectIdStatusList( )
     {
         List<Integer> statusListIds = new ArrayList<>( );
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECTALL_ID, _plugin ) )
         {
             daoUtil.executeQuery( );
 
@@ -193,7 +197,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
             String placeHolders = builder.deleteCharAt( builder.length( ) - 1 ).toString( );
             String stmt = SQL_QUERY_SELECTALL_BY_IDS + placeHolders + ")";
 
-            try ( DAOUtil daoUtil = new DAOUtil( stmt, NotificationStorePlugin.getPlugin( ) ) )
+            try ( DAOUtil daoUtil = new DAOUtil( stmt, _plugin ) )
             {
                 int index = 1;
                 for ( Integer n : listIds )
@@ -215,7 +219,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     @Override
     public Optional<TemporaryStatus> loadByStatusId( int nStatusId )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_STATUS_ID, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_STATUS_ID, _plugin ) )
         {
             daoUtil.setInt( 1, nStatusId );
             daoUtil.executeQuery( );
@@ -233,7 +237,7 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
     @Override
     public Optional<TemporaryStatus> loadByStatus( String strStatus )
     {
-        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_STATUS, NotificationStorePlugin.getPlugin( ) ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_STATUS, _plugin ) )
         {
             daoUtil.setString( 1, strStatus );
             daoUtil.executeQuery( );
@@ -264,5 +268,12 @@ public final class TemporaryStatusDAO implements ITemporaryStatusDAO
         status.setGenericStatus( EnumGenericStatus.getByStatusId( daoUtil.getInt( nIndex++ ) ) );
 
         return status;
+    }
+    
+    @Override
+    public List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder,
+	    String strSortMode )
+    {
+	return searchItemsIdList( SQL_QUERY_SELECTALL_ID, mapFilterCriteria, strColumnToOrder, strSortMode) ;
     }
 }

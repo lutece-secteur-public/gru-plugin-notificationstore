@@ -48,7 +48,6 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEve
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationEventHome;
-import fr.paris.lutece.plugins.notificationstore.service.DemandService;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.ReferenceList;

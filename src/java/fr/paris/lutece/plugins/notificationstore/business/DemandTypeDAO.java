@@ -33,20 +33,22 @@
  */
 package fr.paris.lutece.plugins.notificationstore.business;
 
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandTypeDAO;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
-import java.sql.Statement;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * This class provides Data Access methods for DemandType objects
  */
-public final class DemandTypeDAO implements IDemandTypeDAO
+public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implements IDemandTypeDAO
 {
     // Constants
     private static final String SQL_QUERY_SELECTALL = "SELECT id, demande_type_id, label, code_category, url, application_code FROM notificationstore_demand_type ";
@@ -55,9 +57,27 @@ public final class DemandTypeDAO implements IDemandTypeDAO
     private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_type ( demande_type_id, label, code_category, url, application_code ) VALUES ( ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_demand_type WHERE id = ? ";
     private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_type SET demande_type_id = ?, label = ?, code_category = ? , url = ?, application_code = ? WHERE id = ?";
-    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id FROM notificationstore_demand_type";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECTALL + " WHERE id IN (  ";
     private static final String SQL_ORDER_BY = " ORDER BY demande_type_id asc ";
+
+    private static final String SQL_QUERY_SELECTALL_ID = "SELECT id FROM notificationstore_demand_type";
+    
+    
+    public DemandTypeDAO()
+    {
+	super ( );
+	
+	// override MapSql (DB column names are not corresponding to Class attributes)
+	_mapSql = new HashMap<>();
+	
+	_mapSql.put("demande_type_id","int");
+	_mapSql.put("meta_data","Map");
+	_mapSql.put("id","int");
+	_mapSql.put("label","String");
+	_mapSql.put("code_category","String");
+	_mapSql.put("url","String");
+	_mapSql.put("application_code","String");
+    }
 
     /**
      * {@inheritDoc }
@@ -282,5 +302,12 @@ public final class DemandTypeDAO implements IDemandTypeDAO
         demandType.setAppCode( daoUtil.getString( nIndex ) );
 
         return demandType;
+    }
+
+    @Override
+    public List<Integer> searchItemsIdList( Map<String, String> mapFilterCriteria, String strColumnToOrder,
+	    String strSortMode )
+    {
+	return searchItemsIdList( SQL_QUERY_SELECTALL_ID, mapFilterCriteria, strColumnToOrder, strSortMode) ;
     }
 }

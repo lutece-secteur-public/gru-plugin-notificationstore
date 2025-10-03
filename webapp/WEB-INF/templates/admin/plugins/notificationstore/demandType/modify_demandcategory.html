@@ -1,10 +1,11 @@
 <#include "managedemandtype_tabs.html" />
-<@tabs2 tab="demandcategory" />
+<@tabs>
+<@tabs2 current_tab="demandcategory" />
 
+<@tabContent>
+		<@tabPanel id='demandcategory' active=true>
+		
 
-<@box>
-	<@boxHeader title='#i18n{notificationstore.modify_demandcategory.title}' />
-	<@boxBody>
     <@tform class="form-horizontal" method="post" name="modify_demandcategory" action="jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp" >
 			<@messages errors=errors />
 			<@input type="hidden" id="id" name="id" value="${demandcategory.id}"/>
@@ -18,5 +19,8 @@
 			</@formGroup>
         <@actionButtons button1Name="action_modifyDemandCategory" button2Name="view_manageDemandCategory"/>
     </@tform>
-	</@boxBody>
-</@box>
+
+        
+		</@tabPanel>
+	</@tabContent>
+</@tabs>

@@ -1,8 +1,9 @@
-<#include "manage_tabs.html" />
-<@tabs2 tab="status" />
-<@box>
-	<@boxHeader title='#i18n{notificationstore.create_status.title}' />
-	<@boxBody>
+<#include "manage_status_tabs.html" />
+<@tabs>
+<@tabs2 current_tab="status" />
+
+<@tabContent>
+		<@tabPanel id='status' active=true>
     <@tform name='create_status' action='jsp/admin/plugins/notificationstore/ManageStatus.jsp' >
 
         <@messages errors=errors />
@@ -18,5 +19,7 @@
 				
 		<@actionButtons button1Name="action_createStatus" button2Name="view_manageStatus"/>
     </@tform>
-	</@boxBody>
-</@box>
+
+		</@tabPanel>
+	</@tabContent>
+</@tabs>

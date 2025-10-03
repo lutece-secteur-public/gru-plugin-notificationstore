@@ -1,8 +1,10 @@
 <#include "managedemandtype_tabs.html" />
-<@tabs2 tab="demandcategory" />
-<@box>
-	<@boxHeader title='#i18n{notificationstore.create_demandcategory.title}' />
-	<@boxBody>
+<@tabs>
+<@tabs2 current_tab="demandcategory" />
+
+<@tabContent>
+		<@tabPanel id='demandcategory' active=true>
+	
     <@tform name='create_demandcategory' action='jsp/admin/plugins/notificationstore/ManageDemandCategorys.jsp' >
 
         <@messages errors=errors />
@@ -18,5 +20,7 @@
 				
 		<@actionButtons button1Name="action_createDemandCategory" button2Name="view_manageDemandCategory"/>
     </@tform>
-	</@boxBody>
-</@box>
+
+    		</@tabPanel>
+	</@tabContent>
+</@tabs>

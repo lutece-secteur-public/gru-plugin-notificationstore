@@ -33,34 +33,33 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web;
 
-import fr.paris.lutece.portal.service.message.AdminMessage;
-import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.service.admin.AccessDeniedException;
-import fr.paris.lutece.portal.service.util.AppException;
-import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
-import fr.paris.lutece.util.url.UrlItem;
-import fr.paris.lutece.util.html.AbstractPaginator;
-
 import java.util.Comparator;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.notificationstore.business.DemandCategoryHome;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
+import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.util.url.UrlItem;
 
 /**
  * This class provides the user interface to manage DemandType features ( manage, create, modify, remove )
  */
 @Controller( controllerJsp = "ManageDemandTypes.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "NOTIFICATIONSTORE_DEMANDTYPE_MANAGEMENT" )
-public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, DemandType>
+public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
 {
     /**
      * 
@@ -80,7 +79,6 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
     private static final String PROPERTY_PAGE_TITLE_CREATE_DEMANDTYPE = "notificationstore.create_demandtype.pageTitle";
 
     // Markers
-    private static final String MARK_DEMANDTYPE_LIST = "demandtype_list";
     private static final String MARK_DEMANDTYPE = "demandtype";
     private static final String MARK_DEMANDCATEGORIES = "demandCategories";
 
@@ -113,7 +111,6 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
 
     // Session variable to store working values
     private DemandType _demandtype;
-    private List<Integer> _listIdDemandTypes;
 
     /**
      * Build the Manage View
@@ -127,14 +124,9 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
     {
         _demandtype = null;
 
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdDemandTypes.isEmpty( ) )
-        {
-            _listIdDemandTypes = DemandTypeHome.getIdDemandTypesList( );
-        }
+        fillModelWithSearchParamsAndResult( request, JSP_MANAGE_DEMANDTYPES );
 
-        Map<String, Object> model = getPaginatedListModel( request, MARK_DEMANDTYPE_LIST, _listIdDemandTypes, JSP_MANAGE_DEMANDTYPES );
-
-        return getPage( PROPERTY_PAGE_TITLE_MANAGE_DEMANDTYPES, TEMPLATE_MANAGE_DEMANDTYPES, model );
+        return getPage( PROPERTY_PAGE_TITLE_MANAGE_DEMANDTYPES, TEMPLATE_MANAGE_DEMANDTYPES, _model );
     }
 
     /**
@@ -149,18 +141,21 @@ public class DemandTypeJspBean extends AbstractManageDemandTypeJspBean<Integer, 
         List<DemandType> listDemandType = DemandTypeHome.getDemandTypesListByIds( listIds );
 
         // keep original order
-        return listDemandType.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getIdDemandType( ) ) ) )
+        return listDemandType.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) )
                 .collect( Collectors.toList( ) );
     }
 
     /**
-     * reset the _listIdDemandTypes list
+     * getItemIdsList
      */
-    public void resetListId( )
+    @Override
+    protected List<Integer> getItemIdsList(HashMap<String, String> _mapFilterCriteria,
+			String strOrderByColumn, String strSortMode) 
     {
-        _listIdDemandTypes = new ArrayList<>( );
+    	return DemandTypeHome.searchItemsIdList( _mapFilterCriteria,
+    			strOrderByColumn, strSortMode); 
     }
-
+    
     /**
      * Returns the form to create a demandtype
      *

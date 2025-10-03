@@ -1,10 +1,10 @@
 <#include "managedemandtype_tabs.html" />
-<@tabs2 tab="demandtype" />
+<@tabs>
+<@tabs2 current_tab="demandtype" />
 
-
-<@box>
-	<@boxHeader title='#i18n{notificationstore.modify_demandtype.title}' />
-	<@boxBody>
+<@tabContent>
+		<@tabPanel id='demandtype' active=true>
+		
     <@tform class="form-horizontal" method="post" name="modify_demandtype" action="jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp" >
 			<@messages errors=errors />
 			<@input type="hidden" id="id" name="id" value="${demandtype.id}"/>
@@ -28,5 +28,7 @@
 		
         <@actionButtons button1Name="action_modifyDemandType" button2Name="view_manageDemandType"/>
     </@tform>
-	</@boxBody>
-</@box>
+        
+		</@tabPanel>
+	</@tabContent>
+</@tabs>

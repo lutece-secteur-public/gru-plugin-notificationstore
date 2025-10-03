@@ -54,7 +54,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
-import fr.paris.lutece.plugins.grubusiness.business.web.rs.DemandResult;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
 import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;

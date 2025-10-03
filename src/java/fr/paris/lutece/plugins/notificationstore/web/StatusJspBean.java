@@ -33,23 +33,13 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web;
 
-import fr.paris.lutece.portal.service.message.AdminMessage;
-import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.service.admin.AccessDeniedException;
-import fr.paris.lutece.portal.service.util.AppException;
-import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
-import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
-import fr.paris.lutece.util.url.UrlItem;
-import fr.paris.lutece.util.html.AbstractPaginator;
-
 import java.util.Comparator;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
@@ -58,12 +48,21 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.notificationstore.service.TemporaryStatusService;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
+import fr.paris.lutece.portal.service.admin.AccessDeniedException;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
+import fr.paris.lutece.portal.service.util.AppException;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.util.url.UrlItem;
 
 /**
  * This class provides the user interface to manage Status features ( manage, create, modify, remove )
  */
 @Controller( controllerJsp = "ManageStatus.jsp", controllerPath = "jsp/admin/plugins/notificationstore/", right = "NOTIFICATIONSTORE_MANAGEMENT" )
-public class StatusJspBean extends AbstractManageJspBean<Integer, TemporaryStatus>
+public class StatusJspBean extends AbstractJspBean<Integer, TemporaryStatus>
 {
     /**
      * 
@@ -84,7 +83,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, TemporaryStatu
     private static final String PROPERTY_PAGE_TITLE_CREATE_STATUS = "notificationstore.create_status.pageTitle";
 
     // Markers
-    private static final String MARK_STATUS_LIST = "status_list";
+
     private static final String MARK_STATUS = "status";
     private static final String MARK_GENERIC_STATUS_LIST = "generic_status_list";
 
@@ -117,7 +116,6 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, TemporaryStatu
 
     // Session variable to store working values
     private TemporaryStatus _status;
-    private List<Integer> _listIdStatuss;
 
     /**
      * Build the Manage View
@@ -130,15 +128,10 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, TemporaryStatu
     public String getManageStatus( HttpServletRequest request )
     {
         _status = null;
+        
+        fillModelWithSearchParamsAndResult( request, JSP_MANAGE_STATUS );
 
-        if ( request.getParameter( AbstractPaginator.PARAMETER_PAGE_INDEX ) == null || _listIdStatuss.isEmpty( ) )
-        {
-            _listIdStatuss = TemporaryStatusService.getInstance( ).getIdStatusList( );
-        }
-
-        Map<String, Object> model = getPaginatedListModel( request, MARK_STATUS_LIST, _listIdStatuss, JSP_MANAGE_STATUS );
-
-        return getPage( PROPERTY_PAGE_TITLE_MANAGE_STATUS, TEMPLATE_MANAGE_STATUS, model );
+        return getPage( PROPERTY_PAGE_TITLE_MANAGE_STATUS, TEMPLATE_MANAGE_STATUS, _model );
     }
 
     /**
@@ -156,13 +149,7 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, TemporaryStatu
         return listStatus.stream( ).sorted( Comparator.comparingInt( notif -> listIds.indexOf( notif.getId( ) ) ) ).collect( Collectors.toList( ) );
     }
 
-    /**
-     * reset the _listIdStatuss list
-     */
-    public void resetListId( )
-    {
-        _listIdStatuss = new ArrayList<>( );
-    }
+
 
     /**
      * Returns the form to create a status
@@ -326,6 +313,17 @@ public class StatusJspBean extends AbstractManageJspBean<Integer, TemporaryStatu
         {
             _status.setGenericStatus( EnumGenericStatus.valueOf( strGenericStatus ) );
         }
+    }
+    
+    /**
+     * getItemIdsList
+     */
+    @Override
+    protected List<Integer> getItemIdsList(HashMap<String, String> _mapFilterCriteria,
+			String strOrderByColumn, String strSortMode) 
+    {
+    	return TemporaryStatusService.getInstance( ).searchStatusIdsList( _mapFilterCriteria,
+    			strOrderByColumn, strSortMode); 
     }
 
 }

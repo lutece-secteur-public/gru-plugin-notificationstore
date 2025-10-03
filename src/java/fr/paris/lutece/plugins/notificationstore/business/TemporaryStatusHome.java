@@ -34,11 +34,13 @@
 package fr.paris.lutece.plugins.notificationstore.business;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.demand.ITemporaryStatusDAO;
+import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+
 
 /**
  * This class provides instances management methods (create, find, ...) for Status objects
@@ -47,7 +49,7 @@ public final class TemporaryStatusHome
 {
     // Static variable pointed at the DAO instance
     private static ITemporaryStatusDAO _dao = SpringContextService.getBean( "notificationstore.temporaryStatusDao" );
-
+    
     /**
      * Private constructor - this class need not be instantiated
      */
@@ -160,5 +162,11 @@ public final class TemporaryStatusHome
     {
         return _dao.selectStatusListByIds( listIds );
     }
+
+	public static List<Integer> searchItemsIdList(Map<String, String> mapFilterCriteria, String strColumnToOrder,
+			String strSortMode) 
+	{
+		return _dao.searchItemsIdList( mapFilterCriteria, strColumnToOrder, strSortMode );
+	}
 
 }
