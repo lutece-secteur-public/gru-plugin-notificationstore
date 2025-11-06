@@ -57,6 +57,7 @@ public class NotificationStoreConstants
     public static final String QUERY_PARAM_INDEX = "index";
     public static final String QUERY_PARAM_LIMIT = "limitResult";
     public static final String QUERY_PARAM_ID_DEMAND_TYPE = "idDemandType";
+    public static final String QUERY_PARAM_LIST_IDS_DEMAND_TYPE = "listIdsDemandType";
     public static final String QUERY_PARAM_CUSTOMER_ID = "customerId";
     public static final String QUERY_PARAM_NOTIFICATION_TYPE = "notificationType";
     public static final String QUERY_PARAM_ID_DEMAND = "idDemand";
