@@ -57,6 +57,7 @@ public final class SwaggerConstants
 
     public static final String QUERY_PARAM_ID_DEMAND_DESCRIPTION = "Demand id";
     public static final String QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION = "Demand type id";
+    public static final String QUERY_PARAM_LIST_ID_DEMAND_TYPE_DESCRIPTION = "List of Demand type ids";
     public static final String QUERY_PARAM_INDEX_DESCRIPTION = "Index of pagination";
     public static final String QUERY_PARAM_LIMIT_DESCRIPTION = "Max of responses requested";
     public static final String QUERY_PARAM_CUSTOMER_ID_DESCRIPTION = "Id of the customer";
