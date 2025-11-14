@@ -39,10 +39,6 @@ PRIMARY KEY (id)
 CREATE INDEX notificationstore_notification_index on notificationstore_notification ( demand_type_id, customer_id,demand_id );
 CREATE INDEX idx_notificationstore_notification_date on notificationstore_notification (date ASC, demand_type_id ASC) ;
 
-ALTER TABLE notificationstore_notification ADD CONSTRAINT fk_notificationstore_notification_demand_id FOREIGN KEY (demand_type_id, customer_id,demand_id)
-      REFERENCES notificationstore_demand (demand_type_id, customer_id ,id) ON DELETE CASCADE ON UPDATE RESTRICT;
-   
-
 DROP TABLE IF EXISTS notificationstore_notification_event;
 CREATE TABLE notificationstore_notification_event (
 id int AUTO_INCREMENT,

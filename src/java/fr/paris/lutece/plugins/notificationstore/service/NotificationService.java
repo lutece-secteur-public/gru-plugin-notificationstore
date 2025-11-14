@@ -63,7 +63,7 @@ import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEve
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.grubusiness.business.notification.StatusMessage;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
-import fr.paris.lutece.plugins.grubusiness.service.notification.INotifyerServiceProvider;
+import fr.paris.lutece.plugins.grubusiness.service.notification.INotifierServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.service.notification.NotificationException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
@@ -103,10 +103,12 @@ public class NotificationService
     private static final String MESSAGE_INCORRECT_USER = "Incorrect User Ids";
     private static final String WARNING_INCORRECT_DEMAND_TYPE_ID = "Demand Type Id not found";
 
+    private static final String PROPERTY_STORE_EVEN_CUSTOMER_ID_NOT_EXISTS = "notificationstore.notification.store.storeEventCustomerIdDoesNotExists";
+
     // instance variables
     private static IDemandServiceProvider _demandService;
     private static NotificationService _instance;
-    private static List<INotifyerServiceProvider> _notifyers;
+    private static List<INotifierServiceProvider> _notifiers;
 
     private static ObjectMapper _mapper = new ObjectMapper( );
 
@@ -128,7 +130,7 @@ public class NotificationService
         {
             _instance = new NotificationService( );
             _demandService = SpringContextService.getBean( BEAN_STORAGE_SERVICE );
-            _notifyers = SpringContextService.getBeansOfType( INotifyerServiceProvider.class );
+            _notifiers = SpringContextService.getBeansOfType( INotifierServiceProvider.class );
 
             _mapper.configure( DeserializationFeature.UNWRAP_ROOT_VALUE, true );
             _mapper.configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false );
@@ -152,13 +154,18 @@ public class NotificationService
             Notification notification = getNotificationFromJson( strJson );
 
             // control customer
-            boolean isCustomerValid = processCustomer( notification, warnings );
+            boolean customerExists = processCustomer( notification, warnings );
 
             // check Notification
             checkNotification( notification, warnings );
 
-            // store notification only if customer is valid (or if property "store all" is set)
-            if ( isCustomerValid )
+            // store notification only if :
+            //  * customer_id is not empty
+            //  * AND ( customer exists OR notification can be store even if not exists ) 
+            boolean storeEvenCustomerIfNotExists  = AppPropertiesService.getPropertyBoolean( PROPERTY_STORE_EVEN_CUSTOMER_ID_NOT_EXISTS, false );
+            boolean customerIdNotEmpty = !StringUtils.isEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) ;
+            
+            if ( customerIdNotEmpty && ( customerExists || storeEvenCustomerIfNotExists ) )
             {
                 store( notification );
             }
@@ -166,7 +173,7 @@ public class NotificationService
             // add event (success, or failure if customer not found for example)
             addEvents( notification, warnings );
 
-            // forward notification to registred notifyers (if exists)
+            // forward notification to registred notifiers (if exists)
             forward( notification );
 
         }
@@ -179,6 +186,10 @@ public class NotificationService
             return fail( ex, Response.Status.BAD_REQUEST );
         }
         catch( IOException ex )
+        {
+            return fail( ex, Response.Status.INTERNAL_SERVER_ERROR );
+        }
+        catch( IdentityStoreException ex )
         {
             return fail( ex, Response.Status.INTERNAL_SERVER_ERROR );
         }
@@ -284,12 +295,14 @@ public class NotificationService
                     return false;
                 }
             }
-            catch( IdentityStoreException e )
+            catch ( Exception e )
             {
                 customer = null;
                 AppLogService.error( "An error occured while accessing IdentityStore", e );
                 StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_ERROR, MESSAGE_INCORRECT_USER, ERROR_IDENTITYSTORE );
                 warnings.add( msg );
+                
+                throw new IdentityStoreException ( "An error occured while accessing IdentityStore", e);
             }
         }
 
@@ -300,8 +313,8 @@ public class NotificationService
 
         notification.getDemand( ).setCustomer( customer );
 
-        // return true if customer_id exists
-        return !StringUtils.isEmpty( customer.getCustomerId( ) );
+        // default 
+        return true;
     }
 
     /**
@@ -464,6 +477,8 @@ public class NotificationService
 
             int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
 
+            demand.setStatusId ( nNewStatusId );
+            
             EnumGenericStatus oldStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
             EnumGenericStatus newStatus = EnumGenericStatus.getByStatusId( nNewStatusId );
 
@@ -733,9 +748,9 @@ public class NotificationService
     public void forward( Notification notification ) throws NotificationException
     {
 
-        for ( INotifyerServiceProvider notifyer : _notifyers )
+        for ( INotifierServiceProvider notifier : _notifiers )
         {
-            notifyer.process( notification );
+            notifier.process( notification );
         }
 
     }
