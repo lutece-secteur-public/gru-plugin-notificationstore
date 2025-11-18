@@ -12,7 +12,7 @@
     <artifactId>plugin-notificationstore</artifactId>
     <packaging>lutece-plugin</packaging>
     
-    <version>2.0.4</version>
+    <version>2.0.5-SNAPSHOT</version>
     <name>Lutece notificationstore plugin</name>
 
     <repositories>
@@ -91,7 +91,7 @@
         <connection>scm:git:https://github.com/lutece-secteur-public/gru-plugin-notificationstore.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-secteur-public/gru-plugin-notificationstore.git</developerConnection>
         <url>https://github.com/lutece-secteur-public/gru-plugin-notificationstore.git</url>
-        <tag>plugin-notificationstore-2.0.4</tag>
+        <tag>HEAD</tag>
     </scm>
     
     <!-- Profile 'swagger-json' de g&#233;n&#233;ration du fichier swagger.json -->
