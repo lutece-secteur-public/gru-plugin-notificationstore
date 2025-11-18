@@ -163,7 +163,7 @@ public class NotificationService
             //  * customer_id is not empty
             //  * AND ( customer exists OR notification can be store even if not exists ) 
             boolean storeEvenCustomerIfNotExists  = AppPropertiesService.getPropertyBoolean( PROPERTY_STORE_EVEN_CUSTOMER_ID_NOT_EXISTS, false );
-            boolean customerIdNotEmpty = !StringUtils.isEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) ;
+            boolean customerIdNotEmpty = notification.getDemand( ).getCustomer( ) != null && !StringUtils.isEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) ;
             
             if ( customerIdNotEmpty && ( customerExists || storeEvenCustomerIfNotExists ) )
             {
