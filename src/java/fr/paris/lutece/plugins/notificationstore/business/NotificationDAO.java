@@ -105,7 +105,7 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM notificationstore_notification ORDER BY demand_type_id ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE = " SELECT * FROM notificationstore_notification nn"
             + " INNER JOIN  notificationstore_notification_content nnc ON nn.id = nnc.notification_id "
-            + " WHERE nn.demand_id = ? AND nn.demand_type_id = ?  AND nn.customer_id = ? ";
+            + " WHERE nn.demand_id in (%s) AND nn.demand_type_id in (%s) AND nn.customer_id = ? ";
 
     private static final String SQL_QUERY_SELECT_LAST_NOTIFICATION = "SELECT * FROM notificationstore_notification " + " WHERE demand_id = ?"
             + " AND demand_type_id = ?" + " ORDER BY date desc, id desc " + " LIMIT 1";
@@ -608,7 +608,7 @@ public final class NotificationDAO implements INotificationDAO
     @Override
     public List<Notification> loadByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId, NotificationFilter filter )
     {
-        String strSql = SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE;
+        String strSql = String.format( SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE, strDemandId, strDemandTypeId);
 
         if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
         {
@@ -619,8 +619,6 @@ public final class NotificationDAO implements INotificationDAO
         try ( DAOUtil daoUtil = new DAOUtil( strSql, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
-            daoUtil.setString( nIndex++, strDemandId );
-            daoUtil.setString( nIndex++, strDemandTypeId );
             daoUtil.setString( nIndex++, strCustomerId );
 
             if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
@@ -642,7 +640,7 @@ public final class NotificationDAO implements INotificationDAO
                 notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
                 notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime( ) : 0 );
 
-                notification.setDemand( DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( strDemandId, strDemandTypeId, strCustomerId ) );
+                notification.setDemand( DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( daoUtil.getString( COLUMN_DEMAND_ID ), daoUtil.getString( COLUMN_DEMAND_TYPE_ID ), strCustomerId ) );
                 setNotificationContent( notification, filter );
 
                 Customer customer = new Customer( );
