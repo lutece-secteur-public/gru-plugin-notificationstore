@@ -55,7 +55,7 @@ public final class SwaggerConstants
     public static final String ERROR_NOT_FOUND_RESOURCE = "Resource not found";
     public static final String ERROR_BAD_REQUEST_EMPTY_PARAMETER = "Empty parameter";
 
-    public static final String QUERY_PARAM_ID_DEMAND_DESCRIPTION = "Demand id";
+    public static final String QUERY_PARAM_LIST_IDS_DEMAND_DESCRIPTION = "List ids Demand";
     public static final String QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION = "Demand type id";
     public static final String QUERY_PARAM_LIST_ID_DEMAND_TYPE_DESCRIPTION = "List of Demand type ids";
     public static final String QUERY_PARAM_INDEX_DESCRIPTION = "Index of pagination";

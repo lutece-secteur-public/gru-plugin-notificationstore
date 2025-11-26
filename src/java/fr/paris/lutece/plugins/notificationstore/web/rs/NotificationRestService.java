@@ -116,14 +116,14 @@ public class NotificationRestService
             @ApiResponse( code = 403, message = "Failure" )
     } )
     public Response getListNotification(
-            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
-            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_LIST_IDS_DEMAND_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strDemandIds,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strDemandTypeIds,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         NotificationResult result = new NotificationResult( );
 
-        if ( StringUtils.isNotEmpty( strIdDemand ) && StringUtils.isNotEmpty( strIdDemandType ) && StringUtils.isNotEmpty( strCustomerId ) )
+        if ( StringUtils.isNotEmpty( strDemandIds ) && StringUtils.isNotEmpty( strDemandTypeIds ) && StringUtils.isNotEmpty( strCustomerId ) )
         {
             NotificationFilter filter = new NotificationFilter( );
             if ( StringUtils.isNotEmpty( strNotificationType ) )
@@ -131,7 +131,7 @@ public class NotificationRestService
                 filter.getListNotificationType( ).add( EnumNotificationType.valueOf( strNotificationType ) );
             }
 
-            List<Notification> notifications = NotificationHome.getByDemandIdTypeIdCustomerId( strIdDemand, strIdDemandType, strCustomerId, filter );
+            List<Notification> notifications = NotificationHome.getByIdsDemandTypeIdCustomerId( strDemandIds, strDemandTypeIds, strCustomerId, filter );
 
             result.setNotifications( notifications );
             result.setStatus( ResponseStatusFactory.ok( ) );

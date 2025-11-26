@@ -127,18 +127,18 @@ public final class NotificationHome
     }
 
     /**
-     * Find the notifications by demand id, type id, customer id
+     * Find the notifications by demand ids, type ids, customer id
      * 
-     * @param strDemandId
-     * @param strDemandTypeId
+     * @param strDemandIds
+     * @param strDemandTypeIds
      * @param strCustomerId
      * @param filter
      * @return the notification list
      */
-    public static List<Notification> getByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId,
+    public static List<Notification> getByIdsDemandTypeIdCustomerId( String strDemandIds, String strDemandTypeIds, String strCustomerId,
             NotificationFilter filter )
     {
-        return _dao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId, filter );
+        return _dao.loadByDemandIdTypeIdCustomerId( strDemandIds, strDemandTypeIds, strCustomerId, filter );
     }
 
     /**
