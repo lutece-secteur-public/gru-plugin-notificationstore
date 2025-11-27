@@ -144,7 +144,7 @@ public class DemandRestService
     /**
      * Get list by status
      * 
-     * @param strIdDemandType
+     * @param strlistIdsDemandType
      * @param strIndex
      * @param strCustomerId
      * @return list of active demand
@@ -158,7 +158,7 @@ public class DemandRestService
             @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ), @ApiResponse( code = 403, message = "Failure" )
     } )
     public Response getListOfDemandByStatus(
-            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIST_IDS_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_LIST_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIST_IDS_DEMAND_TYPE ) String strlistIdsDemandType,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_INDEX, value = SwaggerConstants.QUERY_PARAM_INDEX_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_INDEX ) String strIndex,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_LIMIT, value = SwaggerConstants.QUERY_PARAM_LIMIT_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_LIMIT ) String strLimitResult,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
@@ -177,9 +177,9 @@ public class DemandRestService
 
         // Retrieving request types related to the category as a parameter.
         StringBuilder sbIdsTypeDemand = new StringBuilder( );
-        if ( StringUtils.isNotEmpty( strIdDemandType ) )
+        if ( StringUtils.isNotEmpty( strlistIdsDemandType ) )
         {
-            sbIdsTypeDemand.append( Integer.parseInt( strIdDemandType ) + "," );
+            sbIdsTypeDemand.append( strlistIdsDemandType + "," );
         }
         if ( StringUtils.isNotEmpty( strCategoryCode ) )
         {
