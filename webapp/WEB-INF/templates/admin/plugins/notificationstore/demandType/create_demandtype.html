@@ -4,13 +4,13 @@
 
 <@tabContent>
 		<@tabPanel id='demandtype' active=true>
-		
+
     <@tform name='create_demandtype' action='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp' >
 
         <@messages errors=errors />
         <@input type="hidden" id="id" name="id"/>
         <@input type="hidden" value="${token}" name="token" />
-        
+
 		<@formGroup labelFor='id_demand_type' labelKey='#i18n{notificationstore.modify_demandtype.labelIdDemandType}' mandatory=true>
 			<@input type='text' id='id_demand_type' name='id_demand_type'  maxlength=255 value='${demandtype.idDemandType!\'\'}' tabIndex='0' />
 		</@formGroup>
@@ -25,10 +25,14 @@
 		</@formGroup>
 		<@formGroup labelFor='category' labelKey='#i18n{notificationstore.modify_demandtype.labelCodeCategory}'>
 			<@select name='category' id='category' default_value=demandtype.category items=demandCategories />
-		</@formGroup>				
+		</@formGroup>
+		<@formGroup labelFor='metadata' labelKey='#i18n{notificationstore.modify_demandtype.labelMetaData}'>
+			<@input type='textarea' id='metadata' name='demandtype_metadata' value='${demandtype_metadata!\'\'}'/>
+		</@formGroup>
+
 		<@actionButtons button1Name="action_createDemandType" button2Name="view_manageDemandType"/>
     </@tform>
-    
+
 		</@tabPanel>
 	</@tabContent>
 </@tabs>

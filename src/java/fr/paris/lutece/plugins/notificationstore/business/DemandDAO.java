@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2025, City of Paris
+ * Copyright (c) 2002-2026, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,7 @@ import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandDAO;
 import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
+import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.sql.DAOUtil;
 
@@ -316,7 +317,7 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.setInt( nIndex++, demand.getMaxSteps( ) );
             daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
             daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
-            daoUtil.setString( nIndex++, hashMapToJson( demand.getMetaData( ) ) );
+            daoUtil.setString( nIndex++, NotificationStoreUtils.hashMapToJson( demand.getMetaData( ) ) );
 
             daoUtil.executeUpdate( );
             if ( daoUtil.nextGeneratedKey( ) )
@@ -345,7 +346,7 @@ public final class DemandDAO implements IDemandDAO
             daoUtil.setInt( nIndex++, demand.getCurrentStep( ) );
             daoUtil.setString( nIndex++, demand.getSubtypeId( ) );
             daoUtil.setTimestamp( nIndex++, demand.getModifyDate( ) > 0 ? new Timestamp( demand.getModifyDate( ) ) : null );
-            daoUtil.setString( nIndex++, hashMapToJson( demand.getMetaData( ) ) );
+            daoUtil.setString( nIndex++, NotificationStoreUtils.hashMapToJson( demand.getMetaData( ) ) );
 
             // where primary_key
             daoUtil.setInt( nIndex++, demand.getUID( ) );
@@ -496,52 +497,9 @@ public final class DemandDAO implements IDemandDAO
         demand.setMaxSteps( daoUtil.getInt( COLUMN_MAX_STEPS ) );
         demand.setCurrentStep( daoUtil.getInt( COLUMN_CURRENT_STEP ) );
         demand.setModifyDate( daoUtil.getTimestamp( COLUMN_MODIFY_DATE ) != null ? daoUtil.getTimestamp( COLUMN_MODIFY_DATE ).getTime( ) : 0 );
-        demand.setMetaData( jsonToHashMap( daoUtil.getString( COLUMN_META_DATA ) ) );
+        demand.setMetaData( NotificationStoreUtils.jsonToHashMap( daoUtil.getString( COLUMN_META_DATA ) ) );
 
         return demand;
-    }
-
-    /**
-     * convert json string as hashmap
-     * 
-     * @param json
-     * @return the hashmap
-     */
-    private Map<String, String> jsonToHashMap( String json )
-    {
-        if ( json == null )
-        {
-            return null;
-        }
-
-        try
-        {
-            return _mapper.readValue( json, hashMapTypeRef );
-        }
-        catch( JsonProcessingException e )
-        {
-            AppLogService.error( "A problem occurred to generate a map from Json", e );
-            return null;
-        }
-    }
-
-    /**
-     * generate Json String of a hashmap
-     * 
-     * @param map
-     * @return the json
-     */
-    private String hashMapToJson( Map<String, String> map )
-    {
-        try
-        {
-            return _mapper.writeValueAsString( map );
-        }
-        catch( JsonProcessingException e )
-        {
-            AppLogService.error( "A problem occurred to generate Json from map", e );
-            return null;
-        }
     }
 
     /**

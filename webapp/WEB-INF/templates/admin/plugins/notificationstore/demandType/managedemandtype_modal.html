@@ -1,0 +1,21 @@
+<#macro buttonWithModal demand_type>
+    <@button style='modal' buttonTargetId='#modal-${demand_type.idDemandType}' title='#i18n{notificationstore.manage_demandtypes.viewMetaData}' />
+    <@modal id='modal-${demand_type.idDemandType}'>
+        <@modalBody>
+            <@table>
+            <tr>
+                <th>#i18n{notificationstore.manage_demandtypes.viewMetaData.key}</th>
+                <th>#i18n{notificationstore.manage_demandtypes.viewMetaData.value}</th>
+            </tr>
+            <#if demand_type.metaData?? >
+                <#list  demand_type.metaData?keys as key >
+                    <tr>
+                        <td>${key}</td>
+                        <td>${demand_type.metaData[key]!}</td>
+                    </tr>
+                </#list>
+            </#if>
+            </@table>
+        </@modalBody>
+    </@modal>
+</#macro>

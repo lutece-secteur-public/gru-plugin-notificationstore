@@ -86,6 +86,7 @@ label varchar(255) default '' NOT NULL,
 code_category varchar(255) default '',
 url varchar(255) default '',
 application_code varchar(255) not null,
+meta_data long varchar,
 PRIMARY KEY (id)
 );
 

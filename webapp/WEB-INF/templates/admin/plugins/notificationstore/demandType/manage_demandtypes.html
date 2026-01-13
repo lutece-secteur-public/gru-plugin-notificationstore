@@ -1,4 +1,5 @@
 <#include "managedemandtype_tabs.html" />
+<#include "managedemandtype_modal.html" />
 <@tabs>
 <@tabs2 current_tab="demandtype" />
 
@@ -42,6 +43,8 @@
             <th>#i18n{notificationstore.manage_demandtypes.columnLabel}</th>
             <th>#i18n{notificationstore.manage_demandtypes.columnCodeCategory}  
             	<a href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?orderBy=code_category'><i class='fas fa-sort'></i></a></th>
+            <th>#i18n{notificationstore.manage_demandtypes.columnMetaData}
+            	<a href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?orderBy=meta_data'><i class='fas fa-sort'></i></a></th>
             <th>#i18n{portal.util.labelActions}</th>
         </tr>
         
@@ -66,6 +69,7 @@
 				    		placeHolder='#i18n{notificationstore.manage_demandtypes.columnCode}' 
 				    		value=mapFilterCriteria["code_category"]!'' tabIndex='3' />
 				    </@formGroup></td>
+			<td></td>
 		<td><@button type='submit' title='Search' buttonIcon='search'/>	</td>
 	</tr>
 	
@@ -83,6 +87,9 @@
 			</td>
             <td>
 				${demandtype.category}
+			</td>
+			<td>
+				<@buttonWithModal demand_type=demandtype />
 			</td>
         	<td>
 				<@aButton href='jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp?view=modifyDemandType&id=${demandtype.id}' title='#i18n{portal.util.labelModify}' hideTitle=['all'] buttonIcon='pencil' />

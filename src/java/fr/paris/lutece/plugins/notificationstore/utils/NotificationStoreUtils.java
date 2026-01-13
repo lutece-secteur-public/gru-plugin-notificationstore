@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2025, City of Paris
+ * Copyright (c) 2002-2026, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,20 +33,20 @@
  */
 package fr.paris.lutece.plugins.notificationstore.utils;
 
-import java.util.Locale;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.util.ReferenceList;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * 
@@ -57,6 +57,14 @@ public class NotificationStoreUtils
 {
     private static ObjectMapper _mapper = new ObjectMapper( ).configure( DeserializationFeature.UNWRAP_ROOT_VALUE, false )
             .configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false ).configure( SerializationFeature.WRAP_ROOT_VALUE, false );
+
+    private static TypeReference<HashMap<String, String>> hashMapTypeRef = new TypeReference<HashMap<String, String>>( )
+    {
+    };
+
+    private NotificationStoreUtils( )
+    {
+    }
 
     /**
      * Method that can be used to serialize any Java value as a String
@@ -104,4 +112,50 @@ public class NotificationStoreUtils
         }
         return refList;
     }
+
+    /**
+     * convert json string as hashmap
+     *
+     * @param json
+     * @return the hashmap
+     */
+    public static Map<String, String> jsonToHashMap( String json )
+    {
+        if ( StringUtils.isEmpty( json ) )
+        {
+            return null;
+        }
+
+        try
+        {
+            return _mapper.readValue( json, hashMapTypeRef );
+        }
+        catch( JsonProcessingException e )
+        {
+            AppLogService.error( "A problem occurred to generate a map from Json", e );
+            return null;
+        }
+    }
+
+    /**
+     * generate Json String of a hashmap
+     *
+     * @param map
+     * @return the json
+     */
+    public static String hashMapToJson( Map<String, String> map )
+    {
+        try
+        {
+            return _mapper.writeValueAsString( map );
+        }
+        catch( JsonProcessingException e )
+        {
+            AppLogService.error( "A problem occurred to generate Json from map", e );
+            return null;
+        }
+    }
+
+
+
 }
