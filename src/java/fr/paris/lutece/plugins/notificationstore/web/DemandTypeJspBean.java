@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2025, City of Paris
+ * Copyright (c) 2002-2026, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,18 +33,11 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.common.html.HtmlEscapers;
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.notificationstore.business.DemandCategoryHome;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
+import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
@@ -54,6 +47,13 @@ import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.util.url.UrlItem;
+import freemarker.template.utility.HtmlEscape;
+import org.apache.commons.text.StringEscapeUtils;
+import org.apache.tika.parser.html.HtmlParser;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class provides the user interface to manage DemandType features ( manage, create, modify, remove )
@@ -80,6 +80,7 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
 
     // Markers
     private static final String MARK_DEMANDTYPE = "demandtype";
+    private static final String MARK_DEMANDTYPE_METADATA_JSON = "demandtype_metadata";
     private static final String MARK_DEMANDCATEGORIES = "demandCategories";
 
     private static final String JSP_MANAGE_DEMANDTYPES = "jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp";
@@ -123,7 +124,6 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
     public String getManageDemandTypes( HttpServletRequest request )
     {
         _demandtype = null;
-
         fillModelWithSearchParamsAndResult( request, JSP_MANAGE_DEMANDTYPES );
 
         return getPage( PROPERTY_PAGE_TITLE_MANAGE_DEMANDTYPES, TEMPLATE_MANAGE_DEMANDTYPES, _model );
@@ -164,9 +164,11 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
     public String getCreateDemandType( HttpServletRequest request )
     {
         _demandtype = ( _demandtype != null ) ? _demandtype : new DemandType( );
-
         Map<String, Object> model = getModel( );
-        model.put( MARK_DEMANDTYPE, _demandtype );
+        model.put( MARK_DEMANDTYPE, _demandtype);
+        if(Objects.nonNull(_demandtype.getMetaData())) {
+            model.put( MARK_DEMANDTYPE_METADATA_JSON, NotificationStoreUtils.hashMapToJson(_demandtype.getMetaData()));
+        }
         model.put( MARK_DEMANDCATEGORIES, DemandCategoryHome.getDemandCategoriesReferenceList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_CREATE_DEMANDTYPE ) );
 
@@ -184,20 +186,22 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
     @Action( ACTION_CREATE_DEMANDTYPE )
     public String doCreateDemandType( HttpServletRequest request ) throws AccessDeniedException
     {
-        populate( _demandtype, request, getLocale( ) );
 
+        populate(_demandtype, request, getLocale( ) );
+        _demandtype.setMetaData(NotificationStoreUtils.jsonToHashMap(StringEscapeUtils.unescapeHtml4(request.getParameter(MARK_DEMANDTYPE_METADATA_JSON))));
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_CREATE_DEMANDTYPE ) )
         {
             throw new AccessDeniedException( "Invalid security token" );
         }
 
         // Check constraints
-        if ( !validateBean( _demandtype, VALIDATION_ATTRIBUTES_PREFIX ) )
+        if ( !validateBean(_demandtype, VALIDATION_ATTRIBUTES_PREFIX ) )
         {
             return redirectView( request, VIEW_CREATE_DEMANDTYPE );
         }
 
-        DemandTypeHome.create( _demandtype );
+        DemandTypeHome.create(_demandtype);
+
         addInfo( INFO_DEMANDTYPE_CREATED, getLocale( ) );
         resetListId( );
 
@@ -256,12 +260,15 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
 
         if ( _demandtype == null || ( _demandtype.getIdDemandType( ) != nId ) )
         {
-            Optional<DemandType> optDemandType = DemandTypeHome.findByPrimaryKey( nId );
-            _demandtype = optDemandType.orElseThrow( ( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ) );
+            _demandtype = DemandTypeHome.findByPrimaryKey( nId )
+                    .orElseThrow(( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ));
         }
 
         Map<String, Object> model = getModel( );
-        model.put( MARK_DEMANDTYPE, _demandtype );
+        model.put( MARK_DEMANDTYPE, _demandtype);
+        if(Objects.nonNull(_demandtype.getMetaData())) {
+            model.put(MARK_DEMANDTYPE_METADATA_JSON, NotificationStoreUtils.hashMapToJson(_demandtype.getMetaData()));
+        }
         model.put( MARK_DEMANDCATEGORIES, DemandCategoryHome.getDemandCategoriesReferenceList( ) );
         model.put( SecurityTokenService.MARK_TOKEN, SecurityTokenService.getInstance( ).getToken( request, ACTION_MODIFY_DEMANDTYPE ) );
 
@@ -279,7 +286,8 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
     @Action( ACTION_MODIFY_DEMANDTYPE )
     public String doModifyDemandType( HttpServletRequest request ) throws AccessDeniedException
     {
-        populate( _demandtype, request, getLocale( ) );
+        populate(_demandtype, request, getLocale( ) );
+        _demandtype.setMetaData(NotificationStoreUtils.jsonToHashMap(StringEscapeUtils.unescapeHtml4(request.getParameter(MARK_DEMANDTYPE_METADATA_JSON))));
 
         if ( !SecurityTokenService.getInstance( ).validate( request, ACTION_MODIFY_DEMANDTYPE ) )
         {
@@ -287,12 +295,13 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
         }
 
         // Check constraints
-        if ( !validateBean( _demandtype, VALIDATION_ATTRIBUTES_PREFIX ) )
+        if ( !validateBean(_demandtype, VALIDATION_ATTRIBUTES_PREFIX ) )
         {
             return redirect( request, VIEW_MODIFY_DEMANDTYPE, PARAMETER_ID_DEMANDTYPE, _demandtype.getIdDemandType( ) );
         }
 
-        DemandTypeHome.update( _demandtype );
+        DemandTypeHome.update(_demandtype);
+
         addInfo( INFO_DEMANDTYPE_UPDATED, getLocale( ) );
         resetListId( );
 

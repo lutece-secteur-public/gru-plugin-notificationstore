@@ -25,7 +25,9 @@
 			<@formGroup labelFor='category' labelKey='#i18n{notificationstore.modify_demandtype.labelCodeCategory}'>
 				<@select name='category' id='category' default_value=demandtype.category items=demandCategories />
 			</@formGroup>
-		
+			<@formGroup labelFor='metadata' labelKey='#i18n{notificationstore.modify_demandtype.labelMetaData}'>
+				<@input type='textarea' id='metadata' name='demandtype_metadata' value='${demandtype_metadata!\'\'}'/>
+			</@formGroup>
         <@actionButtons button1Name="action_modifyDemandType" button2Name="view_manageDemandType"/>
     </@tform>
         

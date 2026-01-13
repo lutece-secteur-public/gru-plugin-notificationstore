@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2025, City of Paris
+ * Copyright (c) 2002-2026, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,6 +43,7 @@ import java.util.Optional;
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandTypeDAO;
 import fr.paris.lutece.plugins.notificationstore.service.NotificationStorePlugin;
+import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreUtils;
 import fr.paris.lutece.util.sql.DAOUtil;
 
 /**
@@ -51,12 +52,12 @@ import fr.paris.lutece.util.sql.DAOUtil;
 public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implements IDemandTypeDAO
 {
     // Constants
-    private static final String SQL_QUERY_SELECTALL = "SELECT id, demande_type_id, label, code_category, url, application_code FROM notificationstore_demand_type ";
+    private static final String SQL_QUERY_SELECTALL = "SELECT id, demande_type_id, label, code_category, url, application_code, meta_data FROM notificationstore_demand_type ";
     private static final String SQL_QUERY_SELECT_BY_ID = SQL_QUERY_SELECTALL + "  WHERE id = ?";
     private static final String SQL_QUERY_SELECT_BY_TYPE_ID = SQL_QUERY_SELECTALL + "  WHERE demande_type_id = ?";
-    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_type ( demande_type_id, label, code_category, url, application_code ) VALUES ( ?, ?, ?, ?, ? ) ";
+    private static final String SQL_QUERY_INSERT = "INSERT INTO notificationstore_demand_type ( demande_type_id, label, code_category, url, application_code, meta_data ) VALUES ( ?, ?, ?, ?, ?, ? ) ";
     private static final String SQL_QUERY_DELETE = "DELETE FROM notificationstore_demand_type WHERE id = ? ";
-    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_type SET demande_type_id = ?, label = ?, code_category = ? , url = ?, application_code = ? WHERE id = ?";
+    private static final String SQL_QUERY_UPDATE = "UPDATE notificationstore_demand_type SET demande_type_id = ?, label = ?, code_category = ? , url = ?, application_code = ?, meta_data = ? WHERE id = ?";
     private static final String SQL_QUERY_SELECTALL_BY_IDS = SQL_QUERY_SELECTALL + " WHERE id IN (  ";
     private static final String SQL_ORDER_BY = " ORDER BY demande_type_id asc ";
 
@@ -92,6 +93,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
             daoUtil.setString( nIndex++, demandType.getCategory( ) );
             daoUtil.setString( nIndex++, demandType.getUrl( ) );
             daoUtil.setString( nIndex++, demandType.getAppCode( ) );
+            daoUtil.setString( nIndex, NotificationStoreUtils.hashMapToJson( demandType.getMetaData( ) ) );
 
             daoUtil.executeUpdate( );
 
@@ -126,6 +128,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
                 demandType.setCategory( daoUtil.getString( nIndex++ ) );
                 demandType.setUrl( daoUtil.getString( nIndex++ ) );
                 demandType.setAppCode( daoUtil.getString( nIndex++ ) );
+                demandType.setMetaData( NotificationStoreUtils.jsonToHashMap( daoUtil.getString( nIndex ) ) );
             }
 
             return Optional.ofNullable( demandType );
@@ -155,6 +158,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
                 demandType.setCategory( daoUtil.getString( nIndex++ ) );
                 demandType.setUrl( daoUtil.getString( nIndex++ ) );
                 demandType.setAppCode( daoUtil.getString( nIndex++ ) );
+                demandType.setMetaData( NotificationStoreUtils.jsonToHashMap( daoUtil.getString( nIndex ) ) );
             }
 
             return Optional.ofNullable( demandType );
@@ -189,6 +193,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
             daoUtil.setString( nIndex++, demandType.getCategory( ) );
             daoUtil.setString( nIndex++, demandType.getUrl( ) );
             daoUtil.setString( nIndex++, demandType.getAppCode( ) );
+            daoUtil.setString( nIndex++, NotificationStoreUtils.hashMapToJson( demandType.getMetaData( ) ) );
 
             daoUtil.setInt( nIndex, demandType.getId( ) );
 
@@ -298,7 +303,8 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
         demandType.setLabel( daoUtil.getString( nIndex++ ) );
         demandType.setCategory( daoUtil.getString( nIndex++ ) );
         demandType.setUrl( daoUtil.getString( nIndex++ ) );
-        demandType.setAppCode( daoUtil.getString( nIndex ) );
+        demandType.setAppCode( daoUtil.getString( nIndex++ ) );
+        demandType.setMetaData( NotificationStoreUtils.jsonToHashMap( daoUtil.getString( nIndex ) ) );
 
         return demandType;
     }
