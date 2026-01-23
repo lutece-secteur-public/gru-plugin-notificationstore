@@ -61,6 +61,7 @@ public final class SwaggerConstants
     public static final String QUERY_PARAM_LIMIT_DESCRIPTION = "Max of responses requested";
     public static final String QUERY_PARAM_CUSTOMER_ID_DESCRIPTION = "Id of the customer";
     public static final String QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION = "Type of notification";
+    public static final String QUERY_PARAM_NOTIFICATION_TYPE_DATE = "Date of the notification";
     public static final String QUERY_PARAM_LIST_STATUS_DESCRIPTION = "List of requested status";
     public static final String QUERY_PARAM_CATEGORY_CODE_DESCRIPTION = "List of requested category codes";
     public static final String QUERY_PARAM_DIRECT_MODE_DESCRIPTION = "(Deprecated)";

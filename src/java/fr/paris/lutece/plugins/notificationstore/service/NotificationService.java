@@ -33,43 +33,38 @@
  */
 package fr.paris.lutece.plugins.notificationstore.service;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
-import fr.paris.lutece.plugins.grubusiness.business.notification.ReassignNotificationsRequest;
-import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
-import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import fr.paris.lutece.plugins.grubusiness.business.customer.Customer;
 import fr.paris.lutece.plugins.grubusiness.business.demand.Demand;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
-import fr.paris.lutece.plugins.grubusiness.business.notification.Event;
-import fr.paris.lutece.plugins.grubusiness.business.notification.Notification;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationEvent;
-import fr.paris.lutece.plugins.grubusiness.business.notification.NotificationFilter;
-import fr.paris.lutece.plugins.grubusiness.business.notification.StatusMessage;
+import fr.paris.lutece.plugins.grubusiness.business.notification.*;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
 import fr.paris.lutece.plugins.grubusiness.service.notification.INotifierServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.service.notification.NotificationException;
 import fr.paris.lutece.plugins.identitystore.web.exception.IdentityStoreException;
+import fr.paris.lutece.plugins.notificationstore.business.DemandHome;
+import fr.paris.lutece.plugins.notificationstore.business.NotificationHome;
 import fr.paris.lutece.plugins.notificationstore.utils.NotificationStoreConstants;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class NotificationService
 {
@@ -160,11 +155,12 @@ public class NotificationService
             checkNotification( notification, warnings );
 
             // store notification only if :
-            //  * customer_id is not empty
-            //  * AND ( customer exists OR notification can be store even if not exists ) 
-            boolean storeEvenCustomerIfNotExists  = AppPropertiesService.getPropertyBoolean( PROPERTY_STORE_EVEN_CUSTOMER_ID_NOT_EXISTS, false );
-            boolean customerIdNotEmpty = notification.getDemand( ).getCustomer( ) != null && !StringUtils.isEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) ) ;
-            
+            // * customer_id is not empty
+            // * AND ( customer exists OR notification can be store even if not exists )
+            boolean storeEvenCustomerIfNotExists = AppPropertiesService.getPropertyBoolean( PROPERTY_STORE_EVEN_CUSTOMER_ID_NOT_EXISTS, false );
+            boolean customerIdNotEmpty = notification.getDemand( ).getCustomer( ) != null
+                    && !StringUtils.isEmpty( notification.getDemand( ).getCustomer( ).getCustomerId( ) );
+
             if ( customerIdNotEmpty && ( customerExists || storeEvenCustomerIfNotExists ) )
             {
                 store( notification );
@@ -295,14 +291,14 @@ public class NotificationService
                     return false;
                 }
             }
-            catch ( Exception e )
+            catch( Exception e )
             {
                 customer = null;
                 AppLogService.error( "An error occured while accessing IdentityStore", e );
                 StatusMessage msg = new StatusMessage( TYPE_DEMAND, STATUS_ERROR, MESSAGE_INCORRECT_USER, ERROR_IDENTITYSTORE );
                 warnings.add( msg );
-                
-                throw new IdentityStoreException ( "An error occured while accessing IdentityStore", e);
+
+                throw new IdentityStoreException( "An error occured while accessing IdentityStore", e );
             }
         }
 
@@ -313,8 +309,42 @@ public class NotificationService
 
         notification.getDemand( ).setCustomer( customer );
 
-        // default 
+        // default
         return true;
+    }
+
+    /**
+     * Get a single notification from parameters
+     * 
+     * @param idDemand
+     *            identifier of the demand related to the Notification
+     * @param idDemandType
+     *            identfier of the demand type
+     * @param customerId
+     *            identifier of the customer (CUID) related to the notification
+     * @param notificationType
+     *            Type of the notification
+     * @param notificationDate
+     *            Date of the notification
+     * @return Notification corresponding to the parameters, or else null.
+     */
+    public Notification getNotification( final String idDemand, final String idDemandType, final String customerId, final String notificationType,
+            final String notificationDate )
+    {
+
+        LocalDateTime localDateTime = LocalDateTime.parse( notificationDate, DateTimeFormatter.ISO_DATE_TIME );
+        long date = localDateTime.atZone( ZoneId.systemDefault( ) ).toInstant( ).toEpochMilli( );
+
+        NotificationFilter filter = new NotificationFilter( );
+        filter.setDemandId( idDemand );
+        filter.setCustomerId( customerId );
+        filter.setDemandTypeId( idDemandType );
+        filter.setStartDate( date );
+        filter.setEndDate( date );
+        filter.getListNotificationType( ).add( EnumNotificationType.valueOf( notificationType ) );
+
+        return NotificationHome.findByFilter( filter ).stream( ).findFirst( ).orElse( null );
+
     }
 
     /**
@@ -477,8 +507,8 @@ public class NotificationService
 
             int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
 
-            demand.setStatusId ( nNewStatusId );
-            
+            demand.setStatusId( nNewStatusId );
+
             EnumGenericStatus oldStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
             EnumGenericStatus newStatus = EnumGenericStatus.getByStatusId( nNewStatusId );
 

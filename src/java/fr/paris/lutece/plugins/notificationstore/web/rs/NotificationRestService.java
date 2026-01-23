@@ -33,7 +33,13 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web.rs;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -45,6 +51,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import net.sf.cglib.core.Local;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
@@ -69,6 +76,62 @@ import io.swagger.annotations.ApiResponses;
 @Api( RestConstants.BASE_PATH + NotificationStoreConstants.PLUGIN_NAME + NotificationStoreConstants.VERSION_PATH_V3 )
 public class NotificationRestService
 {
+
+    /**
+     * Gets notification by parameters
+     *
+     * @param strIdDemand
+     */
+    @GET
+    @Path( NotificationStoreConstants.PATH_NOTIFICATION )
+    @Produces( MediaType.APPLICATION_JSON )
+    @ApiOperation( value = "Get the notification", response = NotificationResult.class )
+    @ApiResponses( value = {
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 403, message = "Failure" )
+    } )
+    public Response getNotification(
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_DATE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DATE ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_DATE ) String date )
+    {
+        NotificationResult result = new NotificationResult( );
+
+        if ( StringUtils.isNotEmpty( strIdDemand ) && StringUtils.isNotEmpty( strIdDemandType ) && StringUtils.isNotEmpty( strCustomerId )
+                && StringUtils.isNotEmpty( date ) && StringUtils.isNotEmpty( strNotificationType ) )
+        {
+            Pattern pattern = Pattern.compile( "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$" );
+            if ( !pattern.matcher( date ).matches( ) )
+            {
+                result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_INVALID_DATE_FORMAT ) );
+                return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+            }
+            final Notification notification = NotificationService.instance( ).getNotification( strIdDemand, strIdDemandType, strCustomerId, strNotificationType,
+                    date );
+
+            if ( Objects.nonNull( notification ) )
+            {
+                result.setNotifications( List.of( notification ) );
+                result.setStatus( ResponseStatusFactory.ok( ) );
+                return Response.status( Response.Status.OK ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+            }
+            else
+            {
+                result.setStatus( ResponseStatusFactory.notFound( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_NOT_FOUND_RESOURCE ) );
+                return Response.status( Response.Status.NOT_FOUND ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+            }
+
+        }
+        else
+        {
+            result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ALL_REQUIRED )
+                    .setMessageKey( SearchResult.ERROR_FIELD_MANDATORY ) );
+
+            return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+        }
+    }
 
     /**
      * process the notification
