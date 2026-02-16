@@ -34,13 +34,55 @@
 package fr.paris.lutece.plugins.notificationstore.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import fr.paris.lutece.plugins.grubusiness.business.demand.DemandType;
 import fr.paris.lutece.plugins.notificationstore.business.DemandTypeHome;
+import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
 
-public class DemandTypeService
+public class DemandTypeService extends AbstractCacheableService
 {
 
+    private static final String CACHE_NAME = "DemandTypeCacheService";
+    private static DemandTypeService _instance = null;
+
+    /**
+     * get or initialize instance
+     *  
+     * @return the instance
+     */
+    public static DemandTypeService instance( )
+    {
+        if ( _instance == null )
+        {
+            _instance = new DemandTypeService( );
+        }
+
+        return _instance;
+    }
+    
+    /**
+     * get demand types
+     * 
+     * @return list of demand types
+     */
+    public Optional<DemandType> getDemandType( String strId )
+    {
+	DemandType demandType = ( DemandType ) getFromCache( strId );
+	
+	if ( demandType == null )
+	{ 
+	    Optional<DemandType> optDemandType = DemandTypeHome.getDemandType( strId );
+	    if ( optDemandType.isPresent( ) )
+	    {
+		putInCache( strId, optDemandType.get( ) );
+		return optDemandType;
+	    }
+	}
+	        
+        return Optional.of( demandType );
+    }
+    
     /**
      * get demand types
      * 
@@ -51,4 +93,9 @@ public class DemandTypeService
         return DemandTypeHome.getDemandTypesList( );
     }
 
+    @Override
+    public String getName( )
+    {
+	return CACHE_NAME;
+    }
 }
