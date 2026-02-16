@@ -329,18 +329,15 @@ public class NotificationService
      * @return Notification corresponding to the parameters, or else null.
      */
     public Notification getNotification( final String idDemand, final String idDemandType, final String customerId, final String notificationType,
-            final String notificationDate )
+            final long notificationDate )
     {
-
-        LocalDateTime localDateTime = LocalDateTime.parse( notificationDate, DateTimeFormatter.ISO_DATE_TIME );
-        long date = localDateTime.atZone( ZoneId.systemDefault( ) ).toInstant( ).toEpochMilli( );
 
         NotificationFilter filter = new NotificationFilter( );
         filter.setDemandId( idDemand );
         filter.setCustomerId( customerId );
         filter.setDemandTypeId( idDemandType );
-        filter.setStartDate( date );
-        filter.setEndDate( date );
+        filter.setStartDate( notificationDate );
+        filter.setEndDate( notificationDate );
         filter.getListNotificationType( ).add( EnumNotificationType.valueOf( notificationType ) );
 
         return NotificationHome.findByFilter( filter ).stream( ).findFirst( ).orElse( null );

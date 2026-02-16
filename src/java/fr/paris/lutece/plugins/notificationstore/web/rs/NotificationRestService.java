@@ -33,13 +33,8 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web.rs;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -51,7 +46,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import net.sf.cglib.core.Local;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.plugins.grubusiness.business.notification.EnumNotificationType;
@@ -95,21 +89,15 @@ public class NotificationRestService
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
-            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_DATE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DATE ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_DATE ) String date )
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_DATE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DATE ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_DATE ) long lDate )
     {
         NotificationResult result = new NotificationResult( );
 
         if ( StringUtils.isNotEmpty( strIdDemand ) && StringUtils.isNotEmpty( strIdDemandType ) && StringUtils.isNotEmpty( strCustomerId )
-                && StringUtils.isNotEmpty( date ) && StringUtils.isNotEmpty( strNotificationType ) )
+                &&  lDate > 0 && StringUtils.isNotEmpty( strNotificationType ) )
         {
-            Pattern pattern = Pattern.compile( "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}$" );
-            if ( !pattern.matcher( date ).matches( ) )
-            {
-                result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_INVALID_DATE_FORMAT ) );
-                return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
-            }
-            final Notification notification = NotificationService.instance( ).getNotification( strIdDemand, strIdDemandType, strCustomerId, strNotificationType,
-                    date );
+
+            final Notification notification = NotificationService.instance( ).getNotification( strIdDemand, strIdDemandType, strCustomerId, strNotificationType, lDate );
 
             if ( Objects.nonNull( notification ) )
             {
