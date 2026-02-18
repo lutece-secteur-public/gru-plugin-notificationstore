@@ -1,30 +1,626 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
     <properties>
-        <title>Plugin notificationstore</title>
+        <title>Notificationstore Plugin</title>
+        <keywords>notification, demand, storage, GRU, daemon, REST, status, demand type, category, customer</keywords>
     </properties>
-    <head>
-        <!-- Keywords example : "cms, authentication, cms, workflow, seo, collaborative, ..." 
-             Use the language of this xdoc -->
-        <meta name="keywords" content="" />
-    </head>
     <body>
-        <section name="Plugin notificationstore">
-            <!--
+        <section name="Introduction">
             <p>
-                <img src="images/notificationstore.png" />
+                The <strong>notificationstore</strong> plugin is a component of the GRU (Gestion de la Relation Usager —
+                Citizen Relationship Management) stack for the Lutèce platform. It provides persistent storage and
+                management of notifications sent to citizens as part of their demand processing workflow. It also exposes
+                REST services so that other application components can interact with these data.
             </p>
-            -->
-            <subsection name="Introduction">
-                <p></p>
+            <p>
+                The main features of the plugin are:
+            </p>
+            <ul>
+                <li>Receiving and storing notifications associated with citizen demands.</li>
+                <li>Managing the demand lifecycle (creation, update, closure, deletion).</li>
+                <li>Managing demand types and demand categories.</li>
+                <li>Managing temporary statuses and their mapping to generic statuses.</li>
+                <li>Recording notification-related events via NotificationEvent objects.</li>
+                <li>Automatic purge of old events via a scheduled daemon.</li>
+                <li>Reassigning notifications from one customer to another (identity consolidation use case).</li>
+                <li>Exposing REST APIs (version 3) for all of the above features.</li>
+                <li>Managing access to notification-related files via a database-backed file storage provider.</li>
+            </ul>
+        </section>
+
+        <section name="Configuration">
+            <subsection name="Properties File">
+                <p>
+                    The <code>notificationstore.properties</code> file controls the plugin's runtime behaviour.
+                    The available properties are:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Default Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>notificationstore.notification.compress</code></td>
+                            <td><code>false</code></td>
+                            <td>Enables notification compression on storage.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.notification.decompress</code></td>
+                            <td><code>false</code></td>
+                            <td>Enables notification decompression on retrieval.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.daemon.NotificationEventDaemon.purge.nbDaysBefore</code></td>
+                            <td><code>90</code></td>
+                            <td>Retention period in days for notification events before they are purged by the daemon.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.default.client.code</code></td>
+                            <td><code>TEST</code></td>
+                            <td>Default client code used when calling the IdentityStore service.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.notification.considerGuidAsCuid</code></td>
+                            <td><code>false</code></td>
+                            <td>When enabled, the connection ID (GUID) is used as the customer ID (CUID) if the latter is absent.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.notification.store.storeEventCustomerIdDoesNotExists</code></td>
+                            <td><code>false</code></td>
+                            <td>When enabled, notifications are stored even if the customer does not exist in the IdentityStore.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.api.rest.limit.demand</code></td>
+                            <td><code>10</code></td>
+                            <td>Maximum number of demands returned per page by the REST APIs.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </subsection>
-            <subsection name="Configuration">
-                <p></p>
+
+            <subsection name="Injected Spring Beans">
+                <p>
+                    The Spring context file <code>notificationstore_context.xml</code> declares the following beans:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bean ID</th>
+                            <th>Class</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>notificationstore.demandService</code></td>
+                            <td><code>DemandService</code></td>
+                            <td>Main service for managing demands, notifications and events. Implements <code>IDemandServiceProvider</code>. Injected into <code>DemandRestService</code> via <code>@Inject @Named</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.demandDao</code></td>
+                            <td><code>DemandDAO</code></td>
+                            <td>DAO for demand persistence.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.notificationDao</code></td>
+                            <td><code>NotificationDAO</code></td>
+                            <td>DAO for notification persistence.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.notificationEventDao</code></td>
+                            <td><code>NotificationEventDAO</code></td>
+                            <td>DAO for notification event persistence.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.temporaryStatusDao</code></td>
+                            <td><code>TemporaryStatusDAO</code></td>
+                            <td>DAO for temporary status persistence.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.demandTypeDao</code></td>
+                            <td><code>DemandTypeDAO</code></td>
+                            <td>DAO for demand type persistence.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.demandCategoryDao</code></td>
+                            <td><code>DemandCategoryDAO</code></td>
+                            <td>DAO for demand category persistence.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.notificationContentDao</code></td>
+                            <td><code>NotificationContentDAO</code></td>
+                            <td>DAO for notification content (file references) persistence.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.accessDeniedFileRBACService</code></td>
+                            <td><code>AccessDeniedFileRBACService</code></td>
+                            <td>RBAC service controlling access to files stored in the database.</td>
+                        </tr>
+                        <tr>
+                            <td><code>notificationstore.notificationStoreDatabaseFileService</code></td>
+                            <td><code>LocalDatabaseFileService</code></td>
+                            <td>File storage provider backed by the database (registered as the default provider).</td>
+                        </tr>
+                    </tbody>
+                </table>
             </subsection>
-            <subsection name="Usage">
-                <p></p>
+
+            <subsection name="Daemon">
+                <p>
+                    The plugin declares the following daemon, which can be scheduled via the Lutèce back-office:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Daemon ID</th>
+                            <th>Class</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>NotificationEventDaemon</code></td>
+                            <td><code>fr.paris.lutece.plugins.notificationstore.service.NotificationEventDaemon</code></td>
+                            <td>
+                                Automatic purge daemon for notification events. On each run it deletes events older than
+                                the number of days configured by the property
+                                <code>notificationstore.daemon.NotificationEventDaemon.purge.nbDaysBefore</code>
+                                (90 days by default).
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+
+            <subsection name="Lutèce Caches">
+                <p>
+                    The plugin extends <code>AbstractCacheableService</code> for two services with built-in caching:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cache Name</th>
+                            <th>Class</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DemandRefCacheService</code></td>
+                            <td><code>DemandService</code></td>
+                            <td>Caches the list of demand types and individual demand types (prefix <code>DEMAND_TYPE_</code>).</td>
+                        </tr>
+                        <tr>
+                            <td><code>DemandTypeCacheService</code></td>
+                            <td><code>DemandTypeService</code></td>
+                            <td>Caches individual demand types looked up by ID.</td>
+                        </tr>
+                        <tr>
+                            <td><code>temporaryStatusCacheService</code></td>
+                            <td><code>TemporaryStatusCacheService</code></td>
+                            <td>Caches the full list of temporary statuses (key <code>[temporaryStatus]</code>). The cache is invalidated on every create or update of a status.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+
+            <subsection name="Admin Rights">
+                <p>
+                    The plugin registers the following admin features in the <code>CORE_ADMIN_RIGHT</code> table:
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Right ID</th>
+                            <th>URL</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>NOTIFICATIONSTORE_MANAGEMENT</code></td>
+                            <td><code>jsp/admin/plugins/notificationstore/ManageStatus.jsp</code></td>
+                            <td>Access to notification status management (level 0).</td>
+                        </tr>
+                        <tr>
+                            <td><code>NOTIFICATIONSTORE_DEMANDTYPE_MANAGEMENT</code></td>
+                            <td><code>jsp/admin/plugins/notificationstore/ManageDemandTypes.jsp</code></td>
+                            <td>Access to demand type management (level 0).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+        </section>
+
+        <section name="Usage">
+            <subsection name="NotificationService">
+                <p>
+                    The class <code>fr.paris.lutece.plugins.notificationstore.service.NotificationService</code>
+                    is the main entry point for notification processing. It is accessed through its singleton:
+                    <code>NotificationService.instance()</code>.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>instance()</code></td>
+                            <td>Returns the singleton instance. Initialises the <code>DemandService</code> and all registered notifiers.</td>
+                        </tr>
+                        <tr>
+                            <td><code>newNotification(String strJson)</code></td>
+                            <td>Processes an incoming notification in JSON format. Verifies the customer against the IdentityStore, validates the demand, stores the notification and its associated demand, generates warning events if needed, and forwards the notification to all registered notifiers.</td>
+                        </tr>
+                        <tr>
+                            <td><code>newNotificationEvent(String strJson)</code></td>
+                            <td>Stores a notification event (<code>NotificationEvent</code>) provided as JSON.</td>
+                        </tr>
+                        <tr>
+                            <td><code>getNotification(String idDemand, String idDemandType, String customerId, String notificationType, long notificationDate)</code></td>
+                            <td>Retrieves a specific notification matching the provided criteria (demand ID, type, customer, notification type and date).</td>
+                        </tr>
+                        <tr>
+                            <td><code>reassignNotifications(String strJson)</code></td>
+                            <td>Reassigns all notifications and demands from an old CUID to a new CUID (identity consolidation). Generates a MERGE event for each reassigned notification.</td>
+                        </tr>
+                        <tr>
+                            <td><code>forward(Notification notification)</code></td>
+                            <td>Forwards the notification to all <code>INotifierServiceProvider</code> beans registered in the Spring context.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+
+            <subsection name="DemandService">
+                <p>
+                    The class <code>fr.paris.lutece.plugins.notificationstore.service.DemandService</code>
+                    implements <code>IDemandServiceProvider</code> and is available as the Spring bean
+                    <code>notificationstore.demandService</code>.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>findByCustomerId(String strCustomerId)</code></td>
+                            <td>Returns all demands associated with a customer ID, including their notifications.</td>
+                        </tr>
+                        <tr>
+                            <td><code>findByReference(String strReference)</code></td>
+                            <td>Returns all demands matching a given reference, including their notifications.</td>
+                        </tr>
+                        <tr>
+                            <td><code>findByPrimaryKey(String strDemandId, String strDemandTypeId, String strCustomerId)</code></td>
+                            <td>Returns the demand for the composite key (demand ID, type, customer), including its notifications.</td>
+                        </tr>
+                        <tr>
+                            <td><code>create(Demand demand)</code></td>
+                            <td>Persists a demand and notifies all registered <code>IDemandListener</code> beans.</td>
+                        </tr>
+                        <tr>
+                            <td><code>create(Notification notification)</code></td>
+                            <td>Persists a notification, stores its content (<code>NotificationContentHome</code>), and notifies all registered <code>INotificationListener</code> beans.</td>
+                        </tr>
+                        <tr>
+                            <td><code>create(NotificationEvent notificationEvent)</code></td>
+                            <td>Persists a notification event.</td>
+                        </tr>
+                        <tr>
+                            <td><code>update(Demand demand)</code></td>
+                            <td>Updates a demand and notifies all registered <code>IDemandListener</code> beans.</td>
+                        </tr>
+                        <tr>
+                            <td><code>updateDemandsStatusId(int nNewStatusId, int nTemporaryStatusId)</code></td>
+                            <td>Updates the generic status ID on all demands linked to a given temporary status.</td>
+                        </tr>
+                        <tr>
+                            <td><code>remove(String strDemandId, String strDemandTypeId, String strCustomerId)</code></td>
+                            <td>Deletes a demand and its notifications, then notifies the relevant listeners.</td>
+                        </tr>
+                        <tr>
+                            <td><code>deleteAllDemandByCustomerId(String strCustomerId)</code></td>
+                            <td>Deletes all data for a given customer within a single transaction: notification contents, notifications, demands and events.</td>
+                        </tr>
+                        <tr>
+                            <td><code>getDemandTypesList()</code></td>
+                            <td>Returns the complete list of demand types (with caching).</td>
+                        </tr>
+                        <tr>
+                            <td><code>getDemandType(String type_id)</code></td>
+                            <td>Returns a demand type by its ID (with caching).</td>
+                        </tr>
+                        <tr>
+                            <td><code>findEventsByDateAndDemandTypeIdAndStatus(long dStart, long dEnd, String strDemandTypeId, String strStatus)</code></td>
+                            <td>Searches notification events by date range, demand type ID and status.</td>
+                        </tr>
+                        <tr>
+                            <td><code>getStatusByLabel(String strStatusLabel)</code></td>
+                            <td>Looks up a temporary status matching a given label (delegated to <code>TemporaryStatusService</code>).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+
+            <subsection name="TemporaryStatusService">
+                <p>
+                    The class <code>fr.paris.lutece.plugins.notificationstore.service.TemporaryStatusService</code>
+                    manages the temporary statuses associated with notifications. It is accessed through
+                    <code>TemporaryStatusService.getInstance()</code>.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>create(TemporaryStatus status)</code></td>
+                            <td>Creates a temporary status and invalidates the cache.</td>
+                        </tr>
+                        <tr>
+                            <td><code>update(TemporaryStatus status)</code></td>
+                            <td>Updates a temporary status within a transaction. If the status transitions from UNDEFINED to a defined value, cascades the update to associated demands and notification contents.</td>
+                        </tr>
+                        <tr>
+                            <td><code>remove(int nKey)</code></td>
+                            <td>Deletes a temporary status and invalidates the cache.</td>
+                        </tr>
+                        <tr>
+                            <td><code>findByPrimaryKey(int nKey)</code></td>
+                            <td>Looks up a temporary status by its primary key.</td>
+                        </tr>
+                        <tr>
+                            <td><code>findByStatus(String strStatus)</code></td>
+                            <td>Looks up a temporary status by its label (case-insensitive, whitespace-insensitive, from cache).</td>
+                        </tr>
+                        <tr>
+                            <td><code>getStatusList()</code></td>
+                            <td>Returns the complete list of temporary statuses.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
+
+            <subsection name="REST APIs">
+                <p>
+                    All REST APIs are exposed under the base path <code>/rest/notificationstore/v3/</code>.
+                    They produce and consume JSON (<code>application/json</code>).
+                </p>
+
+                <p><strong>Notifications — NotificationRestService</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Verb</th>
+                            <th>Path</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/notification</code></td>
+                            <td>Submits a new notification (JSON body).</td>
+                            <td>Body: notification JSON</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/notification</code></td>
+                            <td>Retrieves a specific notification.</td>
+                            <td><code>idDemand</code>, <code>idDemandType</code>, <code>customerId</code>, <code>notificationType</code>, <code>notificationDate</code> (all required)</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/notification/list</code></td>
+                            <td>Retrieves the list of notifications for a demand.</td>
+                            <td><code>idDemand</code>, <code>idDemandType</code>, <code>customerId</code> (required); <code>notificationType</code> (optional)</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/notificationnotificationType</code></td>
+                            <td>Returns all available notification types (<code>EnumNotificationType</code>).</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/notificationEvent</code></td>
+                            <td>Stores a notification event (JSON body).</td>
+                            <td>Body: NotificationEvent JSON</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/notification/reassign</code></td>
+                            <td>Reassigns notifications from one customer ID to another.</td>
+                            <td>Body: JSON with <code>oldCustomerId</code> and <code>newCustomerId</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Demands — DemandRestService</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Verb</th>
+                            <th>Path</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/demand/list</code></td>
+                            <td>Returns a paginated list of demands for a customer.</td>
+                            <td><code>customerId</code> (required); <code>idDemandType</code>, <code>index</code>, <code>limitResult</code>, <code>notificationType</code>, <code>directionDateOrderBy</code> (optional)</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/demand/status</code></td>
+                            <td>Returns demands for a customer filtered by one or more statuses.</td>
+                            <td><code>customerId</code>, <code>listStatus</code> (required); <code>listIdsDemandType</code>, <code>index</code>, <code>limitResult</code>, <code>notificationType</code>, <code>categoryCode</code> (optional)</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/demand/{customerId}</code></td>
+                            <td>Deletes all data (demands, notifications, events) for a customer.</td>
+                            <td><code>customerId</code> (path)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Demand Types — DemandTypeRestService</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Verb</th>
+                            <th>Path</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/demandType</code></td>
+                            <td>Returns the list of demand types.</td>
+                            <td><code>direct</code> (optional, legacy direct-response mode)</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/demandType/{id}</code></td>
+                            <td>Returns a demand type by its ID.</td>
+                            <td><code>id</code> (path)</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/demandType</code></td>
+                            <td>Creates a new demand type.</td>
+                            <td>Form params: <code>id_demand_type</code>, <code>label</code>, <code>url</code>, <code>app_code</code> (required); <code>category</code> (optional)</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/demandType/{id}</code></td>
+                            <td>Updates an existing demand type.</td>
+                            <td><code>id</code> (path); same form params as POST</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/demandType/{id}</code></td>
+                            <td>Deletes a demand type (rejected if existing notifications reference it).</td>
+                            <td><code>id</code> (path)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Demand Categories — DemandCategoryRestService</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Verb</th>
+                            <th>Path</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/category/list</code></td>
+                            <td>Returns the list of demand categories.</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/category/{id}</code></td>
+                            <td>Returns a category by its ID.</td>
+                            <td><code>id</code> (path)</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/category</code></td>
+                            <td>Creates a new demand category.</td>
+                            <td>Form params: <code>code</code>, <code>label</code> (required); <code>isDefault</code> (optional)</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/category/{id}</code></td>
+                            <td>Updates an existing demand category.</td>
+                            <td><code>id</code> (path); same form params as POST</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/category/{id}</code></td>
+                            <td>Deletes a demand category.</td>
+                            <td><code>id</code> (path)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p><strong>Temporary Statuses — StatusRestService</strong></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Verb</th>
+                            <th>Path</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/status</code></td>
+                            <td>Returns the list of temporary statuses.</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/status/{id}</code></td>
+                            <td>Returns a temporary status by its ID.</td>
+                            <td><code>id</code> (path)</td>
+                        </tr>
+                        <tr>
+                            <td>GET</td>
+                            <td><code>/status/genericStatus</code></td>
+                            <td>Returns the list of generic statuses (<code>EnumGenericStatus</code>).</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td>POST</td>
+                            <td><code>/status</code></td>
+                            <td>Creates a new temporary status (JSON body).</td>
+                            <td>Body: TemporaryStatus JSON</td>
+                        </tr>
+                        <tr>
+                            <td>PUT</td>
+                            <td><code>/status</code></td>
+                            <td>Updates an existing temporary status (JSON body).</td>
+                            <td>Body: TemporaryStatus JSON</td>
+                        </tr>
+                        <tr>
+                            <td>DELETE</td>
+                            <td><code>/status/{id}</code></td>
+                            <td>Deletes a temporary status.</td>
+                            <td><code>id</code> (path)</td>
+                        </tr>
+                    </tbody>
+                </table>
             </subsection>
         </section>
     </body>
 </document>
-
