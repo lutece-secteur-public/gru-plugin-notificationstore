@@ -78,6 +78,10 @@ public class DemandTypeService extends AbstractCacheableService
 		putInCache( strId, optDemandType.get( ) );
 		return optDemandType;
 	    }
+	    else
+	    {
+		return Optional.empty( );
+	    }
 	}
 	        
         return Optional.of( demandType );
