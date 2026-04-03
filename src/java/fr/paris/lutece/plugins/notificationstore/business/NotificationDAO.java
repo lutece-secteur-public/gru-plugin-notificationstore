@@ -38,8 +38,8 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -106,7 +106,11 @@ public final class NotificationDAO implements INotificationDAO
     private static final String SQL_QUERY_DISTINCT_DEMAND_TYPE_ID = " SELECT DISTINCT demand_type_id FROM notificationstore_notification ORDER BY demand_type_id ";
     private static final String SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE = " SELECT * FROM notificationstore_notification nn"
             + " INNER JOIN  notificationstore_notification_content nnc ON nn.id = nnc.notification_id "
-            + " WHERE nn.demand_id in (%s) AND nn.demand_type_id in (%s) AND nn.customer_id = ? ";
+            + " WHERE nn.demand_id = ? AND nn.demand_type_id = ?  AND nn.customer_id = ? ";
+
+    private static final String SQL_QUERY_SELECT_BY_DEMAND_LIST_CUSTOMER = " SELECT * FROM notificationstore_notification nn"
+            + " INNER JOIN notificationstore_notification_content nnc ON nn.id = nnc.notification_id "
+            + " WHERE nn.customer_id = ? AND ( %s ) ";
 
     private static final String SQL_QUERY_SELECT_LAST_NOTIFICATION = "SELECT * FROM notificationstore_notification " + " WHERE demand_id = ?"
             + " AND demand_type_id = ?" + " ORDER BY date desc, id desc " + " LIMIT 1";
@@ -609,13 +613,7 @@ public final class NotificationDAO implements INotificationDAO
     @Override
     public List<Notification> loadByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId, NotificationFilter filter )
     {
-        
-        List<String> listIdsDemand = Arrays.asList( strDemandId.split( "," ) );
-        List<String> listIdsDemandType = Arrays.asList( strDemandTypeId.split( "," ) );
-        
-        String strSql = String.format( SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE, 
-                listIdsDemand.stream( ).map( d -> "?" ).collect( Collectors.joining("," )), 
-                listIdsDemandType.stream( ).map( dt -> "?").collect( Collectors.joining("," )));
+        String strSql = SQL_QUERY_SELECT_BY_DEMAND_CUSTOMER_TYPE;
 
         if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
         {
@@ -626,12 +624,8 @@ public final class NotificationDAO implements INotificationDAO
         try ( DAOUtil daoUtil = new DAOUtil( strSql, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
-            for (String idDemand : listIdsDemand) {
-                daoUtil.setString(nIndex++, idDemand);
-            }
-            for (String idDemandType : listIdsDemandType) {
-                daoUtil.setString(nIndex++, idDemandType);
-            }
+            daoUtil.setString( nIndex++, strDemandId );
+            daoUtil.setString( nIndex++, strDemandTypeId );
             daoUtil.setString( nIndex++, strCustomerId );
 
             if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
@@ -653,12 +647,94 @@ public final class NotificationDAO implements INotificationDAO
                 notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
                 notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime( ) : 0 );
 
-                notification.setDemand( DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( daoUtil.getString( COLUMN_DEMAND_ID ), daoUtil.getString( COLUMN_DEMAND_TYPE_ID ), strCustomerId ) );
+                notification.setDemand( DemandHome.getDemandByDemandIdAndTypeIdAndCustomerId( strDemandId, strDemandTypeId, strCustomerId ) );
                 setNotificationContent( notification, filter );
 
                 Customer customer = new Customer( );
                 customer.setCustomerId( daoUtil.getString( COLUMN_CUSTOMER ) );
                 notification.getDemand( ).setCustomer( customer );
+
+                listNotifications.add( notification );
+            }
+
+            return listNotifications;
+        }
+    }
+
+    /**
+     * Load notifications for a list of (demandId, demandTypeId) pairs and a customer id
+     *
+     * @param listDemandPairs
+     *            list of maps with keys "demandId" and "demandTypeId"
+     * @param strCustomerId
+     *            the customer id
+     * @param filter
+     *            the notification filter
+     * @return the list of notifications
+     */
+    public List<Notification> loadByDemandListAndCustomerId( List<Map<String, String>> listDemandPairs, String strCustomerId, NotificationFilter filter )
+    {
+        if ( listDemandPairs == null || listDemandPairs.isEmpty( ) )
+        {
+            return new ArrayList<>( );
+        }
+
+        // Build ( nn.demand_id = ? AND nn.demand_type_id = ? ) OR ( ... ) clauses
+        String strPairsClauses = listDemandPairs.stream( )
+                .map( p -> "( nn.demand_id = ? AND nn.demand_type_id = ? )" )
+                .collect( Collectors.joining( " OR " ) );
+
+        String strSql = String.format( SQL_QUERY_SELECT_BY_DEMAND_LIST_CUSTOMER, strPairsClauses );
+
+        if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
+        {
+            strSql = strSql + String.format( SQL_QUERY_NOTIFICATION_TYPE,
+                    filter.getListNotificationType( ).stream( ).map( v -> "?" ).collect( Collectors.joining( ", " ) ) );
+        }
+
+        try ( DAOUtil daoUtil = new DAOUtil( strSql, NotificationStorePlugin.getPlugin( ) ) )
+        {
+            int nIndex = 1;
+
+            // First parameter: customerId
+            daoUtil.setString( nIndex++, strCustomerId );
+
+            // Then pairs of (demandId, demandTypeId)
+            for ( Map<String, String> pair : listDemandPairs )
+            {
+                daoUtil.setString( nIndex++, pair.get( "demandId" ) );
+                daoUtil.setString( nIndex++, pair.get( "demandTypeId" ) );
+            }
+
+            // Notification type filter
+            if ( filter != null && !filter.getListNotificationType( ).isEmpty( ) )
+            {
+                for ( EnumNotificationType notifType : filter.getListNotificationType( ) )
+                {
+                    daoUtil.setString( nIndex++, notifType.name( ) );
+                }
+            }
+
+            daoUtil.executeQuery( );
+
+            List<Notification> listNotifications = new ArrayList<>( );
+
+            while ( daoUtil.next( ) )
+            {
+                Notification notification = new Notification( );
+                notification.setId( daoUtil.getInt( COLUMN_NOTIFICATION_ID ) );
+                notification.setDate( daoUtil.getTimestamp( COLUMN_DATE ) != null ? daoUtil.getTimestamp( COLUMN_DATE ).getTime( ) : 0 );
+
+                Demand demand = new Demand( );
+                demand.setId( daoUtil.getString( COLUMN_DEMAND_ID ) );
+                demand.setTypeId( daoUtil.getString( COLUMN_DEMAND_TYPE_ID ) );
+
+                Customer customer = new Customer( );
+                customer.setCustomerId( strCustomerId );
+                demand.setCustomer( customer );
+
+                notification.setDemand( demand );
+                setNotificationContent( notification, filter );
 
                 listNotifications.add( notification );
             }

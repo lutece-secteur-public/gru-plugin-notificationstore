@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.notificationstore.business;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import fr.paris.lutece.plugins.grubusiness.business.notification.INotificationDAO;
@@ -127,23 +128,40 @@ public final class NotificationHome
     }
 
     /**
-     * Find the notifications by demand ids, type ids, customer id
+     * Find the notifications by demand id, type id, customer id
      * 
-     * @param strDemandIds
-     * @param strDemandTypeIds
+     * @param strDemandId
+     * @param strDemandTypeId
      * @param strCustomerId
      * @param filter
      * @return the notification list
      */
-    public static List<Notification> getByIdsDemandTypeIdCustomerId( String strDemandIds, String strDemandTypeIds, String strCustomerId,
+    public static List<Notification> getByDemandIdTypeIdCustomerId( String strDemandId, String strDemandTypeId, String strCustomerId,
             NotificationFilter filter )
     {
-        return _dao.loadByDemandIdTypeIdCustomerId( strDemandIds, strDemandTypeIds, strCustomerId, filter );
+        return _dao.loadByDemandIdTypeIdCustomerId( strDemandId, strDemandTypeId, strCustomerId, filter );
+    }
+
+    /**
+     * Find the notifications for a list of (demandId, demandTypeId) pairs and a customer id
+     *
+     * @param listDemandPairs
+     *            list of maps with keys "demandId" and "demandTypeId"
+     * @param strCustomerId
+     *            the customer id
+     * @param filter
+     *            the notification filter
+     * @return the notification list
+     */
+    public static List<Notification> getByDemandListAndCustomerId( List<Map<String, String>> listDemandPairs, String strCustomerId,
+            NotificationFilter filter )
+    {
+        return ( (NotificationDAO) _dao ).loadByDemandListAndCustomerId( listDemandPairs, strCustomerId, filter );
     }
 
     /**
      * Find the notifications according to the filter
-     * 
+     *
      * @param notificationFilter
      * @return the notification list
      */

@@ -34,6 +34,7 @@
 package fr.paris.lutece.plugins.notificationstore.web.rs;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.ws.rs.Consumes;
@@ -167,14 +168,14 @@ public class NotificationRestService
             @ApiResponse( code = 403, message = "Failure" )
     } )
     public Response getListNotification(
-            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_LIST_IDS_DEMAND_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strDemandIds,
-            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strDemandTypeIds,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND ) String strIdDemand,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE, value = SwaggerConstants.QUERY_PARAM_ID_DEMAND_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_ID_DEMAND_TYPE ) String strIdDemandType,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
             @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType )
     {
         NotificationResult result = new NotificationResult( );
 
-        if ( StringUtils.isNotEmpty( strDemandIds ) && StringUtils.isNotEmpty( strDemandTypeIds ) && StringUtils.isNotEmpty( strCustomerId ) )
+        if ( StringUtils.isNotEmpty( strIdDemand ) && StringUtils.isNotEmpty( strIdDemandType ) && StringUtils.isNotEmpty( strCustomerId ) )
         {
             NotificationFilter filter = new NotificationFilter( );
             if ( StringUtils.isNotEmpty( strNotificationType ) )
@@ -182,7 +183,7 @@ public class NotificationRestService
                 filter.getListNotificationType( ).add( EnumNotificationType.valueOf( strNotificationType ) );
             }
 
-            List<Notification> notifications = NotificationHome.getByIdsDemandTypeIdCustomerId( strDemandIds, strDemandTypeIds, strCustomerId, filter );
+            List<Notification> notifications = NotificationHome.getByDemandIdTypeIdCustomerId( strIdDemand, strIdDemandType, strCustomerId, filter );
 
             result.setNotifications( notifications );
             result.setStatus( ResponseStatusFactory.ok( ) );
@@ -200,8 +201,68 @@ public class NotificationRestService
     }
 
     /**
+     * Gets notifications for a list of demands (POST with JSON body)
+     *
+     * @param strCustomerId
+     *            the customer id (query parameter)
+     * @param strNotificationType
+     *            optional notification type filter (query parameter)
+     * @param listDemandPairs
+     *            JSON body: list of objects with "demandId" and "demandTypeId" keys
+     * @return notifications matching the demands and customer
+     */
+    @POST
+    @Path( NotificationStoreConstants.PATH_NOTIFICATION + NotificationStoreConstants.PATH_LIST )
+    @Consumes( MediaType.APPLICATION_JSON )
+    @Produces( MediaType.APPLICATION_JSON )
+    @ApiOperation( value = "Get notifications for a list of demands", response = NotificationResult.class )
+    @ApiResponses( value = {
+            @ApiResponse( code = 200, message = "Success" ), @ApiResponse( code = 400, message = "Bad request or missing mandatory parameters" ),
+            @ApiResponse( code = 403, message = "Failure" )
+    } )
+    public Response getNotificationsByDemandList(
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID, value = SwaggerConstants.QUERY_PARAM_CUSTOMER_ID_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_CUSTOMER_ID ) String strCustomerId,
+            @ApiParam( name = NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE, value = SwaggerConstants.QUERY_PARAM_NOTIFICATION_TYPE_DESCRIPTION ) @QueryParam( NotificationStoreConstants.QUERY_PARAM_NOTIFICATION_TYPE ) String strNotificationType,
+            @ApiParam( name = "demandList", value = SwaggerConstants.QUERY_PARAM_LIST_IDS_DEMAND_DESCRIPTION ) List<Map<String, String>> listDemandPairs )
+    {
+        NotificationResult result = new NotificationResult( );
+
+        if ( StringUtils.isEmpty( strCustomerId ) || listDemandPairs == null || listDemandPairs.isEmpty( ) )
+        {
+            result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_NOTIF )
+                    .setMessageKey( SearchResult.ERROR_FIELD_MANDATORY ) );
+            return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+        }
+
+        // Validate that each entry contains the required keys
+        for ( Map<String, String> pair : listDemandPairs )
+        {
+            if ( !pair.containsKey( "demandId" ) || !pair.containsKey( "demandTypeId" ) )
+            {
+                result.setStatus( ResponseStatusFactory.badRequest( ).setMessage( NotificationStoreConstants.MESSAGE_ERROR_NOTIF )
+                        .setMessageKey( SearchResult.ERROR_FIELD_MANDATORY ) );
+                return Response.status( Response.Status.BAD_REQUEST ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+            }
+        }
+
+        NotificationFilter filter = new NotificationFilter( );
+        if ( StringUtils.isNotEmpty( strNotificationType ) )
+        {
+            filter.getListNotificationType( ).add( EnumNotificationType.valueOf( strNotificationType ) );
+        }
+
+        List<Notification> notifications = NotificationHome.getByDemandListAndCustomerId( listDemandPairs, strCustomerId, filter );
+
+        result.setNotifications( notifications );
+        result.setStatus( ResponseStatusFactory.ok( ) );
+        result.setNumberResult( notifications.size( ) );
+
+        return Response.status( Response.Status.OK ).entity( NotificationStoreUtils.convertToJsonString( result ) ).build( );
+    }
+
+    /**
      * Gets list of notification types
-     * 
+     *
      * @return list of notification types
      */
     @GET
