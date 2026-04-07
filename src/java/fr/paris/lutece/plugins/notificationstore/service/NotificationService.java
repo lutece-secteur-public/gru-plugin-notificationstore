@@ -777,6 +777,7 @@ public class NotificationService
 
         for ( INotifierServiceProvider notifier : _notifiers )
         {
+            AppLogService.debug( "Notificationstore forward : fire {} ", notifier.getName( ) );
             notifier.process( notification );
         }
 
