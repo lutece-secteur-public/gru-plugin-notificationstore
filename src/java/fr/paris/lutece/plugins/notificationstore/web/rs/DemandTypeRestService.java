@@ -33,11 +33,12 @@
  */
 package fr.paris.lutece.plugins.notificationstore.web.rs;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -127,83 +128,53 @@ public class DemandTypeRestService
 
     /**
      * Create DemandType
-     * 
-     * @param nVersion
-     *            the API version
-     * @param strIdDemandType
-     *            the id_demand_type
-     * @param strLabel
-     *            the label
-     * @param strUrl
-     *            the url
-     * @param strAppCode
-     *            the app_code
-     * @param strCategory
-     *            the category
+     *
+     * @param strJson
+     *            the JSON body representing the DemandType to create
      * @return the DemandType if created
      */
     @POST
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response createDemandType( @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE ) String strIdDemandType,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_LABEL ) String strLabel,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_URL ) String strUrl,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_APP_CODE ) String strAppCode,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_CATEGORY ) String strCategory )
+    public Response createDemandType( DemandType demandType )
     {
-        if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) || StringUtils.isEmpty( strUrl ) || StringUtils.isEmpty( strAppCode ) )
+
+        if ( demandType == null || demandType.getIdDemandType( ) == 0 || StringUtils.isEmpty( demandType.getLabel( ) )
+                || StringUtils.isEmpty( demandType.getUrl( ) ) || StringUtils.isEmpty( demandType.getAppCode( ) ) )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(
                     new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
 
-        DemandType demandtype = new DemandType( );
-        demandtype.setIdDemandType( Integer.parseInt( strIdDemandType ) );
-        demandtype.setLabel( strLabel );
-        demandtype.setUrl( strUrl );
-        demandtype.setAppCode( strAppCode );
-        demandtype.setCategory( strCategory );
+        DemandTypeHome.create( demandType );
 
-        DemandTypeHome.create( demandtype );
-
-        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandtype ) ) ).build( );
+        return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandType ) ) ).build( );
     }
 
     /**
      * Modify DemandType
-     * 
-     * @param nVersion
-     *            the API version
-     * @param id
-     *            the id
-     * @param strIdDemandType
-     *            the id_demand_type
-     * @param strLabel
-     *            the label
-     * @param strUrl
-     *            the url
-     * @param strAppCode
-     *            the app_code
-     * @param strCategory
-     *            the category
+     *
+     * @param nId
+     *            the primary key of the DemandType to modify
+     * @param strJson
+     *            the JSON body representing the DemandType values to apply
      * @return the DemandType if modified
      */
     @PUT
     @Path( NotificationStoreConstants.PATH_ID )
+    @Consumes( MediaType.APPLICATION_JSON )
     @Produces( MediaType.APPLICATION_JSON )
-    public Response modifyDemandType( @PathParam( NotificationStoreConstants.ID ) Integer nId,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_ID_DEMAND_TYPE ) String strIdDemandType,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_LABEL ) String strLabel,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_URL ) String strUrl,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_APP_CODE ) String strAppCode,
-            @FormParam( NotificationStoreConstants.DEMANDTYPE_ATTRIBUTE_CATEGORY ) String strCategory )
+    public Response modifyDemandType( @PathParam( NotificationStoreConstants.ID ) Integer nId, DemandType demandtypeInput )
     {
-        if ( StringUtils.isEmpty( strIdDemandType ) || StringUtils.isEmpty( strLabel ) || StringUtils.isEmpty( strUrl ) )
+        if ( demandtypeInput == null || demandtypeInput.getIdDemandType( ) == 0 || StringUtils.isEmpty( demandtypeInput.getLabel( ) )
+                || StringUtils.isEmpty( demandtypeInput.getUrl( ) ) )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(
                     new ErrorJsonResponse( Response.Status.BAD_REQUEST.name( ), NotificationStoreConstants.MESSAGE_ERROR_BAD_REQUEST_EMPTY_PARAMETER ) ) )
                     .build( );
         }
+
         Optional<DemandType> optDemandType = DemandTypeHome.findByPrimaryKey( nId );
 
         if ( !optDemandType.isPresent( ) )
@@ -215,16 +186,18 @@ public class DemandTypeRestService
         }
         else
         {
-            DemandType demandtype = optDemandType.get( );
-            demandtype.setIdDemandType( Integer.parseInt( strIdDemandType ) );
-            demandtype.setLabel( strLabel );
-            demandtype.setUrl( strUrl );
-            demandtype.setAppCode( StringUtils.isEmpty( strAppCode ) ? StringUtils.EMPTY : strAppCode );
-            demandtype.setCategory( StringUtils.isEmpty( strCategory ) ? StringUtils.EMPTY : strCategory );
+            DemandType demandType = optDemandType.get( );
+            demandType.setIdDemandType( demandtypeInput.getIdDemandType( ) );
+            demandType.setLabel( demandtypeInput.getLabel( ) );
+            demandType.setUrl( demandtypeInput.getUrl( ) );
+            
+            demandType.setAppCode( StringUtils.isEmpty( demandtypeInput.getAppCode( ) ) ? StringUtils.EMPTY : demandtypeInput.getAppCode( ) );
+            demandType.setCategory( StringUtils.isEmpty( demandtypeInput.getCategory( ) ) ? StringUtils.EMPTY : demandtypeInput.getCategory( ) );
+            demandType.setMetaData( (demandtypeInput.getMetaData( ) == null ) ? new HashMap<>() : demandtypeInput.getMetaData( ) );
 
-            DemandTypeHome.update( demandtype );
+            DemandTypeHome.update( demandType );
 
-            return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandtype ) ) ).build( );
+            return Response.status( Response.Status.OK ).entity( JsonUtil.buildJsonResponse( new JsonResponse( demandType ) ) ).build( );
         }
     }
 
