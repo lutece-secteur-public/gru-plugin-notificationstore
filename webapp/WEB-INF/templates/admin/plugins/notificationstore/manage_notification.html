@@ -1,43 +1,69 @@
 <#include "managedemand_tabs.html" />
 
+<#--
+	Displays the message body of a notification behind a button instead of inlining it.
+	The content is rendered in a sandboxed iframe inside a modal, so that complex (or broken)
+	HTML coming from a notification cannot leak into the admin layout.
+	id      : unique id of the modal
+	label   : channel label, used as modal title and iframe title
+	content : raw message body (may be HTML)
+-->
+<#macro notificationMessage id label content>
+	<#local strMessage = content!'' />
+	<#if strMessage?trim?length gt 0>
+		<a href="#${id}" data-bs-toggle="modal">#i18n{notificationstore.manage_notifification.viewContent}</a>
+		<@modal id='${id}'>
+			<div class="modal-header">
+				<h4 class="modal-title">${label} - #i18n{notificationstore.manage_notifification.notification_content}</h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" title="#i18n{notificationstore.manage_notifification.close}"></button>
+			</div>
+			<@modalBody>
+				<iframe class="notification-message-frame" title="${label}" sandbox="" referrerpolicy="no-referrer" style="width:100%;height:70vh;border:0" data-message="${strMessage?html}"></iframe>
+			</@modalBody>
+		</@modal>
+	<#else>
+		<span class="text-muted">#i18n{notificationstore.manage_notifification.noContent}</span>
+	</#if>
+</#macro>
+
 <@tabs>
 	<@notificationstore_tabList current_tab="notification" />
-	
+
 	<@tabContent>
 		<@tabPanel id='notification' active=true>
-	
-        
-        	
+
+
+
 	<@tform class='form-horizontal' type='inline' method="post" action="jsp/admin/plugins/notificationstore/ManageNotification.jsp" name="manage_notification">
-	 	
+
 	 	<@formGroup labelFor='demand_id' tabIndex='1' labelKey='#i18n{notificationstore.manage_demand.demand_id.label}'  formStyle='inline'>
 		 	<@input type='text' id="demand_id" name="demand_id" value=demand_id!'' />
         </@formGroup>
-                
-		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{notificationstore.manage_demand.demand_type_id.label}'  formStyle='inline' >		 	
+
+		<@formGroup labelFor='demand_type_id' tabIndex='2' labelKey='#i18n{notificationstore.manage_demand.demand_type_id.label}'  formStyle='inline' >
                         <@select name="demand_type_id" id="demand_type_id" items=demand_type_id_list![] default_value=demand_type_id!'' />
                 </@formGroup>
-                
+
 		<@formGroup labelFor='start_date' tabIndex='3' labelKey='#i18n{notificationstore.manage_demand.start_date.label}'  formStyle='inline'>
 		    <#if !start_date??><#assign start_date = .now /></#if>
-		    <#assign start_date_value = start_date?string["dd/MM/yyyy"] />		    
+		    <#assign start_date_value = start_date?string["dd/MM/yyyy"] />
 		 	<@input type='date' id="start_date" name="start_date" language=.lang value=start_date_value />
                 </@formGroup>
-                
+
 		<@formGroup labelFor='end_date'  tabIndex='4' labelKey='#i18n{notificationstore.manage_demand.end_date.label}'  formStyle='inline'>
 			<#if end_date??><#assign end_date_value = end_date?string["dd/MM/yyyy"] /></#if>
 		 	<@input type='date' id="end_date" name="end_date" language=.lang value=end_date_value!'' />
                 </@formGroup>
-           	
+
 		<@formGroup formStyle='inline'>
                         <@button type='submit' tabIndex='5' title='#i18n{portal.util.labelSearch}' />
 		</@formGroup>
 	</@tform>
-        
+
 	<@messages infos=infos />
         <@paginationAdmin paginator=paginator combo=1 />
         <div class="clearfix"></div>
-        
+
     	<@table>
 	        <tr>
                     <th>#i18n{notificationstore.manage_demand.columnDemandId}</th>
@@ -57,7 +83,7 @@
                                    <br>
                                    type: ${notification.demand.typeId!''}<br>
                                    <br>
-                                   
+
                                    <#if notification.demand.customer?? && notification.demand.customer.connectionId?? >
                                    connection_id: <br>
                                    ${notification.demand.customer.connectionId!'?'}<br>
@@ -70,10 +96,10 @@
                            <td>
                                    ${notification.date?number_to_datetime!''}
                            </td>
-                          
+
                            <td  class="text-break"><#if notification.backofficeNotification ?? >
                                Status : ${notification.backofficeNotification.statusText!''}<br>
-                               message : ${notification.backofficeNotification.message!''}
+                               <@notificationMessage id='notif-msg-bo-${notification_index}' label='#i18n{notificationstore.manage_notifification.has_backoffice}' content=notification.backofficeNotification.message!'' />
                                <#else>
                                -
                                </#if>
@@ -81,7 +107,7 @@
                            <td  class="text-break"><#if notification.SMSNotification ?? >
                                Sender : ${notification.SMSNotification.sender!''}<br>
                                Phone number : ${notification.SMSNotification.phoneNumber!''}<br>
-                               message : ${notification.SMSNotification.message!''}
+                               <@notificationMessage id='notif-msg-sms-${notification_index}' label='#i18n{notificationstore.manage_notifification.has_sms}' content=notification.SMSNotification.message!'' />
                                <#else>
                                -
                                </#if>
@@ -93,7 +119,7 @@
                                Cc : ${notification.emailNotification.cc!''}<br>
                                Bcc : ${notification.emailNotification.bcc!''}<br>
                                Subject : ${notification.emailNotification.subject!''}<br>
-                               message : ${notification.emailNotification.message!''}
+                               <@notificationMessage id='notif-msg-mail-${notification_index}' label='#i18n{notificationstore.manage_notifification.has_customer_email}' content=notification.emailNotification.message!'' />
                                <#else>
                                -
                                </#if>
@@ -103,7 +129,7 @@
                                Subject : ${notification.myDashboardNotification.subject!''}<br>
                                Sender name : ${notification.myDashboardNotification.senderName!''}<br>
                                data : ${notification.myDashboardNotification.data!''}<br>
-                               message : ${notification.myDashboardNotification.message!''}
+                               <@notificationMessage id='notif-msg-dashboard-${notification_index}' label='#i18n{notificationstore.manage_notifification.has_mydashboard}' content=notification.myDashboardNotification.message!'' />
                                <#else>
                                -
                                </#if>
@@ -116,7 +142,7 @@
                                    Cc : <#list broadcastEmailItem.cc as item>${item.address}, </#list><br>
                                    Bcc : <#list broadcastEmailItem.bcc as item>${item.address}, </#list><br>
                                    Subject : ${broadcastEmailItem.subject!''}<br>
-                                   message : ${broadcastEmailItem.message!''}<br><br>
+                                   <@notificationMessage id='notif-msg-broadcast-${notification_index}-${broadcastEmailItem_index}' label='#i18n{notificationstore.manage_notifification.has_broadcast_email}' content=broadcastEmailItem.message!'' /><br><br>
                                </#list>
                                <#else>
                                -
@@ -146,7 +172,24 @@
        			 </#list>
   			</@table>
             <@paginationAdmin paginator=paginator />
-                        
+
    	  	</@tabPanel>
 	</@tabContent>
 </@tabs>
+
+<script>
+/* The message body is injected into the iframe only when its modal is opened, so that
+   notification contents are never parsed as part of the admin page. */
+document.querySelectorAll( 'iframe.notification-message-frame' ).forEach( frame => {
+	const modal = frame.closest( '.modal' );
+	if ( !modal ) {
+		return;
+	}
+	modal.addEventListener( 'show.bs.modal', () => {
+		if ( frame.dataset.loaded !== 'true' ) {
+			frame.srcdoc = frame.dataset.message;
+			frame.dataset.loaded = 'true';
+		}
+	} );
+} );
+</script>
