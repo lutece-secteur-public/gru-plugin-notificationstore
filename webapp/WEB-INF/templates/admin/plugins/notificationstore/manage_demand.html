@@ -70,7 +70,10 @@
         	<#list demand_list as demand >
         		<tr>
 		                <td>
-                                        ${demand.creationDate?number_to_datetime!''}
+                                    C:    ${demand.creationDate?number_to_datetime!''}<br>
+                                    <#if demand.modifyDate ?? && (demand.creationDate != demand.modifyDate) >
+                                    M:    ${demand.modifyDate?number_to_datetime!''}
+                                    </#if>
                                 </td>
                                 <td>
                                         ${demand.id!''}
