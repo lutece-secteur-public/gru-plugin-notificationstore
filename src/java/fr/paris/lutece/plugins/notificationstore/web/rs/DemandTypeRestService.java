@@ -139,7 +139,8 @@ public class DemandTypeRestService
     public Response createDemandType( DemandType demandType )
     {
 
-        if ( demandType == null || demandType.getIdDemandType( ) == 0 || StringUtils.isEmpty( demandType.getLabel( ) )
+        if ( demandType == null || demandType.getIdDemandType( ) == null
+        	|| StringUtils.isEmpty( demandType.getIdDemandType( ) ) || StringUtils.isEmpty( demandType.getLabel( ) )
                 || StringUtils.isEmpty( demandType.getUrl( ) ) || StringUtils.isEmpty( demandType.getAppCode( ) ) )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(
@@ -167,7 +168,8 @@ public class DemandTypeRestService
     @Produces( MediaType.APPLICATION_JSON )
     public Response modifyDemandType( @PathParam( NotificationStoreConstants.ID ) Integer nId, DemandType demandtypeInput )
     {
-        if ( demandtypeInput == null || demandtypeInput.getIdDemandType( ) == 0 || StringUtils.isEmpty( demandtypeInput.getLabel( ) )
+        if ( demandtypeInput == null || demandtypeInput.getIdDemandType( ) == null
+        	|| StringUtils.isEmpty( demandtypeInput.getIdDemandType( ) ) || StringUtils.isEmpty( demandtypeInput.getLabel( ) )
                 || StringUtils.isEmpty( demandtypeInput.getUrl( ) ) )
         {
             return Response.status( Response.Status.BAD_REQUEST ).entity( JsonUtil.buildJsonResponse(

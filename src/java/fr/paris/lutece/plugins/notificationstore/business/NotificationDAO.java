@@ -772,13 +772,13 @@ public final class NotificationDAO implements INotificationDAO
      * {@inheritDoc}
      */
     @Override
-    public boolean existsNotificationWithDemandTypeId( int nDemandTypeId )
+    public boolean existsNotificationWithDemandTypeId( String strDemandTypeId )
     {
 
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_EXISTS_DEMAND_TYPE_ID, NotificationStorePlugin.getPlugin( ) ) )
         {
 
-            daoUtil.setString( 1, String.valueOf( nDemandTypeId ) );
+            daoUtil.setString( 1, strDemandTypeId );
             daoUtil.executeQuery( );
 
             if ( daoUtil.next( ) )

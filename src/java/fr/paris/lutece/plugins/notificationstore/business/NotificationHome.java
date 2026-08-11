@@ -219,9 +219,9 @@ public final class NotificationHome
      * @param nDemandTypeId
      * @return true if exists
      */
-    public static boolean existsNotificationWithDemandTypeId( int nDemandTypeId )
+    public static boolean existsNotificationWithDemandTypeId( String strDemandTypeId )
     {
-        return _dao.existsNotificationWithDemandTypeId( nDemandTypeId );
+        return _dao.existsNotificationWithDemandTypeId( strDemandTypeId );
     }
 
     /**

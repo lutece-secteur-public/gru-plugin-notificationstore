@@ -258,7 +258,7 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
     {
         int nId = Integer.parseInt( request.getParameter( PARAMETER_ID_DEMANDTYPE ) );
 
-        if ( _demandtype == null || ( _demandtype.getIdDemandType( ) != nId ) )
+        if ( _demandtype == null || ( _demandtype.getId( ) != nId ) )
         {
             _demandtype = DemandTypeHome.findByPrimaryKey( nId )
                     .orElseThrow(( ) -> new AppException( ERROR_RESOURCE_NOT_FOUND ));
@@ -297,7 +297,7 @@ public class DemandTypeJspBean extends AbstractJspBean<Integer, DemandType>
         // Check constraints
         if ( !validateBean(_demandtype, VALIDATION_ATTRIBUTES_PREFIX ) )
         {
-            return redirect( request, VIEW_MODIFY_DEMANDTYPE, PARAMETER_ID_DEMANDTYPE, _demandtype.getIdDemandType( ) );
+            return redirect( request, VIEW_MODIFY_DEMANDTYPE, PARAMETER_ID_DEMANDTYPE, _demandtype.getId( ) );
         }
 
         DemandTypeHome.update(_demandtype);

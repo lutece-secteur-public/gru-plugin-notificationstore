@@ -88,7 +88,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
         try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_INSERT, Statement.RETURN_GENERATED_KEYS, NotificationStorePlugin.getPlugin( ) ) )
         {
             int nIndex = 1;
-            daoUtil.setString( nIndex++, String.valueOf( demandType.getIdDemandType( ) ) );
+            daoUtil.setString( nIndex++, demandType.getIdDemandType( ) );
             daoUtil.setString( nIndex++, demandType.getLabel( ) );
             daoUtil.setString( nIndex++, demandType.getCategory( ) );
             daoUtil.setString( nIndex++, demandType.getUrl( ) );
@@ -123,7 +123,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
                 int nIndex = 1;
 
                 demandType.setId( daoUtil.getInt( nIndex++ ) );
-                demandType.setIdDemandType( daoUtil.getInt( nIndex++ ) );
+                demandType.setIdDemandType( daoUtil.getString( nIndex++ ) );
                 demandType.setLabel( daoUtil.getString( nIndex++ ) );
                 demandType.setCategory( daoUtil.getString( nIndex++ ) );
                 demandType.setUrl( daoUtil.getString( nIndex++ ) );
@@ -153,7 +153,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
                 int nIndex = 1;
 
                 demandType.setId( daoUtil.getInt( nIndex++ ) );
-                demandType.setIdDemandType( daoUtil.getInt( nIndex++ ) );
+                demandType.setIdDemandType( daoUtil.getString( nIndex++ ) );
                 demandType.setLabel( daoUtil.getString( nIndex++ ) );
                 demandType.setCategory( daoUtil.getString( nIndex++ ) );
                 demandType.setUrl( daoUtil.getString( nIndex++ ) );
@@ -188,7 +188,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
         {
             int nIndex = 1;
 
-            daoUtil.setString( nIndex++, String.valueOf( demandType.getIdDemandType( ) ) );
+            daoUtil.setString( nIndex++, demandType.getIdDemandType( ) );
             daoUtil.setString( nIndex++, demandType.getLabel( ) );
             daoUtil.setString( nIndex++, demandType.getCategory( ) );
             daoUtil.setString( nIndex++, demandType.getUrl( ) );
@@ -299,7 +299,7 @@ public final class DemandTypeDAO extends AbstractFilterDao<DemandType> implement
         int nIndex = 1;
 
         demandType.setId( daoUtil.getInt( nIndex++ ) );
-        demandType.setIdDemandType( daoUtil.getInt( nIndex++ ) );
+        demandType.setIdDemandType( daoUtil.getString( nIndex++ ) );
         demandType.setLabel( daoUtil.getString( nIndex++ ) );
         demandType.setCategory( daoUtil.getString( nIndex++ ) );
         demandType.setUrl( daoUtil.getString( nIndex++ ) );
