@@ -1,0 +1,26 @@
+<#include "managedemandtype_tabs.html" />
+<@tabs>
+<@tabs2 current_tab="demandtypetag" />
+
+<@tabContent>
+ 		<@tabPanel id='demandtypetag' active=true>
+ 	
+    <@tform name='create_demandtypetag' action='jsp/admin/plugins/notificationstore/ManageDemandTypeTags.jsp' >
+
+        <@messages errors=errors />
+        <@input type="hidden" id="id" name="id"/>
+        <@input type="hidden" value="${token}" name="token" />
+
+ 		<@formGroup labelFor='name' labelKey='#i18n{notificationstore.modify_demandtypetag.labelName}' mandatory=true>
+ 			<@input type='text' id='name' name='name'  maxlength=255 value='${demandtypetag.name!\'\'}' tabIndex='0' />
+ 		</@formGroup>
+ 		<@formGroup labelFor='code' labelKey='#i18n{notificationstore.modify_demandtypetag.labelCode}' mandatory=true>
+ 			<@input type='text' id='code' name='code'  maxlength=255 value='${demandtypetag.code!\'\'}' tabIndex='1' />
+ 		</@formGroup>
+ 				
+ 		<@actionButtons button1Name="action_createDemandTypeTag" button2Name="view_manageDemandTypeTags"/>
+    </@tform>
+
+     		</@tabPanel>
+ 	</@tabContent>
+</@tabs>

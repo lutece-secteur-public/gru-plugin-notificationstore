@@ -107,6 +107,20 @@ PRIMARY KEY (id_demand_category)
 CREATE UNIQUE INDEX IDX_notificationstore_demand_category_code on  notificationstore_demand_category (code) ;
 
 --
+-- Structure for table notificationstore_demande_type_tag
+--
+
+DROP TABLE IF EXISTS notificationstore_demande_type_tag;
+CREATE TABLE notificationstore_demande_type_tag (
+id int AUTO_INCREMENT,
+name varchar(255) default '' NOT NULL,
+code varchar(255) default '' NOT NULL,
+PRIMARY KEY (id)
+);
+
+CREATE UNIQUE INDEX IDX_notificationstore_demande_type_tag_code on  notificationstore_demande_type_tag (code) ;
+
+--
 -- Structure for table notificationstore_notification_content
 --
 

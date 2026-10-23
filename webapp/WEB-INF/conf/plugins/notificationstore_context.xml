@@ -11,6 +11,7 @@
     <bean id="notificationstore.temporaryStatusDao"  class="fr.paris.lutece.plugins.notificationstore.business.TemporaryStatusDAO" />
     <bean id="notificationstore.demandTypeDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandTypeDAO"/>
 	<bean id="notificationstore.demandCategoryDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandCategoryDAO"/>
+	<bean id="notificationstore.demandTypeTagDao" class="fr.paris.lutece.plugins.notificationstore.business.DemandTypeTagDAO"/>
     <bean id="notificationstore.notificationContentDao" class="fr.paris.lutece.plugins.notificationstore.business.NotificationContentDAO"/>
 
 	<bean id="notificationstore.demandService" class="fr.paris.lutece.plugins.notificationstore.service.DemandService" >
@@ -34,6 +35,7 @@
     <bean id="notificationstore.grurestdatabase" class="fr.paris.lutece.plugins.notificationstore.web.rs.NotificationRestService"/>
     <bean id="notificationstore.demandTypeRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandTypeRestService"/>
     <bean id="notificationstore.demandCategoryRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandCategoryRestService"/>
+    <bean id="notificationstore.demandTypeTagRestService" class="fr.paris.lutece.plugins.notificationstore.web.rs.DemandTypeTagRestService"/>
     
     <!-- FileServiceProvider -->
     <bean id="notificationstore.accessDeniedFileRBACService" class="fr.paris.lutece.plugins.notificationstore.service.file.AccessDeniedFileRBACService" />

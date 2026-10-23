@@ -45,6 +45,7 @@ public class NotificationStoreConstants
     public static final String PATH_DEMAND_STATUS = "/status";
     public static final String PATH_GENERIC_STATUS = "/genericStatus";
     public static final String PATH_CATEGORY = "/category";
+    public static final String PATH_DEMANDE_TYPE_TAG = "/demandTypeTag";
     public static final String PATH_REASSIGN = "/reassign";
 
     public static final String PATH_LIST = "/list";

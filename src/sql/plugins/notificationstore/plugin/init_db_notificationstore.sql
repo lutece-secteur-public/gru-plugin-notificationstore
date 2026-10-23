@@ -206,3 +206,10 @@ VALUES(53, 'Annulée', 10);
 INSERT INTO notificationstore_temporary_status
 (id_temporary_status, status, status_id)
 VALUES(54, 'Annulation', 10);
+
+--
+-- Data for table notificationstore_demande_type_tag
+--
+INSERT INTO notificationstore_demande_type_tag (name, code) VALUES
+    ('Rendez-vous', 'rdv'),
+    ('Facturation', 'facture');
