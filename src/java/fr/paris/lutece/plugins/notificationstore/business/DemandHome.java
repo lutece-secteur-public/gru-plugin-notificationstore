@@ -147,12 +147,12 @@ public final class DemandHome
      * @param strCustomerId
      * @param listStatus
      * @param strNotificationType
-     * @param strIdDemandType
+     * @param strIdDemandTypes
      * @return The list of demand ids
      */
-    public static List<Integer> getIdsByStatus( String strCustomerId, List<String> listStatus, String strNotificationType, String strIdDemandType )
+    public static List<Integer> getIdsByStatus( String strCustomerId, List<String> listStatus, String strNotificationType, String strIdDemandTypes )
     {
-        return _dao.loadIdsByStatus( strCustomerId, listStatus, strNotificationType, strIdDemandType );
+        return _dao.loadIdsByStatus( strCustomerId, listStatus, strNotificationType, strIdDemandTypes );
     }
 
     /**

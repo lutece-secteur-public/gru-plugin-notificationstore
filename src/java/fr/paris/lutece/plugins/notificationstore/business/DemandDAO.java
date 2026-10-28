@@ -640,7 +640,7 @@ public final class DemandDAO implements IDemandDAO
     }
 
     @Override
-    public List<Integer> loadIdsByStatus( String strCustomerId, List<String> listStatus, String strNotificationType, String strIdDemandType )
+    public List<Integer> loadIdsByStatus( String strCustomerId, List<String> listStatus, String strNotificationType, String strIdDemandTypes )
     {
         List<Integer> listIds = new ArrayList<>( );
         String strQuery = SQL_QUERY_IDS_BY_STATUS;
@@ -650,10 +650,10 @@ public final class DemandDAO implements IDemandDAO
             strQuery += listStatus.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " ) ";
         }
 
-        List<Integer> listIdsDemandType = new ArrayList<>( );
-        if ( StringUtils.isNotEmpty( strIdDemandType ) )
+        List<String> listIdsDemandType = new ArrayList<>( );
+        if ( StringUtils.isNotEmpty( strIdDemandTypes ) )
         {
-            listIdsDemandType = Arrays.stream( strIdDemandType.split( "," ) ).map( Integer::parseInt ).collect( Collectors.toList( ) );
+            listIdsDemandType = Arrays.stream( strIdDemandTypes.split( "," ) ).collect( Collectors.toList( ) );
             strQuery += SQL_FILTER_BY_DEMAND_TYPE_GD_ID_IN;
             strQuery += listIdsDemandType.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " ) ";
 
@@ -676,9 +676,9 @@ public final class DemandDAO implements IDemandDAO
                 daoUtil.setString( nIndexIn, strStatus );
                 nIndexIn++;
             }
-            for ( Integer nIdDemandType : listIdsDemandType )
+            for ( String strIdDemandType : listIdsDemandType )
             {
-                daoUtil.setInt( nIndexIn, nIdDemandType );
+                daoUtil.setString( nIndexIn, strIdDemandType );
                 nIndexIn++;
             }
             if ( StringUtils.isNotEmpty( strNotificationType ) )
