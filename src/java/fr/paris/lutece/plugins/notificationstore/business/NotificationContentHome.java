@@ -142,20 +142,6 @@ public final class NotificationContentHome
     }
 
     /**
-     * Update the record in the table
-     * 
-     * @param nNewStatusId
-     *            the new status id
-     * @param nTemporaryStatusId
-     *            This nTemporaryStatusId is allows to filter on the notifications to be updated
-     */
-
-    public static void updateStatusId( int nNewStatusId, int nTemporaryStatusId )
-    {
-        _dao.updateStatusId( nNewStatusId, nTemporaryStatusId, NotificationStorePlugin.getPlugin( ) );
-    }
-
-    /**
      * Remove the notificationContent whose identifier is specified in parameter
      * 
      * @param nNotificationContentId
