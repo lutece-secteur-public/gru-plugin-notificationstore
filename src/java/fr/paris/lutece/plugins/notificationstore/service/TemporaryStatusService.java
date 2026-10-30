@@ -40,7 +40,6 @@ import java.util.Optional;
 import fr.paris.lutece.plugins.grubusiness.business.demand.IDemandServiceProvider;
 import fr.paris.lutece.plugins.grubusiness.business.demand.TemporaryStatus;
 import fr.paris.lutece.plugins.grubusiness.business.web.rs.EnumGenericStatus;
-import fr.paris.lutece.plugins.notificationstore.business.NotificationContentHome;
 import fr.paris.lutece.plugins.notificationstore.business.TemporaryStatusHome;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
@@ -123,8 +122,6 @@ public class TemporaryStatusService
             {
                 // Update demands status id
                 _demandService.updateDemandsStatusId( status.getGenericStatus( ).getStatusId( ), status.getId( ) );
-                // Update notifications status
-                NotificationContentHome.updateStatusId( status.getGenericStatus( ).getStatusId( ), status.getId( ) );
             }
 
             TemporaryStatusHome.update( status );

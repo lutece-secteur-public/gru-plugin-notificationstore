@@ -113,10 +113,10 @@ public final class DemandDAO implements IDemandDAO
     private static final String SQL_QUERY_DEMAND_UPDATE_STATUS_ID = "UPDATE notificationstore_demand d"
             + " INNER JOIN notificationstore_notification n2 ON (d.id = n2.demand_id AND d.demand_type_id = n2.demand_type_id AND d.customer_id = n2.customer_id ) "
             + " INNER JOIN notificationstore_notification_content c2 ON (n2.id = c2.notification_id  AND c2.notification_type ='MYDASHBOARD' AND c2.id_temporary_status = ? ) "
-            + " SET d.status_id = ?" + " WHERE n2.id IN (" + "    SELECT MAX(n.id) " + "    FROM notificationstore_notification n "
+            + " SET d.status_id = ?" + " WHERE d.status_id = -1 AND NOT EXISTS (" + "    SELECT 1 " + "    FROM notificationstore_notification n "
             + "    INNER JOIN notificationstore_notification_content c ON (n.id = c.notification_id " + "    AND c.notification_type ='MYDASHBOARD') "
             + "    WHERE d.id = n.demand_id " + "    AND d.demand_type_id = n.demand_type_id " + "    AND d.customer_id = n.customer_id "
-            + "    GROUP BY n.demand_id, n.demand_type_id, n.customer_id)";
+            + "    AND n.id > n2.id )";
 
     private static final String SQL_QUERY_FILTER_WHERE_BASE = " WHERE 1 ";
     private static final String SQL_FILTER_BY_DEMAND_ID = " AND id = ? ";
