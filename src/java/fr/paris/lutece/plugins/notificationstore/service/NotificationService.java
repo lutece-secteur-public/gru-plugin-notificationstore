@@ -495,19 +495,20 @@ public class NotificationService
             // create demand
             _demandService.create( demand );
         }
-        else
+        else if ( isDemandStateProvided( notification ) )
         {
             // update demand status
             demand.setCurrentStep( notification.getDemand( ).getCurrentStep( ) );
 
             demand.setModifyDate( notification.getDate( ) );
 
-            int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
+            final int nNewStatusId = getNewDemandStatusIdFromNotification( notification );
+
+            // read the old status before overwriting it
+            final EnumGenericStatus oldStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
+            final EnumGenericStatus newStatus = EnumGenericStatus.getByStatusId( nNewStatusId );
 
             demand.setStatusId( nNewStatusId );
-
-            EnumGenericStatus oldStatus = EnumGenericStatus.getByStatusId( demand.getStatusId( ) );
-            EnumGenericStatus newStatus = EnumGenericStatus.getByStatusId( nNewStatusId );
 
             // Demand opened to closed
             if ( oldStatus != null && newStatus != null && !oldStatus.isFinalStatus( ) && newStatus.isFinalStatus( ) )
@@ -523,6 +524,9 @@ public class NotificationService
 
             _demandService.update( demand );
         }
+        // otherwise (e.g. broadcast email sent to agents), the notification carries no demand state :
+        // the existing demand status and step are kept unchanged
+
         notification.setDemand( demand );
 
         // create notification
@@ -706,6 +710,25 @@ public class NotificationService
         }
 
         return message.toString( );
+    }
+
+    /**
+     * Checks whether the notification carries a demand state : a MyDashboard notification, or a generic status in the demand.
+     * Notifications without it (broadcast email, SMS, backoffice...) must not change an existing demand.
+     *
+     * @param notification
+     *            the notification
+     * @return true if the notification carries a demand state
+     */
+    private boolean isDemandStateProvided( final Notification notification )
+    {
+        if ( notification.getMyDashboardNotification( ) != null )
+        {
+            return true;
+        }
+
+        return notification.getDemand( ) != null && notification.getDemand( ).getStatusId( ) > 0
+                && EnumGenericStatus.exists( notification.getDemand( ).getStatusId( ) );
     }
 
     /**
