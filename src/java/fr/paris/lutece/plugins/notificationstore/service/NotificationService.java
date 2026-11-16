@@ -525,7 +525,9 @@ public class NotificationService
             _demandService.update( demand );
         }
         // otherwise (e.g. broadcast email sent to agents), the notification carries no demand state :
-        // the existing demand status and step are kept unchanged
+        // the existing demand status and step are kept unchanged.
+        // The demand modify date is still updated for every notification, by NotificationContentHome.create( )
+        // called from _demandService.create( notification ) below.
 
         notification.setDemand( demand );
 
